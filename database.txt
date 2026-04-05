@@ -1,0 +1,12 @@
+database:
+cpu: id , name ,brand, socket ,price , stock ,
+main:id , name , brand , socket , price , stock
+vga: id , name , brand , price , stock
+ram: id , name , memory , brand , price , stock
+storage: id , type(ssd / hdd) , name , price , stock
+psu: id , capacity , name , brand , price , stock
+case: id , name , brand , type ( mid tower,...) , price , stock
+cooler: id , name , type (khí , nước ) ,sockets , price , stock
+monitor: id , name , size , brand, resolution , refresh_rate , price , stock
+mouse: id, name , brand , type(wire,wireless) , price , stock
+keyboard: id , name , type , switch_type , size , price ,stock
