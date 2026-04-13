@@ -7,7 +7,7 @@ const Footer = () => {
         <footer style={{ backgroundColor: '#ffffff', borderTop: '1px solid var(--border-color)', padding: '4rem 0 2rem 0', marginTop: 'auto' }}>
             <div className="container">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
-                    
+
                     {/* Column 1 */}
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Về HGEARS</h3>
@@ -54,7 +54,7 @@ const Footer = () => {
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: '4rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                    &copy; {new Date().getFullYear()} NovaPC Store. All rights reserved. Clone of HGEARS layout.
+                    &copy; {new Date().getFullYear()} HGEARS Store. All rights reserved.
                 </div>
             </div>
         </footer>

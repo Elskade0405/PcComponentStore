@@ -113,3 +113,4 @@ C:\Users\admin\Documents\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcC
 C:\Users\admin\Documents\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcComponentStore.Api.genruntimeconfig.cache
 C:\Users\admin\Documents\workspace\PcComponentStore\backend\obj\Debug\net8.0\ref\PcComponentStore.Api.dll
 C:\Users\admin\Documents\workspace\PcComponentStore\backend\bin\Debug\net8.0\PcComponentStore.Api.staticwebassets.runtime.json
+C:\Users\admin\Documents\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcComponentStore.Api.sourcelink.json

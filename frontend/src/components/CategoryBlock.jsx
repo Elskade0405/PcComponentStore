@@ -6,11 +6,11 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
     return (
         <section className="container" style={{ marginTop: '2.5rem' }}>
-            <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '380px' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '310px' }}>
                 {/* Left Banner */}
                 <div style={{ 
-                    width: '300px', 
-                    minWidth: '300px',
+                    width: '240px', 
+                    minWidth: '240px',
                     backgroundColor: '#111', 
                     color: 'white',
                     borderRadius: 'var(--border-radius-md)', 
@@ -20,7 +20,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    padding: '2rem'
+                    padding: '1.5rem'
                 }}>
                     <img 
                         src={bannerImage} 
@@ -52,12 +52,12 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                     maxWidth: 'calc(100% - 316px)' /* Account for banner gap */ 
                 }}>
                     <div style={{ 
-                        display: 'flex', gap: '1.25rem', overflowX: 'auto', paddingBottom: '0.5rem', height: '100%',
+                        display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', height: '100%',
                         scrollSnapType: 'x mandatory'
                     }} className="no-scrollbar">
                         {products && products.length > 0 ? (
                             products.map(product => (
-                                <div key={product.id} style={{ minWidth: '220px', flex: '0 0 220px', scrollSnapAlign: 'start' }}>
+                                <div key={product.id} style={{ minWidth: '190px', flex: '0 0 190px', scrollSnapAlign: 'start' }}>
                                     <ProductCard product={product} />
                                 </div>
                             ))

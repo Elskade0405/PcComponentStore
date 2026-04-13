@@ -5,6 +5,13 @@ import ProductCard from '../components/ProductCard';
 import CategoryBlock from '../components/CategoryBlock';
 import api from '../services/api';
 
+// Image Assets
+import imgMayBan from '../assets/Images/HomePage/Mayban.png';
+import imgMonitor from '../assets/Images/HomePage/Monitor.png';
+import imgVGA from '../assets/Images/HomePage/VGA.png';
+import imgCPU from '../assets/Images/HomePage/CPU.jpg';
+import imgRAM from '../assets/Images/HomePage/RAM.png';
+
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,7 +71,7 @@ const Home = () => {
                                 <p style={{ padding: '2rem', textAlign: 'center', width: '100%' }}>Đang tải dữ liệu...</p>
                             ) : products.length > 0 ? (
                                 products.map(product => (
-                                    <div key={product.id} style={{ minWidth: '220px', flex: '0 0 220px', scrollSnapAlign: 'start' }}>
+                                    <div key={product.id} style={{ minWidth: '190px', flex: '0 0 190px', scrollSnapAlign: 'start' }}>
                                         <ProductCard product={product} />
                                     </div>
                                 ))
@@ -88,51 +95,49 @@ const Home = () => {
             <CategoryBlock 
                 title="Máy bàn" 
                 categoryLink="/products?category=pc" 
-                bannerImage="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80" 
+                bannerImage={imgMayBan} 
                 products={products} 
             />
             
             <CategoryBlock 
                 title="Màn hình Gaming" 
                 categoryLink="/products?category=monitor" 
-                bannerImage="https://images.unsplash.com/photo-1542393545-10f5cde2c810?w=500&q=80" 
+                bannerImage={imgMonitor} 
                 products={products} 
             />
 
             <CategoryBlock 
                 title="Card đồ hoạ" 
                 categoryLink="/products?category=vga" 
-                bannerImage="https://images.unsplash.com/photo-1601244093863-144f77c3a070?w=500&q=80" 
+                bannerImage={imgVGA} 
                 products={products} 
             />
 
             <CategoryBlock 
                 title="CPU" 
                 categoryLink="/products?category=cpu" 
-                bannerImage="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&q=80" 
+                bannerImage={imgCPU} 
                 products={products} 
             />
 
             <CategoryBlock 
                 title="RAM" 
                 categoryLink="/products?category=ram" 
-                bannerImage="https://images.unsplash.com/photo-1562976540-1502f75d231b?w=500&q=80" 
+                bannerImage={imgRAM} 
                 products={products} 
             />
 
             {/* Brand Logos Row */}
             <section className="container" style={{ marginTop: '4rem', marginBottom: '1rem' }}>
                 <div style={{ 
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3rem', flexWrap: 'wrap',
-                    padding: '2rem', backgroundColor: 'transparent'
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    padding: '1rem', backgroundColor: 'transparent'
                 }}>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#444' }}>ROCCAT</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#e30019', fontStyle: 'italic' }}>msi</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981', letterSpacing: '2px' }}>RAZER</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#333' }}>thermaltake</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2563eb' }}>ADATA</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e3a8a' }}>HP</span>
-                    <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#000' }}>GIGABYTE</span>
+                    <img 
+                        src="/brands_banner.png" 
+                        alt="Đội ngũ đối tác các hãng" 
+                        style={{ width: '100%', maxWidth: '1200px', objectFit: 'contain', mixBlendMode: 'multiply' }}
+                    />
                 </div>
             </section>
         </div>
