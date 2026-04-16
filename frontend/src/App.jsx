@@ -10,6 +10,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import BuildPC from './pages/BuildPC';
+import VgaCategory from './pages/VgaCategory';
+import CpuCategory from './pages/CpuCategory';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './index.css';
@@ -45,6 +47,8 @@ const App = () => {
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/build-pc" element={<BuildPC />} />
+              <Route path="/category/vga" element={<VgaCategory />} />
+              <Route path="/category/cpu" element={<CpuCategory />} />
               <Route
                 path="/admin"
                 element={

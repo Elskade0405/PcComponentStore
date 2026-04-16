@@ -289,11 +289,16 @@ const Navbar = () => {
                                                 {col.title}
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                                {col.items.map((item, i) => (
-                                                    <Link key={i} to="/products" style={{ color: '#333', fontSize: '0.85rem', textDecoration: 'none' }}>
-                                                        {item}
-                                                    </Link>
-                                                ))}
+                                                {col.items.map((item, i) => {
+                                                    let targetUrl = "/products";
+                                                    if (item.includes('VGA')) targetUrl = "/category/vga";
+                                                    else if (item.includes('CPU')) targetUrl = "/category/cpu";
+                                                    return (
+                                                        <Link key={i} to={targetUrl} style={{ color: '#333', fontSize: '0.85rem', textDecoration: 'none' }}>
+                                                            {item}
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     ))}

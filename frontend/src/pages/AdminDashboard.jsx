@@ -204,7 +204,7 @@ const AdminDashboard = () => {
                 {activeTab === 'products' && (
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-                            <button 
+                            <button
                                 onClick={() => setIsAddProductModalOpen(true)}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
                             >
@@ -279,20 +279,15 @@ const AdminDashboard = () => {
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>Thêm Sản Phẩm Động (Kế thừa)</h2>
                             <button onClick={() => setIsAddProductModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={24} /></button>
                         </div>
-                        
-                        <div style={{ color: '#4b5563', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                            <p><strong>Lưu ý:</strong> Cơ sở dữ liệu của chúng ta sử dụng kiến trúc phân cấp (Table-Per-Hierarchy).</p>
-                            <p>Khi API Backend hoàn thiện, Form này sẽ cho phép bạn chọn Loại Linh Kiện (VD: CPU, RAM), sau đó sẽ tự động mọc thêm các ô input chuyên biệt (như Socket, Speed, Capacity) thay vì chỉ có Name và Price cơ bản.</p>
-                        </div>
-                        
+
                         {/* Mock Form Fields */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Loại linh kiện</label>
-                                <select 
+                                <select
                                     style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                                     value={newProduct.type}
-                                    onChange={(e) => setNewProduct({...newProduct, type: e.target.value})}
+                                    onChange={(e) => setNewProduct({ ...newProduct, type: e.target.value })}
                                 >
                                     <option value="cpu">Bộ vi xử lý (CPU)</option>
                                     <option value="mainboard" disabled>Bo mạch chủ (Mainboard) - Coming soon</option>
@@ -300,40 +295,40 @@ const AdminDashboard = () => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Tên sản phẩm</label>
-                                <input 
-                                    placeholder="Nhập tên..." 
-                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }} 
+                                <input
+                                    placeholder="Nhập tên..."
+                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                                     value={newProduct.name}
-                                    onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                                    onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Thương hiệu (Brand)</label>
-                                <input 
-                                    placeholder="Intel, AMD..." 
-                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }} 
+                                <input
+                                    placeholder="Intel, AMD..."
+                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                                     value={newProduct.brand}
-                                    onChange={(e) => setNewProduct({...newProduct, brand: e.target.value})}
+                                    onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Giá bán (VNĐ)</label>
-                                <input 
-                                    type="number" 
-                                    placeholder="599000" 
-                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }} 
+                                <input
+                                    type="number"
+                                    placeholder="599000"
+                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                                     value={newProduct.price}
-                                    onChange={(e) => setNewProduct({...newProduct, price: Number(e.target.value)})}
+                                    onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Tồn kho</label>
-                                <input 
-                                    type="number" 
-                                    placeholder="10" 
-                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }} 
+                                <input
+                                    type="number"
+                                    placeholder="10"
+                                    style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                                     value={newProduct.stockQuantity}
-                                    onChange={(e) => setNewProduct({...newProduct, stockQuantity: Number(e.target.value)})}
+                                    onChange={(e) => setNewProduct({ ...newProduct, stockQuantity: Number(e.target.value) })}
                                 />
                             </div>
                         </div>
@@ -345,56 +340,56 @@ const AdminDashboard = () => {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Socket</label>
-                                        <input 
-                                            placeholder="LGA 1700, AM5..." 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="LGA 1700, AM5..."
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.socket}
-                                            onChange={(e) => setNewProduct({...newProduct, socket: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, socket: e.target.value })}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Số nhân / Số luồng</label>
-                                        <input 
-                                            placeholder="14 Cores / 20 Threads" 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="14 Cores / 20 Threads"
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.cores}
-                                            onChange={(e) => setNewProduct({...newProduct, cores: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, cores: e.target.value })}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Nhịp cơ bản (Base Clock)</label>
-                                        <input 
-                                            placeholder="3.5 GHz" 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="3.5 GHz"
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.baseClock}
-                                            onChange={(e) => setNewProduct({...newProduct, baseClock: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, baseClock: e.target.value })}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Nhịp tối đa (Boost Clock)</label>
-                                        <input 
-                                            placeholder="5.3 GHz" 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="5.3 GHz"
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.boostClock}
-                                            onChange={(e) => setNewProduct({...newProduct, boostClock: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, boostClock: e.target.value })}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Bộ nhớ đệm (Cache)</label>
-                                        <input 
-                                            placeholder="24MB L3 Cache" 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="24MB L3 Cache"
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.cache}
-                                            onChange={(e) => setNewProduct({...newProduct, cache: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, cache: e.target.value })}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>Công suất (TDP)</label>
-                                        <input 
-                                            placeholder="125W" 
-                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }} 
+                                        <input
+                                            placeholder="125W"
+                                            style={{ padding: '0.6rem 1rem', border: '1px solid #bfdbfe', borderRadius: '0.5rem', outline: 'none' }}
                                             value={newProduct.tdp}
-                                            onChange={(e) => setNewProduct({...newProduct, tdp: e.target.value})}
+                                            onChange={(e) => setNewProduct({ ...newProduct, tdp: e.target.value })}
                                         />
                                     </div>
                                 </div>
@@ -405,7 +400,7 @@ const AdminDashboard = () => {
                             <button onClick={() => setIsAddProductModalOpen(false)} style={{ padding: '0.6rem 1.5rem', border: '1px solid #d1d5db', backgroundColor: '#ffffff', color: '#4b5563', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}>
                                 Hủy
                             </button>
-                            <button 
+                            <button
                                 onClick={handleAddProduct}
                                 style={{ padding: '0.6rem 1.5rem', border: 'none', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
                             >
