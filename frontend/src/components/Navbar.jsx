@@ -290,9 +290,17 @@ const Navbar = () => {
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                                 {col.items.map((item, i) => {
-                                                    let targetUrl = "/products";
-                                                    if (item.includes('VGA')) targetUrl = "/category/vga";
-                                                    else if (item.includes('CPU')) targetUrl = "/category/cpu";
+                                                    const generateSlug = (text) => text.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9 -]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-+/, "").replace(/-+$/, "");
+                                                    
+                                                    // Map explicitly created categories if needed, but we can now use generic for everything safely.
+                                                    // If you still want to route VGA/CPU to their old pages, you can uncomment this:
+                                                    // let targetUrl = "/products";
+                                                    // if (item.includes('VGA')) targetUrl = "/category/vga";
+                                                    // else if (item.includes('CPU')) targetUrl = "/category/cpu";
+                                                    
+                                                    // Switch everything to dynamic GenericCategory
+                                                    let targetUrl = `/collection/${generateSlug(item)}?title=${encodeURIComponent(item)}`;
+
                                                     return (
                                                         <Link key={i} to={targetUrl} style={{ color: '#333', fontSize: '0.85rem', textDecoration: 'none' }}>
                                                             {item}

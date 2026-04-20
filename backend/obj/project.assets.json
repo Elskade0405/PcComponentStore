@@ -3252,19 +3252,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\admin\\.nuget\\packages\\": {}
+    "C:\\Users\\NSH\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
+      "projectUniqueName": "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
       "projectName": "PcComponentStore.Api",
-      "projectPath": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
-      "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\obj\\",
+      "projectPath": "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
+      "packagesPath": "C:\\Users\\NSH\\.nuget\\packages\\",
+      "outputPath": "f:\\workspace\\PcComponentStore\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\NSH\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

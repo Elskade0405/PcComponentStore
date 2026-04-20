@@ -140,6 +140,38 @@ const Home = () => {
                     />
                 </div>
             </section>
+            {/* Left and Right Floating Banners (Hidden on small screens) */}
+            <div className="side-banner side-banner-left" style={{ 
+                position: 'fixed', top: '150px', left: 'calc(50% - 740px)', zIndex: 50, display: 'none' 
+            }}>
+                <a href="#chuyen-muc-khuyen-mai">
+                    <img 
+                        src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=150&h=450&fit=crop" 
+                        alt="Left Promo" 
+                        style={{ width: '120px', height: '400px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+                    />
+                </a>
+            </div>
+
+            <div className="side-banner side-banner-right" style={{ 
+                position: 'fixed', top: '150px', right: 'calc(50% - 740px)', zIndex: 50, display: 'none' 
+            }}>
+                <a href="#giai-dau-esport">
+                    <img 
+                        src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150&h=450&fit=crop" 
+                        alt="Right Promo" 
+                        style={{ width: '120px', height: '400px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+                    />
+                </a>
+            </div>
+
+            <style>{`
+                @media (min-width: 1500px) {
+                    .side-banner {
+                        display: block !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

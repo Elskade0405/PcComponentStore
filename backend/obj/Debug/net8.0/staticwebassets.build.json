@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "krLeIteLoY95mgaHwtxwjNpUkQnQXsXcge60Hht2xMM=",
+  "Hash": "eyQLQJK9pdtaZDVXjCVzdTiqk7fHYl0EY12asqdLTUY=",
   "Source": "PcComponentStore.Api",
   "BasePath": "_content/PcComponentStore.Api",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "PcComponentStore.Api\\wwwroot",
       "Source": "PcComponentStore.Api",
-      "ContentRoot": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\wwwroot\\",
+      "ContentRoot": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\",
       "BasePath": "_content/PcComponentStore.Api",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\wwwroot\\images\\i9_14th.jpg",
+      "Identity": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\images\\i9_14th.jpg",
       "SourceId": "PcComponentStore.Api",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\admin\\Documents\\workspace\\PcComponentStore\\backend\\wwwroot\\",
+      "ContentRoot": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\",
       "BasePath": "_content/PcComponentStore.Api",
       "RelativePath": "images/i9_14th.jpg",
       "AssetKind": "All",

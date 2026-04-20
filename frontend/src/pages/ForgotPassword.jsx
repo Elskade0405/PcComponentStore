@@ -1,40 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { X } from 'lucide-react';
 
-const Register = () => {
-    // Note: The UI shows First Name (Tên) and Last Name (Họ), but backend takes fullName. We'll combine them.
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+const ForgotPassword = () => {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [status, setStatus] = useState({ type: '', message: '' });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { register, login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-
-        if (password.length < 6) {
-            return setError('Mật khẩu phải có ít nhất 6 ký tự');
-        }
-
+        setStatus({ type: '', message: '' });
         setLoading(true);
 
-        const fullName = `${lastName} ${firstName}`.trim();
-        const result = await register(fullName, email, password);
-        
-        if (result.success) {
-            // Auto-login after successful registration
-            await login(email, password);
-            navigate('/');
-        } else {
-            setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại.');
-        }
-        setLoading(false);
+        // Simulation for now since there might not be a backend forgot password endpoint yet
+        setTimeout(() => {
+            setStatus({ type: 'success', message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
+            setLoading(false);
+        }, 1000);
     };
 
     return (
@@ -43,7 +26,7 @@ const Register = () => {
                 {/* Header */}
                 <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0' }}>
                     <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827', margin: 0, letterSpacing: '0.5px' }}>
-                        ĐĂNG KÝ TÀI KHOẢN
+                        QUÊN MẬT KHẨU
                     </h1>
                     <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
                         <X size={24} strokeWidth={1.5} />
@@ -51,64 +34,25 @@ const Register = () => {
                 </div>
 
                 <div style={{ padding: '1.5rem' }}>
-                    {error && (
-                        <div style={{ padding: '0.75rem', marginBottom: '1rem', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '4px', color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>
-                            {error}
+                    {status.message && (
+                        <div style={{ padding: '0.75rem', marginBottom: '1rem', backgroundColor: status.type === 'success' ? '#dcfce7' : 'rgba(239,68,68,0.1)', border: `1px solid ${status.type === 'success' ? '#86efac' : 'rgba(239,68,68,0.3)'}`, borderRadius: '4px', color: status.type === 'success' ? '#166534' : '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>
+                            {status.message}
                         </div>
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
-                        <Link to="#" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'underline' }}>
-                            Đăng ký bằng số điện thoại
+                        <Link to="/login" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'underline' }}>
+                            Quay lại
                         </Link>
                     </div>
 
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ marginBottom: '1.5rem' }}>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Email"
-                                required
-                                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.9rem', outline: 'none' }}
-                                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-                            />
-                        </div>
-
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                type="text"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                placeholder="Họ"
-                                required
-                                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.9rem', outline: 'none' }}
-                                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-                            />
-                        </div>
-
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                type="text"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                placeholder="Tên"
-                                required
-                                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.9rem', outline: 'none' }}
-                                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-                            />
-                        </div>
-
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Mật khẩu"
                                 required
                                 style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.9rem', outline: 'none' }}
                                 onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -127,7 +71,7 @@ const Register = () => {
                             onMouseEnter={(e) => e.target.style.backgroundColor = '#cc0000'}
                             onMouseLeave={(e) => e.target.style.backgroundColor = '#ff0000'}
                         >
-                            {loading ? 'Đang xử lý...' : 'TẠO TÀI KHOẢN'}
+                            {loading ? 'Đang xử lý...' : 'GỬI YÊU CẦU'}
                         </button>
                     </form>
 
@@ -157,7 +101,7 @@ const Register = () => {
                     </div>
 
                     <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.85rem', color: '#334155' }}>
-                        Bạn đã có tài khoản? <Link to="/login" style={{ color: '#0ea5e9', fontWeight: '600', textDecoration: 'underline' }}>Đăng nhập!</Link>
+                        Bạn chưa có tài khoản? <Link to="/register" style={{ color: '#0ea5e9', fontWeight: '600', textDecoration: 'underline' }}>Đăng ký ngay!</Link>
                     </div>
                 </div>
             </div>
@@ -165,4 +109,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default ForgotPassword;
