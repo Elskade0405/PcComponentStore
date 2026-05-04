@@ -21,8 +21,8 @@ const Footer = () => {
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Chính sách</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                            <li><Link to="#">Chính Sách Bảo Hành</Link></li>
-                            <li><Link to="#">Chính Sách Giao Hàng</Link></li>
+                            <li><Link to="/warranty-policy">Chính Sách Bảo Hành</Link></li>
+                            <li><Link to="/shipping-policy">Chính Sách Giao Hàng</Link></li>
                             <li><Link to="#">Chính Sách Bảo Mật</Link></li>
                             <li><Link to="#">Chính Sách Đổi Trả</Link></li>
                             <li><Link to="#">Điều Khoản Sử Dụng</Link></li>
@@ -46,7 +46,7 @@ const Footer = () => {
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Tài khoản ngân hàng</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                            <li><Link to="#">Tài Khoản Ngân Hàng</Link></li>
+                            <li><Link to="/bank-account">Tài Khoản Ngân Hàng</Link></li>
                             <li><Link to="#">Tìm Kiếm Phương Thức Thanh Toán</Link></li>
                         </ul>
                     </div>

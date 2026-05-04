@@ -5,13 +5,27 @@ import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product, onAdd }) => {
     const { addToCart } = useCart();
-    // Determine image, use placeholder if missing
     const backendUrl = 'http://localhost:5285';
-    const imgUrl = product.imageUrl
-        ? `${backendUrl}${product.imageUrl}`
+    
+    // Parse attributes if they come from the new SQL DB
+    let parsedAttributes = null;
+    if (product.attributes && typeof product.attributes === 'string') {
+        try {
+            parsedAttributes = JSON.parse(product.attributes);
+        } catch (e) {
+            console.error("Failed to parse attributes JSON");
+        }
+    }
+
+    const resolvedImage = parsedAttributes?.thumbnailUrl || parsedAttributes?.imageUrl || product.imageUrl;
+    const imgUrl = resolvedImage
+        ? `${backendUrl}${resolvedImage}`
         : 'https://via.placeholder.com/200x200?text=No+Image';
-    // Fake old price logic for visual effect (10% higher)
-    const oldPrice = product.price * 1.1;
+
+    // Parse the original price from Attributes (fallback to normal price if it's 0 or missing to avoid weird displays)
+    const oldPrice = (parsedAttributes?.originalPrice && parsedAttributes.originalPrice > product.price) 
+                        ? parsedAttributes.originalPrice 
+                        : null;
 
     const handleAddToCart = (e) => {
         e.preventDefault();
@@ -23,24 +37,14 @@ const ProductCard = ({ product, onAdd }) => {
             alert('Đã thêm vào giỏ hàng!');
         }
     };
-
-    // Parse attributes if they come from the new SQL DB
-    let parsedAttributes = null;
-    if (product.attributes && typeof product.attributes === 'string') {
-        try {
-            parsedAttributes = JSON.parse(product.attributes);
-        } catch (e) {
-            console.error("Failed to parse attributes JSON");
-        }
-    }
-
     return (
         <div className="card" style={{
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             padding: '0.75rem', /* Reduced padding */
-            position: 'relative'
+            position: 'relative',
+            height: '100%'
         }}>
             {/* New Badge */}
             <div style={{
@@ -78,38 +82,40 @@ const ProductCard = ({ product, onAdd }) => {
                 </div>
             </Link>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textDecoration: 'line-through' }}>
-                    {oldPrice.toLocaleString('vi-VN')}đ
-                </span>
-                <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--accent-red)' }}>
-                    {product.price.toLocaleString('vi-VN')}đ
-                </span>
-            </div>
+            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem', marginBottom: '0.5rem' }}>
+                    <div style={{ color: '#e30019', fontWeight: 700, fontSize: '1.1rem' }}>
+                        {product.price.toLocaleString('vi-VN')} đ
+                    </div>
+                    {oldPrice && (
+                        <div style={{ color: '#9ca3af', textDecoration: 'line-through', fontSize: '0.85rem' }}>
+                            {oldPrice.toLocaleString('vi-VN')} đ
+                        </div>
+                    )}
+                </div>
 
-            {parsedAttributes && (
-                <div style={{ marginTop: 'auto', marginBottom: '0.5rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                    {parsedAttributes.socket && (
+                <div style={{ minHeight: '1.5rem', marginBottom: '0.5rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    {parsedAttributes?.socket && (
                         <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
                             {parsedAttributes.socket}
                         </span>
                     )}
-                    {parsedAttributes.cores && (
+                    {parsedAttributes?.cores && (
                         <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
                             {parsedAttributes.cores}
                         </span>
                     )}
                 </div>
-            )}
 
-            <button
-                className="btn btn-outline"
-                style={{ width: '100%', fontSize: '0.8rem', padding: '0.35rem', zIndex: 2 }}
-                onClick={handleAddToCart}
-                disabled={product.stockQuantity === 0}
-            >
-                {product.stockQuantity > 0 ? 'Thêm giỏ hàng' : 'Hết hàng'}
-            </button>
+                <button
+                    className="btn btn-outline"
+                    style={{ width: '100%', fontSize: '0.8rem', padding: '0.35rem', zIndex: 2 }}
+                    onClick={handleAddToCart}
+                    disabled={product.stockQuantity === 0}
+                >
+                    {product.stockQuantity > 0 ? 'Thêm giỏ hàng' : 'Hết hàng'}
+                </button>
+            </div>
         </div>
     );
 };

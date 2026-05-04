@@ -230,3 +230,5 @@ F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\refint\PcComponentStore.A
 F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcComponentStore.Api.pdb
 F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcComponentStore.Api.genruntimeconfig.cache
 F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\ref\PcComponentStore.Api.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\prod.json
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\products.json

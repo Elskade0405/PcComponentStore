@@ -4,13 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { Search, ShoppingCart, User, Settings, Facebook, Instagram, Menu, ChevronRight } from 'lucide-react';
 import api from '../services/api';
-
+import MegaMenu from './MegaMenu';
 const Navbar = () => {
     const { user, isAdmin, logout } = useAuth();
     const { cartCount } = useCart();
     const navigate = useNavigate();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('pc-gaming');
     
     // Search suggestions logic
     const [searchQuery, setSearchQuery] = useState('');
@@ -40,42 +38,7 @@ const Navbar = () => {
         }
     }, [searchQuery, allProducts]);
 
-    const menuData = [
-        {
-            id: 'pc-gaming',
-            label: 'PC GAMING',
-            columns: [
-                { title: 'MÁY TÍNH CHƠI GAME', items: ['PC ĐẸP', 'PC GAMING GIÁ RẺ', 'PC GAMING TRUNG CẤP', 'PC GAMING CAO CẤP'] },
-                { title: 'PC STREAM', items: [] },
-                { title: 'THEO KHOẢNG GIÁ', items: ['Dưới 10 triệu', '10-15 triệu', '15-20 triệu', '20-25 triệu', '25-30 triệu', '30-40 triệu', '40-50 triệu', 'Trên 50 triệu'] },
-                { title: 'FULL BỘ PC KÈM MÀN HÌNH', items: [] }
-            ]
-        },
-        { 
-            id: 'pc-workstation', 
-            label: 'PC Workstation 2D 3D', 
-            columns: [
-                { title: 'PC VIDEO EDITING', items: ['PC RENDER'] },
-                { title: 'PC PHOTO EDITING', items: ['PC Architecture - CAD'] },
-                { title: 'PC 3D DESIGN - ANIMATION', items: ['PC MACHINE LEARNING/AI'] }
-            ] 
-        },
-        { id: 'pc-office', label: 'PC VĂN PHÒNG', columns: [] },
-        { id: 'pc-emulator', label: 'PC GIẢ LẬP', columns: [] },
-        { 
-            id: 'components', 
-            label: 'LINH KIỆN MÁY TÍNH', 
-            columns: [
-                { title: 'CPU', items: ['CPU Intel', 'CPU AMD'] },
-                { title: 'Mainboard - Bo Mạch Chủ', items: ['Mainboard cho CPU Intel', 'Mainboard cho CPU AMD'] },
-                { title: 'RAM', items: ['DDR4', 'DDR5'] },
-                { title: 'VGA - Card Màn Hình', items: ['VGA NVIDIA', 'VGA AMD', 'VGA RTX 5000 SERIES'] }
-            ] 
-        },
-        { id: 'monitor', label: 'MÀN HÌNH MÁY TÍNH', columns: [] },
-        { id: 'accessories', label: 'PHỤ KIỆN', columns: [] },
-        { id: 'onsale', label: 'OnSale', columns: [] },
-    ];
+
 
     return (
         <header style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -238,85 +201,7 @@ const Navbar = () => {
             {/* Tier 3: Navigation Links */}
             <div className="container" style={{ padding: '0.5rem 1rem', display: 'flex', justifyContent: 'center', gap: '3rem', fontSize: '0.85rem', fontWeight: 600 }}>
                 
-                {/* Mega Menu Wrapper */}
-                <div 
-                    style={{ position: 'relative' }} 
-                    onMouseEnter={() => setIsMenuOpen(true)}
-                    onMouseLeave={() => setIsMenuOpen(false)}
-                >
-                    <div style={{ 
-                        display: 'flex', alignItems: 'center', gap: '0.5rem', 
-                        border: '1px solid var(--accent-blue)', borderRadius: 'var(--border-radius-full)', 
-                        padding: '0.4rem 1.2rem', cursor: 'pointer', 
-                        backgroundColor: isMenuOpen ? 'var(--accent-blue)' : 'white', 
-                        color: isMenuOpen ? 'white' : 'var(--accent-blue)' 
-                    }}>
-                        <Menu size={16} /> Danh mục sản phẩm
-                    </div>
-
-                    {/* Dropdown Container */}
-                    {isMenuOpen && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 110, display: 'flex', width: '900px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-                            {/* Left Vertical Menu */}
-                            <div style={{ width: '260px', backgroundColor: 'white', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' }}>
-                                {menuData.map(menu => (
-                                    <div 
-                                        key={menu.id}
-                                        onMouseEnter={() => setActiveMenu(menu.id)}
-                                        style={{
-                                            padding: '0.75rem 1rem', 
-                                            borderBottom: '1px solid #e5e7eb',
-                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                            backgroundColor: activeMenu === menu.id ? '#e30019' : 'white',
-                                            color: activeMenu === menu.id ? 'white' : '#333',
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            fontSize: '0.85rem'
-                                        }}
-                                    >
-                                        <span style={{ textTransform: 'uppercase' }}>{menu.label}</span>
-                                        <ChevronRight size={16} />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Right Mega Menu Content */}
-                            {menuData.find(m => m.id === activeMenu)?.columns?.length > 0 ? (
-                                <div style={{ flex: 1, backgroundColor: 'white', border: '1px solid #e5e7eb', borderLeft: 'none', padding: '1.5rem', display: 'flex', gap: '2rem' }}>
-                                    {menuData.find(m => m.id === activeMenu).columns.map((col, idx) => (
-                                        <div key={idx} style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 700, color: '#e30019', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                                                {col.title}
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                                {col.items.map((item, i) => {
-                                                    const generateSlug = (text) => text.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9 -]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-+/, "").replace(/-+$/, "");
-                                                    
-                                                    // Map explicitly created categories if needed, but we can now use generic for everything safely.
-                                                    // If you still want to route VGA/CPU to their old pages, you can uncomment this:
-                                                    // let targetUrl = "/products";
-                                                    // if (item.includes('VGA')) targetUrl = "/category/vga";
-                                                    // else if (item.includes('CPU')) targetUrl = "/category/cpu";
-                                                    
-                                                    // Switch everything to dynamic GenericCategory
-                                                    let targetUrl = `/collection/${generateSlug(item)}?title=${encodeURIComponent(item)}`;
-
-                                                    return (
-                                                        <Link key={i} to={targetUrl} style={{ color: '#333', fontSize: '0.85rem', textDecoration: 'none' }}>
-                                                            {item}
-                                                        </Link>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div style={{ flex: 1, backgroundColor: 'white', border: '1px solid #e5e7eb', borderLeft: 'none' }}></div>
-                            )}
-                        </div>
-                    )}
-                </div>
+                <MegaMenu />
 
                 <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', color: 'var(--accent-blue)' }}>
                     <Link to="#">Laptop</Link>

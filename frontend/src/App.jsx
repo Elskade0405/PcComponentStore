@@ -14,6 +14,9 @@ import BuildPC from './pages/BuildPC';
 import VgaCategory from './pages/VgaCategory';
 import CpuCategory from './pages/CpuCategory';
 import GenericCategory from './pages/GenericCategory';
+import BankAccount from './pages/BankAccount';
+import WarrantyPolicy from './pages/WarrantyPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './index.css';
@@ -53,6 +56,9 @@ const App = () => {
               <Route path="/category/vga" element={<VgaCategory />} />
               <Route path="/category/cpu" element={<CpuCategory />} />
               <Route path="/collection/:alias" element={<GenericCategory />} />
+              <Route path="/bank-account" element={<BankAccount />} />
+              <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
               <Route
                 path="/admin"
                 element={

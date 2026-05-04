@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Minus, Plus, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Minus, Plus, ChevronDown, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -14,7 +14,8 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [similarProducts, setSimilarProducts] = useState([]);
-    const [showAllSpecs, setShowAllSpecs] = useState(false);
+    const [isSpecModalOpen, setIsSpecModalOpen] = useState(false);
+    const [activeIdx, setActiveIdx] = useState(0);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -34,6 +35,7 @@ const ProductDetail = () => {
         };
         fetchProduct();
         window.scrollTo(0, 0);
+        setActiveIdx(0);
     }, [id]);
 
     if (loading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Đang tải thông tin sản phẩm...</div>;
@@ -49,7 +51,98 @@ const ProductDetail = () => {
 
     // Mock images since DB doesn't have them yet
     const placeholderImg = "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80"; // CPU placeholder
-    const thumbnails = [placeholderImg, placeholderImg, placeholderImg, placeholderImg, placeholderImg];
+    
+    const backendUrl = 'http://localhost:5285';
+    const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
+    const mainImg = resolvedThumb ? `${backendUrl}${resolvedThumb}` : placeholderImg;
+    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => `${backendUrl}${u}`) : [];
+    
+    // Combined list of images
+    const allImages = Array.from(new Set([mainImg, ...detailList]));
+
+    // Mapper for friendly labels
+    const specLabels = {
+        // CPU
+        generation: 'Thế hệ',
+        generationName: 'Tên thế hệ',
+        socket: 'Socket',
+        cores: 'Số nhân',
+        threads: 'Số luồng',
+        baseClock: 'Tốc độ cơ bản',
+        boostClock: 'Tốc độ tối đa',
+        cache: 'Cache',
+        memorySupport: 'Hỗ trợ bộ nhớ',
+        memoryChannels: 'Hỗ trợ số kênh bộ nhớ',
+        pcieVersion: 'Phiên bản PCI Express',
+        pcieLanes: 'Số lane PCI Express',
+        tdp: 'TDP',
+        cooling: 'Tản nhiệt',
+        // VGA
+        graphicEngine: 'Engine đồ họa',
+        busStandard: 'Chuẩn Bus',
+        vram: 'Bộ nhớ (VRAM)',
+        engineClock: 'Engine Clock',
+        cudaCores: 'Lõi CUDA',
+        memoryClock: 'Clock bộ nhớ',
+        memoryInterface: 'Giao diện bộ nhớ',
+        ports: 'Kết nối',
+        dimensions: 'Kích thước',
+        recommendedPsu: 'PSU đề nghị',
+        powerConnectors: 'Power Connectors',
+        directX: 'DirectX',
+        // RAM
+        ramModel: 'Model',
+        ramType: 'Loại RAM',
+        capacity: 'Dung lượng RAM',
+        busSpeed: 'Tốc độ Bus RAM',
+        overclock: 'Overclock',
+        rgb: 'Đèn nền',
+        voltage: 'Điện Áp',
+        casLatency: 'CAS Latency',
+        warranty: 'Bảo hành',
+        // Monitor
+        screenSize: 'Kích thước Màn hình',
+        resolution: 'Độ phân giải',
+        refreshRate: 'Tần số quét',
+        // Mainboard
+        mainboardSize: 'Kích Thước Mainboard',
+        ramSlots: 'Khe Cắm Ram',
+        chipset: 'CHIPSET',
+        // Storage
+        driveType: 'Loại ổ cứng',
+        connection: 'Kết nối',
+        storageCapacity: 'Dung lượng',
+        readSpeed: 'Tốc độ đọc',
+        writeSpeed: 'Tốc độ ghi',
+        osSupport: 'Hỗ trợ hệ điều hành',
+        operatingTemp: 'Nhiệt độ hoạt động',
+        otherFeatures: 'Tính năng khác',
+        // PC
+        pcCpu: 'Vi xử lý',
+        pcMainboard: 'Bo mạch chủ',
+        pcRam: 'RAM',
+        pcVga: 'Card đồ họa',
+        pcStorage: 'Ổ cứng',
+        pcPsu: 'Nguồn',
+        pcCase: 'Vỏ Case',
+        // PSU
+        powerCapacity: 'Công suất',
+        efficiency: 'Chuẩn hiệu suất',
+        formFactor: 'Kích thước',
+        modular: 'Kiểu cáp',
+        inputVoltage: 'Nguồn điện',
+        psuFanSize: 'Kích thước quạt',
+        // Cooling
+        coolerType: 'Loại tản nhiệt',
+        supportedSockets: 'Hỗ trợ Socket',
+        fanSpeed: 'Tốc độ quạt',
+        airflow: 'Lưu lượng gió',
+        noiseLevel: 'Độ ồn',
+        radiatorSize: 'Kích thước Radiator',
+        // Common
+        type: 'Loại linh kiện',
+        category: 'Danh mục'
+    };
 
     return (
         <div style={{ backgroundColor: '#f1f1f1', paddingBottom: '4rem', paddingTop: '1rem' }}>
@@ -57,7 +150,7 @@ const ProductDetail = () => {
             <div className="container" style={{ marginBottom: '1rem', fontSize: '0.875rem', color: '#666' }}>
                 <span style={{ cursor: 'pointer' }}>Trang chủ</span> &gt;
                 <span style={{ cursor: 'pointer', margin: '0 0.5rem' }}>Linh kiện PC</span> &gt;
-                <span style={{ color: '#000', margin: '0 0.5rem' }}>{product.name}</span>
+                <span style={{ color: '#000', margin: '0 0.5rem' }}>{product.name || 'Đang cập nhật tên sản phẩm'}</span>
             </div>
 
             <div className="container">
@@ -67,13 +160,13 @@ const ProductDetail = () => {
                     {/* 1. Left: Images */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-                            <img src={placeholderImg} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                            <img src={allImages[activeIdx] || mainImg} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
-                            {thumbnails.map((img, idx) => (
-                                <div key={idx} style={{
-                                    width: '70px', height: '70px', border: idx === 0 ? '2px solid #ee1b24' : '1px solid #eee',
-                                    borderRadius: '4px', padding: '4px', cursor: 'pointer'
+                            {allImages.map((img, idx) => (
+                                <div key={idx} onClick={() => setActiveIdx(idx)} style={{
+                                    width: '70px', height: '70px', border: idx === activeIdx ? '2px solid #ee1b24' : '1px solid #eee',
+                                    borderRadius: '4px', padding: '4px', cursor: 'pointer', flexShrink: 0
                                 }}>
                                     <img src={img} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                 </div>
@@ -84,7 +177,7 @@ const ProductDetail = () => {
                     {/* 2. Middle: Info & Buy */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem', color: '#333', lineHeight: 1.4 }}>
-                            {product.name}
+                            {product.name || 'Đang cập nhật tên sản phẩm'}
                         </h1>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
@@ -97,8 +190,10 @@ const ProductDetail = () => {
 
                         {/* Price Block TTG style (Red Text, Gray Background or bold red) */}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem', backgroundColor: '#f9f9f9', padding: '1rem', borderRadius: '4px' }}>
-                            <span style={{ fontSize: '2rem', fontWeight: 700, color: '#e30019' }}>{product.price?.toLocaleString('vi-VN') || '5.000.000'} đ</span>
-                            <span style={{ fontSize: '1.1rem', color: '#999', textDecoration: 'line-through' }}>{(product.price * 1.1).toLocaleString('vi-VN')} đ</span>
+                            <span style={{ fontSize: '2rem', fontWeight: 700, color: '#e30019' }}>{product.price?.toLocaleString('vi-VN')} đ</span>
+                            {attributes.originalPrice && attributes.originalPrice > product.price && (
+                                <span style={{ fontSize: '1.1rem', color: '#999', textDecoration: 'line-through' }}>{attributes.originalPrice.toLocaleString('vi-VN')} đ</span>
+                            )}
                         </div>
 
                         {/* Short Specs Bullet Points */}
@@ -107,7 +202,7 @@ const ProductDetail = () => {
                                 <li><b>Tình trạng:</b> {product.stockQuantity > 0 ? <span style={{ color: '#28a745', fontWeight: 'bold' }}>Còn hàng</span> : <span style={{ color: 'red' }}>Hết hàng</span>}</li>
                                 <li><b>Bảo hành:</b> 36 Tháng chính hãng</li>
                                 {attributes.socket && <li><b>Socket:</b> {attributes.socket}</li>}
-                                {attributes.cores && <li><b>Số nhân/luồng:</b> {attributes.cores}</li>}
+                                {attributes.cores && <li><b>Số nhân/luồng:</b> {attributes.cores} {attributes.threads ? `/ ${attributes.threads}` : ''}</li>}
                             </ul>
                         </div>
 
@@ -211,9 +306,9 @@ const ProductDetail = () => {
                             </h2>
                         </div>
 
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem', color: '#0056b3' }}>Đánh giá {product.name}</h3>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem', color: '#0056b3' }}>Đánh giá {product.name || 'sản phẩm này'}</h3>
                         <p style={{ fontSize: '0.95rem', color: '#444', lineHeight: 1.6, marginBottom: '1rem' }}>
-                            Sản phẩm <b>{product.name}</b> mang lại hiệu năng tối đa cho người dùng nhờ áp dụng công nghệ {attributes.cores || 'lõi kiến trúc'} hoàn toàn mới, đồng thời cũng duy trì mức nhiệt độ ổn định khi được tích hợp khả năng tối ưu điện năng.
+                            Sản phẩm <b>{product.name || 'này'}</b> mang lại hiệu năng tối đa cho người dùng nhờ áp dụng công nghệ {attributes.cores || 'lõi kiến trúc'} hoàn toàn mới, đồng thời cũng duy trì mức nhiệt độ ổn định khi được tích hợp khả năng tối ưu điện năng.
                         </p>
                         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                             <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=1000&q=80" alt="Tech" style={{ maxWidth: '100%', borderRadius: '4px' }} />
@@ -244,25 +339,28 @@ const ProductDetail = () => {
 
                             {/* Dynamic Attributes from JSON */}
                             {Object.entries(attributes)
-                                .slice(0, showAllSpecs ? undefined : 3)
+                                .filter(([key, value]) => !['thumbnailUrl', 'detailImageUrls', 'imageUrl'].includes(key) && value !== null && value !== '')
+                                .slice(0, 5)
                                 .map(([key, value]) => (
                                     <div key={key} style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', fontSize: '0.85rem' }}>
                                         <div style={{ flex: '1', backgroundColor: '#f9f9f9', padding: '0.75rem', fontWeight: 600, borderRight: '1px solid #e5e7eb', textTransform: 'capitalize' }}>
-                                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                                            {specLabels[key] || key.replace(/([A-Z])/g, ' $1').trim()}
                                         </div>
-                                        <div style={{ flex: '2', padding: '0.75rem', color: '#333' }}>{value}</div>
+                                        <div style={{ flex: '2', padding: '0.75rem', color: '#333' }}>
+                                            {Array.isArray(value) ? value.join(', ') : (value !== null && value !== '' ? String(value) : '-')}
+                                        </div>
                                     </div>
                                 ))}
                         </div>
 
-                        {Object.entries(attributes).length > 3 && (
+                        {Object.entries(attributes).length > 5 && (
                             <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                                 <button
-                                    onClick={() => setShowAllSpecs(!showAllSpecs)}
-                                    style={{ backgroundColor: 'white', border: '1px solid #2563eb', color: '#2563eb', padding: '0.5rem 2rem', borderRadius: '20px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                    onClick={() => setIsSpecModalOpen(true)}
+                                    style={{ backgroundColor: 'white', border: '1px solid #2563eb', color: '#2563eb', padding: '0.5rem 2rem', borderRadius: '4px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                 >
-                                    {showAllSpecs ? 'Thu gọn' : 'Xem cấu hình chi tiết'}
-                                    <ChevronDown size={18} style={{ transform: showAllSpecs ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+                                    Xem cấu hình chi tiết
+                                    <ChevronDown size={18} />
                                 </button>
                             </div>
                         )}
@@ -285,6 +383,53 @@ const ProductDetail = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal Thông Số Kỹ Thuật Chi Tiết */}
+            {isSpecModalOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+                    <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', borderRadius: '4px', overflow: 'hidden' }}>
+                        {/* Nút Close đỏ góc trên phải */}
+                        <button 
+                            onClick={() => setIsSpecModalOpen(false)}
+                            style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#f44336', color: 'white', border: 'none', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                        >
+                            <X size={20} />
+                        </button>
+                        
+                        <div style={{ padding: '2rem', overflowY: 'auto' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', color: '#333', textTransform: 'uppercase' }}>Thông số kỹ thuật chi tiết</h2>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e5e7eb', fontSize: '0.9rem' }}>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ width: '30%', padding: '1rem', border: '1px solid #e5e7eb', fontWeight: 600, backgroundColor: '#f9f9f9' }}>Thương hiệu</td>
+                                        <td style={{ padding: '1rem', border: '1px solid #e5e7eb', color: '#333' }}>{product.brand}</td>
+                                    </tr>
+                                    {Object.entries(attributes)
+                                        .filter(([key, value]) => !['thumbnailUrl', 'detailImageUrls', 'imageUrl', 'originalPrice'].includes(key) && value !== null && value !== '')
+                                        .map(([key, value]) => {
+                                            const stringVal = String(value);
+                                            const lines = stringVal.split('\n').filter(line => line.trim() !== '');
+                                            return (
+                                                <tr key={key}>
+                                                    <td style={{ padding: '1rem', border: '1px solid #e5e7eb', fontWeight: 600, backgroundColor: '#f9f9f9', textTransform: 'capitalize' }}>
+                                                        {specLabels[key] || key.replace(/([A-Z])/g, ' $1').trim()}
+                                                    </td>
+                                                    <td style={{ padding: 0, border: '1px solid #e5e7eb', color: '#333' }}>
+                                                        {lines.map((line, idx) => (
+                                                            <div key={idx} style={{ padding: '1rem', borderBottom: idx < lines.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                                                                {line}
+                                                            </div>
+                                                        ))}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

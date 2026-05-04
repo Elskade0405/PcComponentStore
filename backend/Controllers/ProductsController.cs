@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using PcComponentStore.Api.Data;
 using PcComponentStore.Api.DTOs;
 using PcComponentStore.Api.Models;
+using System.IO;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PcComponentStore.Api.Controllers
 {
@@ -20,25 +24,29 @@ namespace PcComponentStore.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetProducts([FromQuery] string? category)
         {
-            // For now, only the CPU table exists in the new schema. 
-            // If they query CPU, return it. Otherwise, return empty.
-            if (string.IsNullOrEmpty(category) || category.ToLower() == "cpu")
-            {
-                var cpus = await _context.Cpu.ToListAsync();
-                var result = cpus.Select(c => new 
-                {
+            var cpus = await _context.Cpu.ToListAsync();
+            var result = cpus.Select(c => {
+                string catName = "cpu";
+                try {
+                    using (JsonDocument doc = JsonDocument.Parse(c.Attributes ?? "{}")) {
+                        if (doc.RootElement.TryGetProperty("category", out JsonElement catElement)) {
+                            catName = catElement.GetString() ?? "cpu";
+                        }
+                    }
+                } catch { }
+
+                return new {
                     Id = c.Id,
                     Name = c.CpuName,
                     Brand = c.Brand,
-                    Price = 5000000, // mock price since the new schema has no price
+                    Price = c.Price ?? 0,
                     StockQuantity = c.Stock,
-                    CategoryName = "CPU",
+                    CategoryName = catName,
                     Attributes = c.Attributes
-                });
-                return Ok(result);
-            }
-
-            return Ok(new List<dynamic>());
+                };
+            }).Where(p => string.IsNullOrEmpty(category) || p.CategoryName.ToLower() == category.ToLower());
+            
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -47,13 +55,22 @@ namespace PcComponentStore.Api.Controllers
             var cpu = await _context.Cpu.FindAsync(id);
             if (cpu == null) return NotFound();
 
+            string catName = "cpu";
+            try {
+                using (JsonDocument doc = JsonDocument.Parse(cpu.Attributes ?? "{}")) {
+                    if (doc.RootElement.TryGetProperty("category", out JsonElement catElement)) {
+                        catName = catElement.GetString() ?? "cpu";
+                    }
+                }
+            } catch { }
+
             return Ok(new {
                 Id = cpu.Id,
                 Name = cpu.CpuName,
                 Brand = cpu.Brand,
-                Price = 5000000,
+                Price = cpu.Price ?? 0,
                 StockQuantity = cpu.Stock,
-                CategoryName = "CPU",
+                CategoryName = catName,
                 Attributes = cpu.Attributes
             });
         }
@@ -61,19 +78,98 @@ namespace PcComponentStore.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<dynamic>> CreateProduct([FromBody] ProductCreateDto productDto)
         {
-            var attributesObj = new {
-                socket = productDto.Socket ?? "",
-                cores = productDto.Cores ?? "",
-                baseClock = productDto.BaseClock ?? "",
-                boostClock = productDto.BoostClock ?? "",
-                cache = productDto.Cache ?? "",
-                tdp = productDto.Tdp ?? ""
+            var attributesObj = new Dictionary<string, object> {
+                { "category", productDto.Type ?? "cpu" },
+                { "originalPrice", productDto.OriginalPrice ?? 0 },
+                { "thumbnailUrl", productDto.ThumbnailUrl ?? "" },
+                { "detailImageUrls", productDto.DetailImageUrls ?? new List<string>() }
             };
+
+            if (productDto.Type == "cpu") {
+                attributesObj["socket"] = productDto.Socket ?? "";
+                attributesObj["cores"] = productDto.Cores ?? "";
+                attributesObj["baseClock"] = productDto.BaseClock ?? "";
+                attributesObj["boostClock"] = productDto.BoostClock ?? "";
+                attributesObj["cache"] = productDto.Cache ?? "";
+                attributesObj["tdp"] = productDto.Tdp ?? "";
+                attributesObj["generation"] = productDto.Generation ?? "";
+                attributesObj["generationName"] = productDto.GenerationName ?? "";
+                attributesObj["threads"] = productDto.Threads ?? "";
+                attributesObj["memorySupport"] = productDto.MemorySupport ?? "";
+                attributesObj["memoryChannels"] = productDto.MemoryChannels ?? "";
+                attributesObj["pcieVersion"] = productDto.PcieVersion ?? "";
+                attributesObj["pcieLanes"] = productDto.PcieLanes ?? "";
+                attributesObj["cooling"] = productDto.Cooling ?? "";
+            } else if (productDto.Type == "vga") {
+                attributesObj["graphicEngine"] = productDto.GraphicEngine ?? "";
+                attributesObj["busStandard"] = productDto.BusStandard ?? "";
+                attributesObj["vram"] = productDto.Vram ?? "";
+                attributesObj["engineClock"] = productDto.EngineClock ?? "";
+                attributesObj["cudaCores"] = productDto.CudaCores ?? "";
+                attributesObj["memoryClock"] = productDto.MemoryClock ?? "";
+                attributesObj["memoryInterface"] = productDto.MemoryInterface ?? "";
+                attributesObj["ports"] = productDto.Ports ?? "";
+                attributesObj["dimensions"] = productDto.Dimensions ?? "";
+                attributesObj["recommendedPsu"] = productDto.RecommendedPsu ?? "";
+                attributesObj["powerConnectors"] = productDto.PowerConnectors ?? "";
+                attributesObj["directX"] = productDto.DirectX ?? "";
+            } else if (productDto.Type == "ram") {
+                attributesObj["ramModel"] = productDto.RamModel ?? "";
+                attributesObj["capacity"] = productDto.Capacity ?? "";
+                attributesObj["busSpeed"] = productDto.BusSpeed ?? "";
+                attributesObj["ramType"] = productDto.RamType ?? "";
+                attributesObj["overclock"] = productDto.Overclock ?? "";
+                attributesObj["rgb"] = productDto.Rgb ?? "";
+                attributesObj["voltage"] = productDto.Voltage ?? "";
+                attributesObj["casLatency"] = productDto.CasLatency ?? "";
+                attributesObj["warranty"] = productDto.Warranty ?? "";
+            } else if (productDto.Type == "monitor") {
+                attributesObj["screenSize"] = productDto.ScreenSize ?? "";
+                attributesObj["resolution"] = productDto.Resolution ?? "";
+                attributesObj["refreshRate"] = productDto.RefreshRate ?? "";
+            } else if (productDto.Type == "mainboard") {
+                attributesObj["socket"] = productDto.Socket ?? "";
+                attributesObj["mainboardSize"] = productDto.MainboardSize ?? "";
+                attributesObj["ramSlots"] = productDto.RamSlots ?? "";
+                attributesObj["chipset"] = productDto.Chipset ?? "";
+            } else if (productDto.Type == "storage") {
+                attributesObj["driveType"] = productDto.DriveType ?? "";
+                attributesObj["connection"] = productDto.Connection ?? "";
+                attributesObj["storageCapacity"] = productDto.StorageCapacity ?? "";
+                attributesObj["readSpeed"] = productDto.ReadSpeed ?? "";
+                attributesObj["writeSpeed"] = productDto.WriteSpeed ?? "";
+                attributesObj["osSupport"] = productDto.OsSupport ?? "";
+                attributesObj["operatingTemp"] = productDto.OperatingTemp ?? "";
+                attributesObj["otherFeatures"] = productDto.OtherFeatures ?? "";
+            } else if (productDto.Type == "pc") {
+                attributesObj["pcCpu"] = productDto.PcCpu ?? "";
+                attributesObj["pcMainboard"] = productDto.PcMainboard ?? "";
+                attributesObj["pcRam"] = productDto.PcRam ?? "";
+                attributesObj["pcVga"] = productDto.PcVga ?? "";
+                attributesObj["pcStorage"] = productDto.PcStorage ?? "";
+                attributesObj["pcPsu"] = productDto.PcPsu ?? "";
+                attributesObj["pcCase"] = productDto.PcCase ?? "";
+            } else if (productDto.Type == "psu") {
+                attributesObj["powerCapacity"] = productDto.PowerCapacity ?? "";
+                attributesObj["efficiency"] = productDto.Efficiency ?? "";
+                attributesObj["formFactor"] = productDto.FormFactor ?? "";
+                attributesObj["modular"] = productDto.Modular ?? "";
+                attributesObj["inputVoltage"] = productDto.InputVoltage ?? "";
+                attributesObj["psuFanSize"] = productDto.PsuFanSize ?? "";
+            } else if (productDto.Type == "cooling") {
+                attributesObj["coolerType"] = productDto.CoolerType ?? "";
+                attributesObj["supportedSockets"] = productDto.SupportedSockets ?? "";
+                attributesObj["fanSpeed"] = productDto.FanSpeed ?? "";
+                attributesObj["airflow"] = productDto.Airflow ?? "";
+                attributesObj["noiseLevel"] = productDto.NoiseLevel ?? "";
+                attributesObj["radiatorSize"] = productDto.RadiatorSize ?? "";
+            }
 
             var cpu = new Cpu
             {
                 Brand = string.IsNullOrEmpty(productDto.Brand) ? "Intel" : productDto.Brand,
                 CpuName = productDto.Name,
+                Price = productDto.Price,
                 Stock = productDto.StockQuantity,
                 Attributes = System.Text.Json.JsonSerializer.Serialize(attributesObj)
             };
@@ -89,9 +185,120 @@ namespace PcComponentStore.Api.Controllers
             if (cpu == null) return NotFound();
             
             cpu.CpuName = productDto.Name;
+            cpu.Price = productDto.Price;
             cpu.Stock = productDto.StockQuantity;
+            
+            var attributesObj = new Dictionary<string, object> {
+                { "category", productDto.Type ?? "cpu" },
+                { "originalPrice", productDto.OriginalPrice ?? 0 },
+                { "thumbnailUrl", productDto.ThumbnailUrl ?? "" },
+                { "detailImageUrls", productDto.DetailImageUrls ?? new List<string>() }
+            };
+
+            if (productDto.Type == "cpu") {
+                attributesObj["socket"] = productDto.Socket ?? "";
+                attributesObj["cores"] = productDto.Cores ?? "";
+                attributesObj["baseClock"] = productDto.BaseClock ?? "";
+                attributesObj["boostClock"] = productDto.BoostClock ?? "";
+                attributesObj["cache"] = productDto.Cache ?? "";
+                attributesObj["tdp"] = productDto.Tdp ?? "";
+                attributesObj["generation"] = productDto.Generation ?? "";
+                attributesObj["generationName"] = productDto.GenerationName ?? "";
+                attributesObj["threads"] = productDto.Threads ?? "";
+                attributesObj["memorySupport"] = productDto.MemorySupport ?? "";
+                attributesObj["memoryChannels"] = productDto.MemoryChannels ?? "";
+                attributesObj["pcieVersion"] = productDto.PcieVersion ?? "";
+                attributesObj["pcieLanes"] = productDto.PcieLanes ?? "";
+                attributesObj["cooling"] = productDto.Cooling ?? "";
+            } else if (productDto.Type == "vga") {
+                attributesObj["graphicEngine"] = productDto.GraphicEngine ?? "";
+                attributesObj["busStandard"] = productDto.BusStandard ?? "";
+                attributesObj["vram"] = productDto.Vram ?? "";
+                attributesObj["engineClock"] = productDto.EngineClock ?? "";
+                attributesObj["cudaCores"] = productDto.CudaCores ?? "";
+                attributesObj["memoryClock"] = productDto.MemoryClock ?? "";
+                attributesObj["memoryInterface"] = productDto.MemoryInterface ?? "";
+                attributesObj["ports"] = productDto.Ports ?? "";
+                attributesObj["dimensions"] = productDto.Dimensions ?? "";
+                attributesObj["recommendedPsu"] = productDto.RecommendedPsu ?? "";
+                attributesObj["powerConnectors"] = productDto.PowerConnectors ?? "";
+                attributesObj["directX"] = productDto.DirectX ?? "";
+            } else if (productDto.Type == "ram") {
+                attributesObj["ramModel"] = productDto.RamModel ?? "";
+                attributesObj["capacity"] = productDto.Capacity ?? "";
+                attributesObj["busSpeed"] = productDto.BusSpeed ?? "";
+                attributesObj["ramType"] = productDto.RamType ?? "";
+                attributesObj["overclock"] = productDto.Overclock ?? "";
+                attributesObj["rgb"] = productDto.Rgb ?? "";
+                attributesObj["voltage"] = productDto.Voltage ?? "";
+                attributesObj["casLatency"] = productDto.CasLatency ?? "";
+                attributesObj["warranty"] = productDto.Warranty ?? "";
+            } else if (productDto.Type == "monitor") {
+                attributesObj["screenSize"] = productDto.ScreenSize ?? "";
+                attributesObj["resolution"] = productDto.Resolution ?? "";
+                attributesObj["refreshRate"] = productDto.RefreshRate ?? "";
+            } else if (productDto.Type == "mainboard") {
+                attributesObj["socket"] = productDto.Socket ?? "";
+                attributesObj["mainboardSize"] = productDto.MainboardSize ?? "";
+                attributesObj["ramSlots"] = productDto.RamSlots ?? "";
+                attributesObj["chipset"] = productDto.Chipset ?? "";
+            } else if (productDto.Type == "storage") {
+                attributesObj["driveType"] = productDto.DriveType ?? "";
+                attributesObj["connection"] = productDto.Connection ?? "";
+                attributesObj["storageCapacity"] = productDto.StorageCapacity ?? "";
+                attributesObj["readSpeed"] = productDto.ReadSpeed ?? "";
+                attributesObj["writeSpeed"] = productDto.WriteSpeed ?? "";
+                attributesObj["osSupport"] = productDto.OsSupport ?? "";
+                attributesObj["operatingTemp"] = productDto.OperatingTemp ?? "";
+                attributesObj["otherFeatures"] = productDto.OtherFeatures ?? "";
+            } else if (productDto.Type == "pc") {
+                attributesObj["pcCpu"] = productDto.PcCpu ?? "";
+                attributesObj["pcMainboard"] = productDto.PcMainboard ?? "";
+                attributesObj["pcRam"] = productDto.PcRam ?? "";
+                attributesObj["pcVga"] = productDto.PcVga ?? "";
+                attributesObj["pcStorage"] = productDto.PcStorage ?? "";
+                attributesObj["pcPsu"] = productDto.PcPsu ?? "";
+                attributesObj["pcCase"] = productDto.PcCase ?? "";
+            } else if (productDto.Type == "psu") {
+                attributesObj["powerCapacity"] = productDto.PowerCapacity ?? "";
+                attributesObj["efficiency"] = productDto.Efficiency ?? "";
+                attributesObj["formFactor"] = productDto.FormFactor ?? "";
+                attributesObj["modular"] = productDto.Modular ?? "";
+                attributesObj["inputVoltage"] = productDto.InputVoltage ?? "";
+                attributesObj["psuFanSize"] = productDto.PsuFanSize ?? "";
+            } else if (productDto.Type == "cooling") {
+                attributesObj["coolerType"] = productDto.CoolerType ?? "";
+                attributesObj["supportedSockets"] = productDto.SupportedSockets ?? "";
+                attributesObj["fanSpeed"] = productDto.FanSpeed ?? "";
+                attributesObj["airflow"] = productDto.Airflow ?? "";
+                attributesObj["noiseLevel"] = productDto.NoiseLevel ?? "";
+                attributesObj["radiatorSize"] = productDto.RadiatorSize ?? "";
+            }
+            
+            cpu.Attributes = System.Text.Json.JsonSerializer.Serialize(attributesObj);
+            
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
+            
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+            
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+            
+            var fileUrl = $"/uploads/{uniqueFileName}";
+            return Ok(new { url = fileUrl });
         }
 
         [HttpDelete("{id}")]

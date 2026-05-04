@@ -40,6 +40,7 @@ namespace PcComponentStore.Api.Data
                 entity.Property(e => e.Brand).HasColumnName("brand");
                 entity.Property(e => e.CpuName).HasColumnName("cpu_name");
                 entity.Property(e => e.Stock).HasColumnName("stock");
+                entity.Property(e => e.Price).HasColumnName("price");
                 entity.Property(e => e.Attributes).HasColumnName("attributes").HasColumnType("json");
             });
         }

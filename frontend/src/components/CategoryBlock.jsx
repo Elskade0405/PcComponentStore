@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
+    const sliderRef = useRef(null);
+
+    const scrollLeft = () => {
+        if (sliderRef.current) sliderRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    };
+    const scrollRight = () => {
+        if (sliderRef.current) sliderRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    };
+
     return (
         <section className="container" style={{ marginTop: '2.5rem' }}>
             <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '310px' }}>
@@ -32,16 +41,15 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                         <Link to={categoryLink} style={{ fontSize: '0.9rem', textDecoration: 'underline' }}>Xem tất cả</Link>
                     </div>
                     {/* Floating Right Mock Arrow on the banner */}
-                    <div style={{
+                    <div onClick={scrollLeft} style={{
                         position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
                         width: '32px', height: '32px', backgroundColor: 'white', border: '1px solid var(--border-color)', borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, cursor: 'pointer'
                     }}>
-                        <ChevronRight size={18} color="var(--text-secondary)" />
+                        <ChevronLeft size={18} color="var(--text-secondary)" />
                     </div>
                 </div>
 
-                {/* Product Grid inside Category Block */}
                 <div style={{ 
                     flex: 1, 
                     backgroundColor: 'white', 
@@ -51,7 +59,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                     position: 'relative',
                     maxWidth: 'calc(100% - 316px)' /* Account for banner gap */ 
                 }}>
-                    <div style={{ 
+                    <div ref={sliderRef} style={{ 
                         display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', height: '100%',
                         scrollSnapType: 'x mandatory'
                     }} className="no-scrollbar">
@@ -68,8 +76,8 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                         )}
                     </div>
                     
-                    {/* Mock Right Scroll Arrow */}
-                    <div style={{
+                    {/* Right Scroll Arrow */}
+                    <div onClick={scrollRight} style={{
                         position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
                         width: '32px', height: '32px', backgroundColor: 'white', border: '1px solid var(--border-color)', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10

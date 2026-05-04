@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Trash2, Minus, Plus, Settings } from 'lucide-react'; // Settings as a placeholder for Print/Excel if needed
+import CheckoutModal from '../components/CheckoutModal';
 
 const Cart = () => {
     const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+    const [showCheckoutModal, setShowCheckoutModal] = React.useState(false);
     const backendUrl = 'http://localhost:5285';
 
     return (
@@ -26,7 +28,11 @@ const Cart = () => {
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {cart.map((item, index) => {
-                                const imgUrl = item.imageUrl ? `${backendUrl}${item.imageUrl}` : 'https://via.placeholder.com/80?text=SP';
+                                let parsedAttr = {};
+                                try { if (item.attributes) parsedAttr = JSON.parse(item.attributes); } catch(e) {}
+                                const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl || item.imageUrl;
+                                const imgUrl = resolvedImage ? `${backendUrl}${resolvedImage}` : 'https://via.placeholder.com/80?text=SP';
+                                
                                 return (
                                     <div key={item.id} style={{ 
                                         display: 'flex', alignItems: 'center', padding: '1rem 1.5rem', 
@@ -193,13 +199,15 @@ const Cart = () => {
                                 </button>
                             </div>
 
-                            <button onClick={() => alert('Chức năng đặt hàng đang được hoàn thiện!')} style={{ width: '100%', backgroundColor: '#e30019', color: 'white', border: 'none', borderRadius: '4px', padding: '0.8rem', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}>
+                            <button onClick={() => setShowCheckoutModal(true)} style={{ width: '100%', backgroundColor: '#e30019', color: 'white', border: 'none', borderRadius: '4px', padding: '0.8rem', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}>
                                 ✓ ĐẶT HÀNG
                             </button>
                         </div>
                     </div>
                 )}
             </div>
+
+            <CheckoutModal isOpen={showCheckoutModal} onClose={() => setShowCheckoutModal(false)} />
         </div>
     );
 };

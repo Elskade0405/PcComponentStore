@@ -16,11 +16,13 @@ namespace PcComponentStore.Api.Controllers
     {
         private readonly PcComponentStoreDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
 
-        public AuthController(PcComponentStoreDbContext context, IConfiguration configuration)
+        public AuthController(PcComponentStoreDbContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
             _context = context;
             _configuration = configuration;
+            _env = env;
         }
 
         [HttpPost("register")]
@@ -87,15 +89,16 @@ namespace PcComponentStore.Api.Controllers
         [HttpGet("import-db")]
         public async Task<IActionResult> ImportDb()
         {
-            var sqlFilePath = @"C:\Users\admin\Documents\workspace\DoAn_PcStore\Db\pccomdb.sql";
-            if (!System.IO.File.Exists(sqlFilePath)) return NotFound("SQL file not found at " + sqlFilePath);
+            var sqlFilePath = Path.Combine(_env.ContentRootPath, "Db", "pccomdb.sql");
+            if (!System.IO.File.Exists(sqlFilePath)) return NotFound("SQL file not found at " + sqlFilePath + ". Please place your pccomdb.sql here.");
 
             var sql = await System.IO.File.ReadAllTextAsync(sqlFilePath);
             
             try 
             {
                 // First, connect without database to create it
-                var masterConnectionString = "Server=localhost;User=root;Password=1234;";
+                var defaultConn = _configuration.GetConnectionString("DefaultConnection");
+                var masterConnectionString = defaultConn.Replace("Database=pccomdb;", "");
                 using var masterConnection = new MySqlConnector.MySqlConnection(masterConnectionString);
                 await masterConnection.OpenAsync();
                 

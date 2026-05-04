@@ -1,0 +1,126 @@
+.mega-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.mega-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--accent-blue);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border: none;
+  font-size: 0.95rem;
+}
+
+.mega-menu-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.mega-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  width: 900px;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s ease-in-out;
+  min-height: 440px;
+}
+
+/* Pseudo element to cover the gap so hover doesn't break */
+.mega-menu-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px;
+  height: 20px;
+  background: transparent;
+  z-index: 999;
+}
+
+.mega-menu-wrapper:hover .mega-menu-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.mega-menu-sidebar {
+  width: 250px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.mega-menu-category {
+  padding: 0.8rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.1s ease;
+}
+
+.mega-menu-category:last-child {
+  border-bottom: none;
+}
+
+.mega-menu-category:hover,
+.mega-menu-category.active {
+  background-color: #ed1c24; /* Red color from image */
+  color: white;
+}
+
+.mega-menu-content {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  background-color: white;
+}
+
+.mega-menu-column {
+  flex: 1;
+}
+
+.mega-menu-column-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ed1c24;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.mega-menu-column-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.mega-menu-column-item {
+  font-size: 0.85rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.mega-menu-column-item:hover {
+  color: var(--accent-blue);
+}

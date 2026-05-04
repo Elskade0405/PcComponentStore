@@ -34,20 +34,28 @@ const GenericCategory = () => {
                 const res = await api.get('/products');
                 const allProds = res.data;
                 const filtered = allProds.filter(p => {
+                    if (searchKey === 'tất cả' || alias === 'all') return true;
+                    
                     const nameLower = p.name.toLowerCase();
                     const descLower = p.description ? p.description.toLowerCase() : '';
-                    if (searchKey === 'tất cả' || alias === 'all') return true;
+                    const catLower = (p.categoryName || '').toLowerCase();
+                    
+                    // Handle MegaMenu main titles specifically to match exact categories
+                    if (alias === 'mainboard-bo-mach-chu' && catLower === 'mainboard') return true;
+                    if (alias === 'vga-card-man-hinh' && catLower === 'vga') return true;
+                    if (alias === 'o-cung-ssd-hdd' && catLower === 'storage') return true;
+                    if (alias === 'nguon-psu' && (catLower === 'psu' || catLower === 'pc')) return true;
+                    if (alias === 'tan-nhiet' && catLower === 'cooling') return true;
+                    if (alias === 'vo-case' && catLower === 'case') return true;
+                    if (alias === 'gia-treo-man-hinh' && catLower === 'monitor-arm') return true;
+                    if (alias === 'cpu' && catLower === 'cpu') return true;
+                    if (alias === 'ram' && catLower === 'ram') return true;
                     
                     // Specific complex matching logic can go here. For now, substring match.
                     return nameLower.includes(searchKey) || descLower.includes(searchKey);
                 });
 
-                if (filtered.length === 0) {
-                    // Fallback to mock data to show the UI
-                    setProducts(allProds.slice(0, 8));
-                } else {
-                    setProducts(filtered);
-                }
+                setProducts(filtered);
             } catch (err) {
                 console.error("Failed to load products", err);
             } finally {
