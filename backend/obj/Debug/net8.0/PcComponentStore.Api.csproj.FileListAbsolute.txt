@@ -232,3 +232,9 @@ F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\PcComponentStore.Api.genr
 F:\workspace\PcComponentStore\backend\obj\Debug\net8.0\ref\PcComponentStore.Api.dll
 F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\prod.json
 F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\products.json
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\Google.Apis.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\Google.Apis.Auth.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\Google.Apis.Core.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\System.Management.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Management.dll

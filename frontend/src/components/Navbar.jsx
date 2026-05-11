@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { Search, ShoppingCart, User, Settings, Facebook, Instagram, Menu, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, User, Settings, Facebook, Instagram, Menu, ChevronRight, ClipboardList, KeyRound, LogOut, ShieldAlert } from 'lucide-react';
 import api from '../services/api';
 import MegaMenu from './MegaMenu';
 const Navbar = () => {
@@ -15,6 +15,21 @@ const Navbar = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    
+    // Account Menu state
+    const [showAccountMenu, setShowAccountMenu] = useState(false);
+    const accountMenuRef = useRef(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+                setShowAccountMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -129,8 +144,11 @@ const Navbar = () => {
                 {/* User & Cart Icons */}
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                     {user ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }} onClick={() => isAdmin && navigate('/admin')}>
+                        <div style={{ position: 'relative' }} ref={accountMenuRef}>
+                            <div 
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }} 
+                                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                            >
                                 <div style={{ 
                                     width: '36px', height: '36px', 
                                     border: '2px solid var(--accent-blue)', 
@@ -150,12 +168,60 @@ const Navbar = () => {
                                     </span>
                                 </div>
                             </div>
-                            <span 
-                                onClick={logout} 
-                                style={{ cursor: 'pointer', fontSize: '0.8rem', color: 'var(--danger)', textDecoration: 'underline' }}
-                            >
-                                Đăng xuất
-                            </span>
+
+                            {/* Dropdown Menu */}
+                            {showAccountMenu && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    right: 0,
+                                    marginTop: '0.5rem',
+                                    width: '220px',
+                                    backgroundColor: 'white',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                    border: '1px solid #e5e7eb',
+                                    zIndex: 100,
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}>
+                                    {isAdmin && (
+                                        <button 
+                                            onClick={() => { setShowAccountMenu(false); navigate('/admin'); }}
+                                            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem', border: 'none', background: 'none', textAlign: 'left', cursor: 'pointer', color: '#374151', borderBottom: '1px solid #f3f4f6' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <ShieldAlert size={16} /> <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Trang Quản Trị</span>
+                                        </button>
+                                    )}
+                                    <button 
+                                        onClick={() => { setShowAccountMenu(false); navigate('/profile'); }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem', border: 'none', background: 'none', textAlign: 'left', cursor: 'pointer', color: '#374151', borderBottom: '1px solid #f3f4f6' }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    >
+                                        <ClipboardList size={16} /> <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Lịch sử đơn hàng</span>
+                                    </button>
+                                    <button 
+                                        onClick={() => { setShowAccountMenu(false); navigate('/change-password'); }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem', border: 'none', background: 'none', textAlign: 'left', cursor: 'pointer', color: '#374151', borderBottom: '1px solid #f3f4f6' }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    >
+                                        <KeyRound size={16} /> <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Đổi mật khẩu</span>
+                                    </button>
+                                    <button 
+                                        onClick={() => { setShowAccountMenu(false); logout(); }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem', border: 'none', background: 'none', textAlign: 'left', cursor: 'pointer', color: '#e30019' }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                    >
+                                        <LogOut size={16} /> <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Đăng xuất</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>

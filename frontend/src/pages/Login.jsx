@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { X } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
+import api from '../services/api';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -107,21 +109,31 @@ const Login = () => {
                     </div>
 
                     {/* Social Buttons */}
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button style={{ 
-                            flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', 
-                            padding: '0.6rem', backgroundColor: '#ea4335', color: 'white', border: 'none', borderRadius: '4px', 
-                            fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' 
-                        }}>
-                            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>G+</span> Google
-                        </button>
-                        <button style={{ 
-                            flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', 
-                            padding: '0.6rem', backgroundColor: '#3b5998', color: 'white', border: 'none', borderRadius: '4px', 
-                            fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' 
-                        }}>
-                            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>f</span> Facebook
-                        </button>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={async (credentialResponse) => {
+                                    setLoading(true);
+                                    try {
+                                        const res = await api.post('/auth/google-login', { credential: credentialResponse.credential });
+                                        if (res.data && res.data.token) {
+                                            localStorage.setItem('token', res.data.token);
+                                            localStorage.setItem('user', JSON.stringify(res.data.user));
+                                            window.location.href = '/';
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        setError('Đăng nhập bằng Google thất bại');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                onError={() => {
+                                    setError('Đăng nhập bằng Google thất bại');
+                                }}
+                                useOneTap
+                            />
+                        </div>
                     </div>
 
                     <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.85rem', color: '#334155' }}>

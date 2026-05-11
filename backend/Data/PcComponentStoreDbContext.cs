@@ -11,6 +11,8 @@ namespace PcComponentStore.Api.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Cpu> Cpu { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -42,6 +44,50 @@ namespace PcComponentStore.Api.Data
                 entity.Property(e => e.Stock).HasColumnName("stock");
                 entity.Property(e => e.Price).HasColumnName("price");
                 entity.Property(e => e.Attributes).HasColumnName("attributes").HasColumnType("json");
+            });
+
+            // Configure Order table mapping
+            builder.Entity<Order>(entity =>
+            {
+                entity.ToTable("orders");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").HasMaxLength(50);
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.CustomerName).HasColumnName("customer_name").HasMaxLength(255);
+                entity.Property(e => e.Phone).HasColumnName("phone").HasMaxLength(20);
+                entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255);
+                entity.Property(e => e.Address).HasColumnName("address").HasColumnType("text");
+                entity.Property(e => e.TotalAmount).HasColumnName("total_amount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(50);
+                entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50);
+                entity.Property(e => e.OrderDate).HasColumnName("order_date");
+
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure OrderItem table mapping
+            builder.Entity<OrderItem>(entity =>
+            {
+                entity.ToTable("order_items");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.OrderId).HasColumnName("order_id").HasMaxLength(50);
+                entity.Property(e => e.ProductId).HasColumnName("product_id");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
+                entity.Property(e => e.UnitPrice).HasColumnName("unit_price").HasColumnType("decimal(18,2)");
+
+                entity.HasOne(e => e.Order)
+                      .WithMany(o => o.OrderItems)
+                      .HasForeignKey(e => e.OrderId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Product)
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

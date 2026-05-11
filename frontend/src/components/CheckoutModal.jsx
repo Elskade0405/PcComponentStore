@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, CreditCard, ShoppingBag, ShieldCheck, ArrowLeft, QrCode, CreditCard as CardIcon, Banknote, Building2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import api from '../services/api';
 
 const CheckoutModal = ({ isOpen, onClose }) => {
-    const { cart, cartTotal } = useCart();
+    const { cart, cartTotal, clearCart } = useCart();
     const [gender, setGender] = useState('anh');
     const [deliveryType, setDeliveryType] = useState('home');
     const [currentStep, setCurrentStep] = useState(1);
@@ -62,6 +63,41 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     const wardName = wards.find(x => x.code.toString() === selectedWard)?.name || '';
     const fullAddress = [addressLine, wardName, districtName, provinceName].filter(Boolean).join(', ');
     const fullNameDisplay = `${gender === 'anh' ? 'Anh' : 'Chị'} ${customerName}`;
+
+    const handlePlaceOrder = async (paymentMethod) => {
+        if (!cart || cart.length === 0) {
+            alert('Giỏ hàng của bạn đang trống!');
+            return;
+        }
+        
+        try {
+            const orderPayload = {
+                customerName: fullNameDisplay,
+                phone: customerPhone,
+                email: customerEmail,
+                address: fullAddress,
+                totalAmount: cartTotal,
+                paymentMethod: paymentMethod,
+                items: cart.map(item => ({
+                    productId: parseInt(item.id, 10),
+                    quantity: item.quantity,
+                    unitPrice: parseFloat(item.price)
+                }))
+            };
+
+            const response = await api.post('/orders', orderPayload);
+            if (response.data) {
+                clearCart();
+                alert(`Đặt hàng thành công! Mã đơn hàng của bạn là: ${response.data.orderId || response.data.orderId}`);
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Lỗi khi đặt hàng:', error);
+            const data = error.response?.data || {};
+            const errorMessage = data.inner || data.message || data.Message || error.message;
+            alert(`Có lỗi xảy ra khi đặt hàng: ${typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage)}`);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -300,7 +336,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                     {/* Payment Method 1 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left' }}>
+                                    <button onClick={() => handlePlaceOrder('VietQR')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <div style={{ color: '#e30019' }}><QrCode size={32} /></div>
                                             <div>
@@ -312,25 +348,25 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                     </button>
 
                                     {/* Payment Method 2 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
+                                    <button onClick={() => handlePlaceOrder('ATM')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#00709e' }}><CardIcon size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thẻ ATM</div>
                                     </button>
 
                                     {/* Payment Method 3 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
+                                    <button onClick={() => handlePlaceOrder('Visa/MasterCard')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#1e3a8a' }}><CardIcon size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thẻ Visa, MasterCard, JCB</div>
                                     </button>
 
                                     {/* Payment Method 4 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
+                                    <button onClick={() => handlePlaceOrder('COD')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#e30019' }}><Banknote size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thanh toán khi nhận hàng (COD)</div>
                                     </button>
 
                                     {/* Payment Method 5 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
+                                    <button onClick={() => handlePlaceOrder('Bank Transfer')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#00709e' }}><Building2 size={28} /></div>
                                         <div>
                                             <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem', marginBottom: '0.2rem' }}>Tài khoản ngân hàng</div>
@@ -339,7 +375,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                     </button>
 
                                     {/* Payment Method 6 */}
-                                    <button style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
+                                    <button onClick={() => handlePlaceOrder('VNPAY')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#e30019' }}><QrCode size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>VNPAY QR</div>
                                     </button>

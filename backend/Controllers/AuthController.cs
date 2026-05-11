@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using PcComponentStore.Api.Data;
 using PcComponentStore.Api.DTOs;
 using PcComponentStore.Api.Models;
+using Google.Apis.Auth;
 
 namespace PcComponentStore.Api.Controllers
 {
@@ -132,6 +133,91 @@ namespace PcComponentStore.Api.Controllers
                 );
 
             return token;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.RoleType == "admin" ? "Admin" : "Customer")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "ThisIsAVerySecretKeyThatNeedsToBeAtLeast32BytesLong"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public class GoogleLoginRequest
+        {
+            public string Credential { get; set; } = null!;
+        }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            try
+            {
+                // Note: For production, you should pass ValidationSettings with your Client ID.
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential, new GoogleJsonWebSignature.ValidationSettings
+                {
+                    // Audience = new[] { "YOUR_GOOGLE_CLIENT_ID" } 
+                });
+
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == payload.Email);
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        Username = payload.Name ?? payload.Email.Split('@')[0],
+                        Email = payload.Email,
+                        PasswordHash = "GOOGLE_LOGIN", // Placeholder for Google users
+                        PhoneNumber = "0000000000",
+                        RoleType = "customer",
+                        Attributes = "{}",
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    if (!await _context.Users.AnyAsync())
+                    {
+                        user.RoleType = "admin";
+                    }
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+
+                var token = GenerateJwtToken(user);
+                return Ok(new
+                {
+                    Token = token,
+                    User = new
+                    {
+                        Id = user.Id,
+                        Username = user.Username,
+                        Email = user.Email,
+                        Role = user.RoleType == "admin" ? "Admin" : "Customer"
+                    }
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return Unauthorized(new { Message = "Invalid Google Token" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Error processing Google Login", Details = ex.Message });
+            }
         }
     }
 }
