@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj": {}
+    "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj": {}
   },
   "projects": {
-    "F:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj": {
+    "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
+        "projectUniqueName": "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
         "projectName": "PcComponentStore.Api",
-        "projectPath": "F:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
+        "projectPath": "f:\\workspace\\PcComponentStore\\backend\\PcComponentStore.Api.csproj",
         "packagesPath": "C:\\Users\\NSH\\.nuget\\packages\\",
-        "outputPath": "F:\\workspace\\PcComponentStore\\backend\\obj\\",
+        "outputPath": "f:\\workspace\\PcComponentStore\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\NSH\\AppData\\Roaming\\NuGet\\NuGet.Config"
