@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Sparkles, User, Loader2, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -12,6 +13,7 @@ const Chatbot = () => {
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
+    const navigate = useNavigate();
 
     const { user } = useAuth(); // Import useAuth to get user
     const { addToCart } = useCart();
@@ -153,9 +155,17 @@ const Chatbot = () => {
                                         <div style={{ marginTop: '1rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                 {msg.buildItems.map((item, idx) => (
-                                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9fafb', padding: '0.5rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                                                    <div key={idx} 
+                                                         onClick={() => {
+                                                             setIsOpen(false);
+                                                             navigate(`/product/${item.id}`);
+                                                         }}
+                                                         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9fafb', padding: '0.5rem', borderRadius: '8px', border: '1px solid #f3f4f6', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                                                         onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                                                         onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                                                    >
                                                         <div style={{ flex: 1, minWidth: 0, paddingRight: '0.5rem' }}>
-                                                            <div style={{ fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+                                                            <div style={{ fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--accent-blue)' }}>{item.name}</div>
                                                             <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{item.categoryName?.toUpperCase()}</div>
                                                         </div>
                                                         <div style={{ fontWeight: 600, color: '#ef4444', fontSize: '0.85rem', flexShrink: 0 }}>
