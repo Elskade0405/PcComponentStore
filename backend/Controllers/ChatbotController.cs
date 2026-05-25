@@ -34,7 +34,9 @@ namespace PcComponentStore.Api.Controllers
             // Nhận diện ý định (Intent detection) cơ bản
             bool isGreeting = msg.Contains("chào") || msg.Contains("hello") || msg.Contains("hi");
             bool isPriceQuery = msg.Contains("giá") || msg.Contains("rẻ") || msg.Contains("đắt");
-            bool isBuildPc = msg.Contains("build") || msg.Contains("xây dựng") || msg.Contains("cấu hình");
+            bool isBuildPc = msg.Contains("build") || msg.Contains("xây dựng") || msg.Contains("cấu hình") 
+                             || msg.Contains("bộ pc") || msg.Contains("dàn pc") || msg.Contains("máy tính") 
+                             || (msg.Contains("pc") && (msg.Contains("triệu") || msg.Contains("tr") || msg.Contains("củ") || msg.Contains("giá")));
             bool optimizeVga = msg.Contains("vga") || msg.Contains("card màn hình") || msg.Contains("đồ họa");
             
             // Xây dựng danh sách từ khóa tìm kiếm
