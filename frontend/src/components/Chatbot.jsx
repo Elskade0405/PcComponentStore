@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Sparkles, User, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, User, Loader2, ShoppingCart } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +14,7 @@ const Chatbot = () => {
     const messagesEndRef = useRef(null);
 
     const { user } = useAuth(); // Import useAuth to get user
+    const { addToCart } = useCart();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -39,7 +41,7 @@ const Chatbot = () => {
                 payload.userId = user.userId;
             }
             const res = await api.post('/chatbot/ask', payload);
-            setMessages(prev => [...prev, { role: 'bot', text: res.data.reply }]);
+            setMessages(prev => [...prev, { role: 'bot', text: res.data.reply, buildItems: res.data.buildItems }]);
         } catch (error) {
             console.error("Chatbot error:", error);
             setMessages(prev => [...prev, { role: 'bot', text: 'Xin lỗi, hệ thống AI đang gặp sự cố. Vui lòng thử lại sau!' }]);
@@ -147,6 +149,36 @@ const Chatbot = () => {
                                     whiteSpace: 'pre-wrap'
                                 }}>
                                     {msg.text}
+                                    {msg.buildItems && msg.buildItems.length > 0 && (
+                                        <div style={{ marginTop: '1rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                {msg.buildItems.map((item, idx) => (
+                                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9fafb', padding: '0.5rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                                                        <div style={{ flex: 1, minWidth: 0, paddingRight: '0.5rem' }}>
+                                                            <div style={{ fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+                                                            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{item.categoryName?.toUpperCase()}</div>
+                                                        </div>
+                                                        <div style={{ fontWeight: 600, color: '#ef4444', fontSize: '0.85rem', flexShrink: 0 }}>
+                                                            {item.price?.toLocaleString()}đ
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    msg.buildItems.forEach(item => addToCart(item));
+                                                    alert('Đã thêm toàn bộ cấu hình vào giỏ hàng!');
+                                                }}
+                                                style={{
+                                                    marginTop: '1rem', width: '100%', padding: '0.75rem', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 600, transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)'
+                                                }}
+                                                onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
+                                                onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
+                                            >
+                                                <ShoppingCart size={18} /> Thêm vào giỏ hàng
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

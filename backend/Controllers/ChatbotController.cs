@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PcComponentStore.Api.Helpers;
 
 namespace PcComponentStore.Api.Controllers
 {
@@ -33,6 +34,8 @@ namespace PcComponentStore.Api.Controllers
             // Nhận diện ý định (Intent detection) cơ bản
             bool isGreeting = msg.Contains("chào") || msg.Contains("hello") || msg.Contains("hi");
             bool isPriceQuery = msg.Contains("giá") || msg.Contains("rẻ") || msg.Contains("đắt");
+            bool isBuildPc = msg.Contains("build") || msg.Contains("xây dựng") || msg.Contains("cấu hình");
+            bool optimizeVga = msg.Contains("vga") || msg.Contains("card màn hình") || msg.Contains("đồ họa");
             
             // Xây dựng danh sách từ khóa tìm kiếm
             string[] keywords = msg.Split(new[] { ' ', ',', '.', '?' }, System.StringSplitOptions.RemoveEmptyEntries);
@@ -40,7 +43,7 @@ namespace PcComponentStore.Api.Controllers
             // Trích xuất danh mục sản phẩm có thể có
             string? targetCategory = null;
             if (msg.Contains("laptop")) targetCategory = "laptop";
-            else if (msg.Contains("vga") || msg.Contains("card màn hình") || msg.Contains("card đồ họa")) targetCategory = "vga";
+            else if (optimizeVga) targetCategory = "vga";
             else if (msg.Contains("màn hình") || msg.Contains("monitor")) targetCategory = "monitor";
             else if (msg.Contains("cpu") || msg.Contains("vi xử lý") || msg.Contains("chip")) targetCategory = "cpu";
             else if (msg.Contains("mainboard") || msg.Contains("bo mạch")) targetCategory = "mainboard";
@@ -52,6 +55,7 @@ namespace PcComponentStore.Api.Controllers
             // Nhận diện giá tiền (VD: dưới 10 triệu, trên 5 tr)
             decimal? maxPrice = null;
             decimal? minPrice = null;
+            decimal? exactBudget = null;
             
             var matchUnder = System.Text.RegularExpressions.Regex.Match(msg, @"dưới\s+(\d+)\s*(triệu|tr|củ)");
             if (matchUnder.Success && decimal.TryParse(matchUnder.Groups[1].Value, out decimal maxVal)) {
@@ -63,8 +67,47 @@ namespace PcComponentStore.Api.Controllers
                 minPrice = minVal * 1000000;
             }
 
+            var matchExact = System.Text.RegularExpressions.Regex.Match(msg, @"(?<!dưới\s|trên\s|hơn\s)\b(\d+)\s*(triệu|tr|củ)\b");
+            if (matchExact.Success && decimal.TryParse(matchExact.Groups[1].Value, out decimal exactVal)) {
+                exactBudget = exactVal * 1000000;
+            }
+
             // Truy vấn CSDL
             var allProducts = await _context.Products.ToListAsync();
+
+            if (isBuildPc)
+            {
+                decimal targetBudget = exactBudget ?? maxPrice ?? minPrice ?? 0;
+                
+                if (targetBudget == 0)
+                {
+                    return Ok(new { reply = "Bạn muốn build PC với ngân sách khoảng bao nhiêu tiền ạ? (VD: 20 triệu, 15 triệu...)" });
+                }
+
+                var build = PcBuilderAlgorithm.BuildPc(allProducts, targetBudget, optimizeVga);
+                
+                if (build.Count == 0)
+                {
+                    return Ok(new { reply = "Xin lỗi bạn, với ngân sách này hiện tại cửa hàng chưa có đủ linh kiện để build trọn bộ. Bạn có thể tăng thêm ngân sách một chút được không ạ?" });
+                }
+
+                decimal totalPrice = build.Sum(p => p.Price ?? 0);
+                string buildReplyText = $"Dạ vâng! Đây là cấu hình PC tối ưu nhất trong tầm giá **{totalPrice.ToString("N0")}đ** mà AI của cửa hàng vừa xây dựng cho bạn:\n\n";
+
+                var buildItemsResult = build.Select(p => new {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Brand = p.Brand,
+                    Price = p.Price ?? 0,
+                    StockQuantity = p.Stock,
+                    CategoryName = p.Category,
+                    Attributes = p.Attributes
+                }).ToList();
+
+                buildReplyText += "Bạn có thể xem danh sách linh kiện bên dưới và bấm nút thêm vào giỏ hàng nhé!";
+                
+                return Ok(new { reply = buildReplyText, buildItems = buildItemsResult });
+            }
             
             // Lọc sản phẩm
             var matchedProducts = allProducts.Select(c => {
