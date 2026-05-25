@@ -18,7 +18,10 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<PcComponentStoreDbContext>(options =>
 {
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    // Use an explicit version instead of AutoDetect to prevent segmentation fault (139) 
+    // when the database is unreachable during app startup on Linux/Render.
+    var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
+    options.UseMySql(connectionString, serverVersion);
 });
 
 // Configure JWT Authentication
