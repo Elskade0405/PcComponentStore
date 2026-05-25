@@ -64,11 +64,11 @@ namespace PcComponentStore.Api.Controllers
             }
 
             // Truy vấn CSDL
-            var allProducts = await _context.Cpu.ToListAsync();
+            var allProducts = await _context.Products.ToListAsync();
             
             // Lọc sản phẩm
             var matchedProducts = allProducts.Select(c => {
-                string catName = "cpu";
+                string catName = c.Category;
                 try {
                     if (!string.IsNullOrEmpty(c.Attributes)) {
                         using (JsonDocument doc = JsonDocument.Parse(c.Attributes)) {
@@ -98,7 +98,7 @@ namespace PcComponentStore.Api.Controllers
             // Tính điểm số trùng khớp dựa trên Keywords
             var rankedProducts = matchedProducts.Select(p => {
                 int score = 0;
-                string searchSpace = $"{p.Product.CpuName?.ToLower()} {p.Product.Brand?.ToLower()} {p.Product.Attributes?.ToLower()}";
+                string searchSpace = $"{p.Product.Name?.ToLower()} {p.Product.Brand?.ToLower()} {p.Product.Attributes?.ToLower()}";
                 
                 // Các keyword loại trừ không tính điểm
                 string[] ignoreWords = { "cho", "mình", "tôi", "hỏi", "có", "không", "giá", "bao", "nhiêu", "tìm", "mua", "loại", "nào" };
@@ -118,12 +118,12 @@ namespace PcComponentStore.Api.Controllers
             .ToList();
 
             // Nếu chỉ chào hỏi mà không có keyword cụ thể
-            if (isGreeting && rankedProducts.Count == 0 && string.IsNullOrEmpty(targetCategory))
+            if (isGreeting && rankedProducts.Count() == 0 && string.IsNullOrEmpty(targetCategory))
             {
                 return Ok(new { reply = "Chào bạn! Mình là trợ lý AI của PC Component Store. Bạn đang cần tìm mua linh kiện gì, laptop hay muốn build PC ạ?" });
             }
 
-            if (rankedProducts.Count == 0)
+            if (rankedProducts.Count() == 0)
             {
                 return Ok(new { reply = "Dạ hiện tại mình chưa tìm thấy sản phẩm nào khớp với yêu cầu của bạn. Bạn có thể nói rõ hơn tên thương hiệu hoặc loại sản phẩm được không ạ?" });
             }
@@ -134,7 +134,7 @@ namespace PcComponentStore.Api.Controllers
             foreach (var item in rankedProducts)
             {
                 string priceFmt = item.Product.Price?.ToString("N0") + "đ";
-                replyText += $"- **{item.Product.CpuName}**\n  💵 Giá chỉ: {priceFmt}\n\n";
+                replyText += $"- **{item.Product.Name}**\n  💵 Giá chỉ: {priceFmt}\n\n";
             }
             
             replyText += "Bạn thấy ưng mẫu nào chưa ạ? Bạn có thể bấm vào mục tìm kiếm trên Web để xem hình ảnh và chi tiết nhé!";
@@ -209,10 +209,10 @@ namespace PcComponentStore.Api.Controllers
 
             if (currentHistory.Count == 0) return Ok(new List<object>());
 
-            var allProducts = await _context.Cpu.ToListAsync();
+            var allProducts = await _context.Products.ToListAsync();
             
             var matchedProducts = allProducts.Select(c => {
-                string catName = "cpu";
+                string catName = c.Category;
                 try {
                     if (!string.IsNullOrEmpty(c.Attributes)) {
                         using (JsonDocument doc = JsonDocument.Parse(c.Attributes)) {
@@ -227,7 +227,7 @@ namespace PcComponentStore.Api.Controllers
 
             var rankedProducts = matchedProducts.Select(p => {
                 int score = 0;
-                string searchSpace = $"{p.Product.CpuName?.ToLower()} {p.Product.Brand?.ToLower()} {p.Category}".ToLower();
+                string searchSpace = $"{p.Product.Name?.ToLower()} {p.Product.Brand?.ToLower()} {p.Category}".ToLower();
                 
                 foreach (var kw in currentHistory) {
                     if (searchSpace.Contains(kw.ToLower())) {
@@ -241,7 +241,7 @@ namespace PcComponentStore.Api.Controllers
             .Take(8)
             .Select(p => new {
                 Id = p.Product.Id,
-                Name = p.Product.CpuName,
+                Name = p.Product.Name,
                 Brand = p.Product.Brand,
                 Price = p.Product.Price ?? 0,
                 StockQuantity = p.Product.Stock,

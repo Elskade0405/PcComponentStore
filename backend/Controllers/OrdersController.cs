@@ -127,7 +127,7 @@ namespace PcComponentStore.Api.Controllers
                     o.TotalAmount,
                     o.Status,
                     Items = o.OrderItems.Select(oi => new {
-                        Name = oi.Product != null ? oi.Product.CpuName : "Unknown Product",
+                        Name = oi.Product != null ? oi.Product.Name : "Unknown Product",
                         oi.Quantity,
                         oi.UnitPrice,
                         Image = oi.Product != null ? oi.Product.Attributes : null // To parse image on frontend

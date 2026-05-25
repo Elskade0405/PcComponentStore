@@ -15,7 +15,7 @@ namespace PcComponentStore.Api.Models
         public Order? Order { get; set; }
 
         public int ProductId { get; set; }
-        public Cpu? Product { get; set; }
+        public Product? Product { get; set; }
 
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

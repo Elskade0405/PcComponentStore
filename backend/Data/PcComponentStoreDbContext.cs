@@ -10,7 +10,7 @@ namespace PcComponentStore.Api.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Cpu> Cpu { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
@@ -33,14 +33,15 @@ namespace PcComponentStore.Api.Data
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
 
-            // Configure Cpu table mapping
-            builder.Entity<Cpu>(entity =>
+            // Configure Products table mapping
+            builder.Entity<Product>(entity =>
             {
-                entity.ToTable("cpu");
+                entity.ToTable("products");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Category).HasColumnName("category");
                 entity.Property(e => e.Brand).HasColumnName("brand");
-                entity.Property(e => e.CpuName).HasColumnName("cpu_name");
+                entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.Stock).HasColumnName("stock");
                 entity.Property(e => e.Price).HasColumnName("price");
                 entity.Property(e => e.Attributes).HasColumnName("attributes").HasColumnType("json");

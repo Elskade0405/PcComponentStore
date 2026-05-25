@@ -24,26 +24,15 @@ namespace PcComponentStore.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetProducts([FromQuery] string? category)
         {
-            var cpus = await _context.Cpu.ToListAsync();
-            var result = cpus.Select(c => {
-                string catName = "cpu";
-                try {
-                    using (JsonDocument doc = JsonDocument.Parse(c.Attributes ?? "{}")) {
-                        if (doc.RootElement.TryGetProperty("category", out JsonElement catElement)) {
-                            catName = catElement.GetString() ?? "cpu";
-                        }
-                    }
-                } catch { }
-
-                return new {
-                    Id = c.Id,
-                    Name = c.CpuName,
-                    Brand = c.Brand,
-                    Price = c.Price ?? 0,
-                    StockQuantity = c.Stock,
-                    CategoryName = catName,
-                    Attributes = c.Attributes
-                };
+            var products = await _context.Products.ToListAsync();
+            var result = products.Select(p => new {
+                Id = p.Id,
+                Name = p.Name,
+                Brand = p.Brand,
+                Price = p.Price ?? 0,
+                StockQuantity = p.Stock,
+                CategoryName = p.Category,
+                Attributes = p.Attributes
             }).Where(p => string.IsNullOrEmpty(category) || p.CategoryName.ToLower() == category.ToLower());
             
             return Ok(result);
@@ -52,26 +41,17 @@ namespace PcComponentStore.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<dynamic>> GetProduct(int id)
         {
-            var cpu = await _context.Cpu.FindAsync(id);
-            if (cpu == null) return NotFound();
-
-            string catName = "cpu";
-            try {
-                using (JsonDocument doc = JsonDocument.Parse(cpu.Attributes ?? "{}")) {
-                    if (doc.RootElement.TryGetProperty("category", out JsonElement catElement)) {
-                        catName = catElement.GetString() ?? "cpu";
-                    }
-                }
-            } catch { }
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
 
             return Ok(new {
-                Id = cpu.Id,
-                Name = cpu.CpuName,
-                Brand = cpu.Brand,
-                Price = cpu.Price ?? 0,
-                StockQuantity = cpu.Stock,
-                CategoryName = catName,
-                Attributes = cpu.Attributes
+                Id = product.Id,
+                Name = product.Name,
+                Brand = product.Brand,
+                Price = product.Price ?? 0,
+                StockQuantity = product.Stock,
+                CategoryName = product.Category,
+                Attributes = product.Attributes
             });
         }
 
@@ -165,28 +145,31 @@ namespace PcComponentStore.Api.Controllers
                 attributesObj["radiatorSize"] = productDto.RadiatorSize ?? "";
             }
 
-            var cpu = new Cpu
+            var product = new Product
             {
-                Brand = string.IsNullOrEmpty(productDto.Brand) ? "Intel" : productDto.Brand,
-                CpuName = productDto.Name,
+                Category = productDto.Type ?? "cpu",
+                Brand = string.IsNullOrEmpty(productDto.Brand) ? "Unknown" : productDto.Brand,
+                Name = productDto.Name,
                 Price = productDto.Price,
                 Stock = productDto.StockQuantity,
                 Attributes = System.Text.Json.JsonSerializer.Serialize(attributesObj)
             };
-            _context.Cpu.Add(cpu);
+            _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetProduct), new { id = cpu.Id }, cpu);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductCreateDto productDto)
         {
-            var cpu = await _context.Cpu.FindAsync(id);
-            if (cpu == null) return NotFound();
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
             
-            cpu.CpuName = productDto.Name;
-            cpu.Price = productDto.Price;
-            cpu.Stock = productDto.StockQuantity;
+            product.Name = productDto.Name;
+            product.Price = productDto.Price;
+            product.Stock = productDto.StockQuantity;
+            product.Category = productDto.Type ?? "cpu";
+            product.Brand = string.IsNullOrEmpty(productDto.Brand) ? "Unknown" : productDto.Brand;
             
             var attributesObj = new Dictionary<string, object> {
                 { "category", productDto.Type ?? "cpu" },
@@ -275,7 +258,7 @@ namespace PcComponentStore.Api.Controllers
                 attributesObj["radiatorSize"] = productDto.RadiatorSize ?? "";
             }
             
-            cpu.Attributes = System.Text.Json.JsonSerializer.Serialize(attributesObj);
+            product.Attributes = System.Text.Json.JsonSerializer.Serialize(attributesObj);
             
             await _context.SaveChangesAsync();
             return NoContent();
@@ -304,9 +287,9 @@ namespace PcComponentStore.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var cpu = await _context.Cpu.FindAsync(id);
-            if (cpu == null) return NotFound();
-            _context.Cpu.Remove(cpu);
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return NoContent();
         }
