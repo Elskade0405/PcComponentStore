@@ -25,12 +25,24 @@
       "PackagePath": "staticwebassets\\uploads\\1996e817-6fb5-410b-b221-f206c1b0b961_4eb65e05a12f64ed4e58d7795326dba4.webp"
     },
     {
+      "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\22107106-77fa-4667-87cd-9b5468e83228_1072100340_cpu_intel_core_i5_11400f_tray.png",
+      "PackagePath": "staticwebassets\\uploads\\22107106-77fa-4667-87cd-9b5468e83228_1072100340_cpu_intel_core_i5_11400f_tray.png"
+    },
+    {
       "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\2af7158b-63a7-463c-b7c6-d0e727d2e867_467403577_559157127044917_3479697642903097721_n.jpg",
       "PackagePath": "staticwebassets\\uploads\\2af7158b-63a7-463c-b7c6-d0e727d2e867_467403577_559157127044917_3479697642903097721_n.jpg"
     },
     {
+      "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\30b93a3c-113d-49a0-8a96-71818900e9bd_1072100369_nguon_may_tinh_antec_g750_750w_80_plus_gold_pcm_2.jpg",
+      "PackagePath": "staticwebassets\\uploads\\30b93a3c-113d-49a0-8a96-71818900e9bd_1072100369_nguon_may_tinh_antec_g750_750w_80_plus_gold_pcm_2.jpg"
+    },
+    {
       "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\31673966-e98b-45be-bdd8-95b54ee4f408_494819152_1212526373372942_6195497853069404841_n.jpg",
       "PackagePath": "staticwebassets\\uploads\\31673966-e98b-45be-bdd8-95b54ee4f408_494819152_1212526373372942_6195497853069404841_n.jpg"
+    },
+    {
+      "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\3d452924-4afd-494e-b884-ab3e37bc40be_1072100458_zotac_gaming_geforce_rtx_5070_solid_1.jpg",
+      "PackagePath": "staticwebassets\\uploads\\3d452924-4afd-494e-b884-ab3e37bc40be_1072100458_zotac_gaming_geforce_rtx_5070_solid_1.jpg"
     },
     {
       "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\3eb38bf7-8eb7-421c-a9c3-bbb930eef3f8_1072100393_o_cung_ssd_patriot_p400_lite_1tb_pcm_4.jpg",
@@ -131,6 +143,10 @@
     {
       "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\d6728cc4-2b96-4a27-99e6-811aa2832627_1072100376_1072100375_12479_pcm_dsc08264_copy.jpg",
       "PackagePath": "staticwebassets\\uploads\\d6728cc4-2b96-4a27-99e6-811aa2832627_1072100376_1072100375_12479_pcm_dsc08264_copy.jpg"
+    },
+    {
+      "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\dc3648ff-4330-4ae0-a6d6-de5ae5410b65_1072100284_cpu_intel_core_ultra_7_270k_plus.jpg",
+      "PackagePath": "staticwebassets\\uploads\\dc3648ff-4330-4ae0-a6d6-de5ae5410b65_1072100284_cpu_intel_core_ultra_7_270k_plus.jpg"
     },
     {
       "Id": "F:\\workspace\\PcComponentStore\\backend\\wwwroot\\uploads\\ded8706d-f576-4708-8198-f7116b02be9f_1072100389_tan_nhiet_cooler_master_hyper_620s_argb_1.jpg",

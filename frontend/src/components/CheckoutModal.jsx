@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, CreditCard, ShoppingBag, ShieldCheck, ArrowLeft, QrCode, CreditCard as CardIcon, Banknote, Building2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import API_URL from '../config';
 
 const CheckoutModal = ({ isOpen, onClose }) => {
     const { cart, cartTotal, clearCart } = useCart();
+    const { user } = useAuth();
     const [gender, setGender] = useState('anh');
     const [deliveryType, setDeliveryType] = useState('home');
     const [currentStep, setCurrentStep] = useState(1);
@@ -24,7 +27,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     const [selectedWard, setSelectedWard] = useState('');
     
     const [orderId, setOrderId] = useState('');
-    const backendUrl = 'http://localhost:5285';
+    const backendUrl = API_URL;
 
     useEffect(() => {
         // Generate a random order ID on mount
@@ -72,6 +75,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
         
         try {
             const orderPayload = {
+                userId: user?.userId ? parseInt(user.userId) : null,
                 customerName: fullNameDisplay,
                 phone: customerPhone,
                 email: customerEmail,
@@ -89,7 +93,11 @@ const CheckoutModal = ({ isOpen, onClose }) => {
             if (response.data) {
                 clearCart();
                 alert(`Đặt hàng thành công! Mã đơn hàng của bạn là: ${response.data.orderId || response.data.orderId}`);
-                window.location.href = '/';
+                if (user?.userId) {
+                    window.location.href = '/order-history';
+                } else {
+                    window.location.href = '/';
+                }
             }
         } catch (error) {
             console.error('Lỗi khi đặt hàng:', error);

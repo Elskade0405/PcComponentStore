@@ -109,5 +109,33 @@ namespace PcComponentStore.Api.Controllers
 
             return Ok(new { Message = "Order status updated" });
         }
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<dynamic>>> GetUserOrders(int userId)
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate)
+                .Select(o => new
+                {
+                    o.Id,
+                    o.CustomerName,
+                    o.Email,
+                    o.OrderDate,
+                    o.TotalAmount,
+                    o.Status,
+                    Items = o.OrderItems.Select(oi => new {
+                        Name = oi.Product != null ? oi.Product.CpuName : "Unknown Product",
+                        oi.Quantity,
+                        oi.UnitPrice,
+                        Image = oi.Product != null ? oi.Product.Attributes : null // To parse image on frontend
+                    })
+                })
+                .ToListAsync();
+
+            return Ok(orders);
+        }
     }
 }

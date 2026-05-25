@@ -14,8 +14,8 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
     };
 
     return (
-        <section className="container" style={{ marginTop: '2.5rem' }}>
-            <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '310px' }}>
+        <section className="container" style={{ marginTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '280px' }}>
                 {/* Left Banner */}
                 <div style={{ 
                     width: '240px', 

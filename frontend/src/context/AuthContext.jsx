@@ -14,14 +14,16 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         const email = localStorage.getItem('email');
         const role = localStorage.getItem('role');
+        const userId = localStorage.getItem('userId');
 
         if (token && token !== 'undefined' && email && email !== 'undefined') {
-            setUser({ email, role, token });
+            setUser({ email, role, token, userId });
         } else {
             // Clean up bad state
             localStorage.removeItem('token');
             localStorage.removeItem('email');
             localStorage.removeItem('role');
+            localStorage.removeItem('userId');
         }
         setLoading(false);
     }, []);
@@ -33,14 +35,16 @@ export const AuthProvider = ({ children }) => {
             // Handle both camelCase and PascalCase from .NET responses
             const token = response.data.token || response.data.Token;
             const role = response.data.role || response.data.Role;
+            const userId = response.data.userId || response.data.UserId || (response.data.user && response.data.user.id) || (response.data.User && response.data.User.Id);
 
             if (!token) throw new Error("Token missing from response");
 
             localStorage.setItem('token', token);
             localStorage.setItem('email', email);
             localStorage.setItem('role', role);
+            if (userId) localStorage.setItem('userId', userId);
 
-            setUser({ email, role, token });
+            setUser({ email, role, token, userId });
             return true;
         } catch (error) {
             console.error('Login failed:', error);
@@ -69,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('email');
         localStorage.removeItem('role');
+        localStorage.removeItem('userId');
         setUser(null);
     };
 

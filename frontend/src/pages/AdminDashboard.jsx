@@ -3,16 +3,20 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Package, Truck, Edit, Trash2, Plus, LayoutDashboard, Users, Tags, X } from 'lucide-react';
 import ComponentPickerModal from '../components/ComponentPickerModal';
+import API_URL from '../config';
 
 const AdminDashboard = () => {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [users, setUsers] = useState([]);
     const [activeTab, setActiveTab] = useState('products'); // Default to products for easier testing
     const [loading, setLoading] = useState(true);
     const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
     const [pcPickerModalOpen, setPcPickerModalOpen] = useState(false);
     const [pcActiveSlot, setPcActiveSlot] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     
     // Filtering states for products
     const [searchTerm, setSearchTerm] = useState('');
@@ -94,9 +98,9 @@ const AdminDashboard = () => {
                 ]);
                 setProducts(prodRes.data);
                 setCategories(catRes.data);
-            } else if (activeTab === 'categories') {
-                const res = await api.get('/categories');
-                setCategories(res.data);
+            } else if (activeTab === 'users') {
+                const res = await api.get('/users/all');
+                setUsers(res.data);
             }
         } catch (error) {
             console.error(`Failed to fetch ${activeTab} data:`, error);
@@ -105,7 +109,27 @@ const AdminDashboard = () => {
         }
     };
 
+    const fetchOrderDetails = async (orderId) => {
+        try {
+            const res = await api.get(`/orders/${orderId}`);
+            setSelectedOrder(res.data);
+            setIsOrderModalOpen(true);
+        } catch (error) {
+            console.error('Failed to fetch order details:', error);
+            alert('Không thể tải chi tiết đơn hàng.');
+        }
+    };
+
     const updateOrderStatus = async (orderId, newStatus) => {
+        if (newStatus === 'Delivered') {
+            const confirm = window.confirm('Xác nhận đơn hàng này đã được giao thành công? (Sau khi xác nhận sẽ không thể hoàn tác hay chỉnh sửa).');
+            if (!confirm) {
+                // Force a re-render so the select box resets to its previous value visually
+                setOrders([...orders]); 
+                return;
+            }
+        }
+
         try {
             await api.put(`/orders/${orderId}/status`, JSON.stringify(newStatus), {
                 headers: { 'Content-Type': 'application/json' }
@@ -180,7 +204,6 @@ const AdminDashboard = () => {
         { id: 'dashboard', label: 'Tóm tắt', icon: LayoutDashboard },
         { id: 'orders', label: 'Đơn hàng', icon: Package },
         { id: 'products', label: 'Sản phẩm', icon: Truck },
-        { id: 'categories', label: 'Danh mục', icon: Tags },
         { id: 'users', label: 'Khách hàng', icon: Users },
     ];
 
@@ -250,17 +273,34 @@ const AdminDashboard = () => {
                                                 </span>
                                             </td>
                                             <td style={{ padding: '1rem' }}>
-                                                <select
-                                                    style={{ padding: '0.35rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '0.875rem', outline: 'none' }}
-                                                    value={order.status}
-                                                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                                                >
-                                                    <option value="Pending">Chờ xử lý</option>
-                                                    <option value="Processing">Đang xuất kho</option>
-                                                    <option value="Shipped">Đang giao</option>
-                                                    <option value="Delivered">Đã giao</option>
-                                                    <option value="Cancelled">Đã hủy</option>
-                                                </select>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <select
+                                                        style={{ 
+                                                            padding: '0.35rem', 
+                                                            border: '1px solid #d1d5db', 
+                                                            borderRadius: '0.375rem', 
+                                                            fontSize: '0.875rem', 
+                                                            outline: 'none',
+                                                            backgroundColor: order.status === 'Delivered' ? '#f3f4f6' : 'white',
+                                                            cursor: order.status === 'Delivered' ? 'not-allowed' : 'pointer'
+                                                        }}
+                                                        value={order.status}
+                                                        disabled={order.status === 'Delivered'}
+                                                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                                                    >
+                                                        <option value="Pending">Chờ xử lý</option>
+                                                        <option value="Processing">Đang xuất kho</option>
+                                                        <option value="Shipped">Đang giao</option>
+                                                        <option value="Delivered">Đã giao</option>
+                                                        <option value="Cancelled">Đã hủy</option>
+                                                    </select>
+                                                    <button 
+                                                        onClick={() => fetchOrderDetails(order.id)}
+                                                        style={{ padding: '0.35rem 0.75rem', backgroundColor: '#f3f4f6', color: '#4b5563', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 500 }}
+                                                    >
+                                                        Chi tiết
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -378,8 +418,45 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+                {/* --- Users Tab --- */}
+                {activeTab === 'users' && (
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                <tr>
+                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>ID</th>
+                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Tài khoản (Username)</th>
+                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Mật khẩu (Password)</th>
+                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Email</th>
+                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Loại (Role)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>Đang tải...</td></tr>
+                                ) : users.map(u => (
+                                    <tr key={u.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1rem', color: '#6b7280', fontSize: '0.9rem' }}>{u.id}</td>
+                                        <td style={{ padding: '1rem', color: '#111827', fontWeight: 500 }}>{u.username}</td>
+                                        <td style={{ padding: '1rem', color: '#dc2626', fontWeight: 500 }}>{u.passwordHash}</td>
+                                        <td style={{ padding: '1rem', color: '#4b5563', fontSize: '0.9rem' }}>{u.email}</td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{ backgroundColor: u.roleType === 'admin' ? '#fef3c7' : '#f3f4f6', color: u.roleType === 'admin' ? '#92400e' : '#4b5563', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize' }}>
+                                                {u.roleType}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {users.length === 0 && !loading && (
+                                    <tr><td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Chưa có người dùng nào</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
                 {/* --- Placeholders for other tabs --- */}
-                {(activeTab === 'dashboard' || activeTab === 'categories' || activeTab === 'users') && (
+                {(activeTab === 'dashboard') && (
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
                         <p>Khu vực quản lý {navItems.find(i => i.id === activeTab)?.label.toLowerCase()} (Đang xây dựng...)</p>
                     </div>
@@ -450,7 +527,7 @@ const AdminDashboard = () => {
                                         }}
                                     />
                                     {newProduct.thumbnailUrl && (
-                                        <img src={`http://localhost:5285${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <img src={`${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     )}
                                 </div>
                             </div>
@@ -484,7 +561,7 @@ const AdminDashboard = () => {
                                         }}
                                     />
                                     {newProduct.detailImageUrls && newProduct.detailImageUrls.map((url, index) => (
-                                        <img key={index} src={`http://localhost:5285${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <img key={index} src={`${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     ))}
                                 </div>
                             </div>
@@ -1189,6 +1266,74 @@ const AdminDashboard = () => {
                                 style={{ padding: '0.6rem 1.5rem', border: 'none', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
                             >
                                 Lưu Sản Phẩm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Order Details Modal --- */}
+            {isOrderModalOpen && selectedOrder && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '1rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>
+                                Chi Tiết Đơn Hàng #{selectedOrder.id}
+                            </h2>
+                            <button onClick={() => setIsOrderModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={24} /></button>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem', color: '#374151' }}>Thông Tin Khách Hàng</h3>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Tên:</strong> {selectedOrder.customerName}</p>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>SĐT:</strong> {selectedOrder.phone}</p>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Email:</strong> {selectedOrder.email}</p>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Địa chỉ:</strong> {selectedOrder.address}</p>
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem', color: '#374151' }}>Thông Tin Thanh Toán</h3>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Phương thức:</strong> {selectedOrder.paymentMethod}</p>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Trạng thái đơn:</strong> {selectedOrder.status}</p>
+                                <p style={{ margin: '0.25rem 0', color: '#4b5563' }}><strong style={{ color: '#111827' }}>Ngày đặt:</strong> {new Date(selectedOrder.orderDate).toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', color: '#374151' }}>Sản Phẩm Đã Đặt</h3>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                    <tr>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Sản Phẩm</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Đơn Giá</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>SL</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem', textAlign: 'right' }}>Thành Tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedOrder.orderItems?.map(item => (
+                                        <tr key={item.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                            <td style={{ padding: '1rem', color: '#111827', fontWeight: 500 }}>
+                                                {item.product?.cpuName || item.product?.name || `Product ID: ${item.productId}`}
+                                            </td>
+                                            <td style={{ padding: '1rem', color: '#4b5563' }}>${item.unitPrice.toLocaleString()}</td>
+                                            <td style={{ padding: '1rem', color: '#4b5563' }}>x{item.quantity}</td>
+                                            <td style={{ padding: '1rem', color: '#059669', fontWeight: 600, textAlign: 'right' }}>
+                                                ${(item.unitPrice * item.quantity).toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', paddingRight: '1rem' }}>
+                                <span style={{ fontSize: '1.1rem', fontWeight: 600, color: '#374151', marginRight: '1rem' }}>Tổng Cộng:</span>
+                                <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#dc2626' }}>${selectedOrder.totalAmount?.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                            <button onClick={() => setIsOrderModalOpen(false)} style={{ padding: '0.6rem 1.5rem', backgroundColor: '#e5e7eb', color: '#374151', borderRadius: '0.5rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                                Đóng
                             </button>
                         </div>
                     </div>

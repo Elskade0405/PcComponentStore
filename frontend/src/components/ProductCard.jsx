@@ -1,11 +1,12 @@
 import React from 'react';
+import API_URL from '../config';
 import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product, onAdd }) => {
     const { addToCart } = useCart();
-    const backendUrl = 'http://localhost:5285';
+    const backendUrl = API_URL;
     
     // Parse attributes if they come from the new SQL DB
     let parsedAttributes = null;
@@ -63,7 +64,7 @@ const ProductCard = ({ product, onAdd }) => {
             </div>
 
             <Link to={`/product/${product.id}`} style={{ display: 'flex', flexDirection: 'column', flex: 1, textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ height: '130px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
+                <div style={{ height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
                     <img src={imgUrl} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                 </div>
 
@@ -104,6 +105,96 @@ const ProductCard = ({ product, onAdd }) => {
                         <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
                             {parsedAttributes.cores}
                         </span>
+                    )}
+                    {parsedAttributes?.gpu && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.gpu}
+                        </span>
+                    )}
+                    {parsedAttributes?.vram && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.vram}
+                        </span>
+                    )}
+                    {parsedAttributes?.type && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.type}
+                        </span>
+                    )}
+                    {parsedAttributes?.capacity && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.capacity}
+                        </span>
+                    )}
+                    {parsedAttributes?.bus && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.bus}
+                        </span>
+                    )}
+                    {parsedAttributes?.chipset && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.chipset}
+                        </span>
+                    )}
+                    {parsedAttributes?.formFactor && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.formFactor}
+                        </span>
+                    )}
+                    {parsedAttributes?.wattage && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.wattage}
+                        </span>
+                    )}
+                    {parsedAttributes?.efficiency && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.efficiency}
+                        </span>
+                    )}
+                    {parsedAttributes?.resolution && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.resolution}
+                        </span>
+                    )}
+                    {parsedAttributes?.refreshRate && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            {parsedAttributes.refreshRate}
+                        </span>
+                    )}
+                    {parsedAttributes?.panel && (
+                        <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                            Tấm nền {parsedAttributes.panel}
+                        </span>
+                    )}
+                    {/* Laptop attributes */}
+                    {parsedAttributes?.category === 'laptop' && (
+                        <>
+                            {parsedAttributes?.cpu && (
+                                <span style={{ backgroundColor: '#e0f2fe', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#0369a1', fontWeight: 600 }}>
+                                    {parsedAttributes.cpu}
+                                </span>
+                            )}
+                            {parsedAttributes?.ram && (
+                                <span style={{ backgroundColor: '#dcfce7', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#15803d', fontWeight: 600 }}>
+                                    {parsedAttributes.ram}
+                                </span>
+                            )}
+                            {parsedAttributes?.gpu && (
+                                <span style={{ backgroundColor: '#f3e8ff', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#7e22ce', fontWeight: 600 }}>
+                                    {parsedAttributes.gpu}
+                                </span>
+                            )}
+                            {parsedAttributes?.storage && (
+                                <span style={{ backgroundColor: '#fef9c3', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#a16207', fontWeight: 600 }}>
+                                    {parsedAttributes.storage}
+                                </span>
+                            )}
+                            {parsedAttributes?.weight && (
+                                <span style={{ backgroundColor: '#f3f4f6', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', color: '#4b5563', fontWeight: 600 }}>
+                                    {parsedAttributes.weight}
+                                </span>
+                            )}
+                        </>
                     )}
                 </div>
 

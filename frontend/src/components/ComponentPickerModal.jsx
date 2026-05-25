@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
+import API_URL from '../config';
 
 export const BUILD_SLOTS = [
     { 
@@ -385,7 +386,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                                 try { if (p.attributes) parsedAttr = JSON.parse(p.attributes); } catch(e) {}
                                 const oldPrice = (parsedAttr.originalPrice && parsedAttr.originalPrice > p.price) ? parsedAttr.originalPrice : null;
                                 const resolvedImage = parsedAttr.thumbnailUrl || parsedAttr.imageUrl || p.imageUrl || '';
-                                const imageSrc = resolvedImage ? `http://localhost:5285${resolvedImage}` : 'https://via.placeholder.com/180?text=No+Image';
+                                const imageSrc = resolvedImage ? `${API_URL}${resolvedImage}` : 'https://via.placeholder.com/180?text=No+Image';
                                 
                                 return (
                                 <div key={p.id} style={{ backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

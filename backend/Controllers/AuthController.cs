@@ -81,7 +81,7 @@ namespace PcComponentStore.Api.Controllers
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     Email = user.Email,
-                    Role = user.RoleType == "admin" ? "Admin" : "Customer"
+                    Role = user.RoleType == "admin" ? "Admin" : "Customer", UserId = user.Id
                 });
             }
             return Unauthorized();
@@ -99,6 +99,7 @@ namespace PcComponentStore.Api.Controllers
             {
                 // First, connect without database to create it
                 var defaultConn = _configuration.GetConnectionString("DefaultConnection");
+                if (string.IsNullOrEmpty(defaultConn)) return BadRequest("DefaultConnection is not configured.");
                 var masterConnectionString = defaultConn.Replace("Database=pccomdb;", "");
                 using var masterConnection = new MySqlConnector.MySqlConnection(masterConnectionString);
                 await masterConnection.OpenAsync();
@@ -206,7 +207,7 @@ namespace PcComponentStore.Api.Controllers
                         Id = user.Id,
                         Username = user.Username,
                         Email = user.Email,
-                        Role = user.RoleType == "admin" ? "Admin" : "Customer"
+                        Role = user.RoleType == "admin" ? "Admin" : "Customer", UserId = user.Id
                     }
                 });
             }

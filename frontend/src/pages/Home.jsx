@@ -4,6 +4,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import CategoryBlock from '../components/CategoryBlock';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 // Image Assets
 import imgMayBan from '../assets/Images/HomePage/Mayban.png';
@@ -13,15 +14,25 @@ import imgCPU from '../assets/Images/HomePage/CPU.jpg';
 import imgRAM from '../assets/Images/HomePage/RAM.png';
 
 const Home = () => {
+    const { user } = useAuth();
     const [products, setProducts] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const sliderRef = useRef(null);
+    const suggestionSliderRef = useRef(null);
 
     const scrollLeft = () => {
         if (sliderRef.current) sliderRef.current.scrollBy({ left: -300, behavior: 'smooth' });
     };
     const scrollRight = () => {
         if (sliderRef.current) sliderRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    };
+
+    const scrollSugLeft = () => {
+        if (suggestionSliderRef.current) suggestionSliderRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    };
+    const scrollSugRight = () => {
+        if (suggestionSliderRef.current) suggestionSliderRef.current.scrollBy({ left: 300, behavior: 'smooth' });
     };
 
     useEffect(() => {
@@ -39,6 +50,20 @@ const Home = () => {
         fetchProducts();
     }, []);
 
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (user && user.userId) {
+                try {
+                    const res = await api.get(`/chatbot/suggestions/${user.userId}`);
+                    setSuggestions(res.data);
+                } catch (err) {
+                    console.error("Failed to load suggestions", err);
+                }
+            }
+        };
+        fetchSuggestions();
+    }, [user]);
+
     return (
         <>
             <div className="animate-fade-in" style={{ paddingBottom: '4rem', backgroundColor: '#f3f4f6' }}>
@@ -55,7 +80,7 @@ const Home = () => {
                 </section>
 
                 {/* New Products Container (No side banner) */}
-                <section className="container" style={{ marginTop: '2rem' }}>
+                <section className="container" style={{ marginTop: '1rem' }}>
                     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 'var(--border-radius-md)', boxShadow: 'var(--shadow-sm)' }}>
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -100,52 +125,94 @@ const Home = () => {
                     </div>
                 </section>
 
+                {/* AI Suggestions Section */}
+                {user && suggestions.length > 0 && (
+                    <section className="container" style={{ marginTop: '2rem' }}>
+                        <div style={{ backgroundColor: '#fffbe3', border: '1px solid #fde047', padding: '1.5rem', borderRadius: 'var(--border-radius-md)', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, textTransform: 'uppercase', color: '#854d0e', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    Gợi Ý
+                                </h2>
+                            </div>
+
+                            <div style={{ position: 'relative' }}>
+                                <div onClick={scrollSugLeft} style={{
+                                    position: 'absolute', left: '-1rem', top: '50%', transform: 'translateY(-50%)',
+                                    width: '32px', height: '32px', backgroundColor: 'white', borderRadius: '50%', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10
+                                }}>
+                                    <ChevronLeft size={20} color="#ca8a04" />
+                                </div>
+
+                                <div ref={suggestionSliderRef} style={{
+                                    display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem',
+                                    scrollSnapType: 'x mandatory'
+                                }} className="no-scrollbar">
+                                    {suggestions.map(product => (
+                                        <div key={product.id} style={{ minWidth: '190px', flex: '0 0 190px', scrollSnapAlign: 'start' }}>
+                                            <ProductCard product={product} />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div onClick={scrollSugRight} style={{
+                                    position: 'absolute', right: '-1rem', top: '50%', transform: 'translateY(-50%)',
+                                    width: '32px', height: '32px', backgroundColor: 'white', borderRadius: '50%', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10
+                                }}>
+                                    <ChevronRight size={20} color="#ca8a04" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* Reusable Category Blocks */}
                 <CategoryBlock
                     title="Máy bàn"
-                    categoryLink="/products?category=pc"
+                    categoryLink="/collection/pc-gaming"
                     bannerImage={imgMayBan}
                     products={products.filter(p => p.categoryName === 'pc')}
                 />
 
                 <CategoryBlock
                     title="Màn hình Gaming"
-                    categoryLink="/products?category=monitor"
+                    categoryLink="/collection/man-hinh-may-tinh"
                     bannerImage={imgMonitor}
                     products={products.filter(p => p.categoryName === 'monitor')}
                 />
 
                 <CategoryBlock
                     title="Card đồ hoạ"
-                    categoryLink="/products?category=vga"
+                    categoryLink="/category/vga"
                     bannerImage={imgVGA}
                     products={products.filter(p => p.categoryName === 'vga')}
                 />
 
                 <CategoryBlock
                     title="CPU"
-                    categoryLink="/products?category=cpu"
+                    categoryLink="/category/cpu"
                     bannerImage={imgCPU}
                     products={products.filter(p => p.categoryName === 'cpu')}
                 />
 
                 <CategoryBlock
                     title="RAM"
-                    categoryLink="/products?category=ram"
+                    categoryLink="/collection/ram"
                     bannerImage={imgRAM}
                     products={products.filter(p => p.categoryName === 'ram')}
                 />
 
                 <CategoryBlock
                     title="Bo mạch chủ (Mainboard)"
-                    categoryLink="/products?category=mainboard"
+                    categoryLink="/collection/mainboard-bo-mach-chu"
                     bannerImage={imgCPU}
                     products={products.filter(p => p.categoryName === 'mainboard')}
                 />
 
                 <CategoryBlock
                     title="Ổ cứng (SSD/HDD)"
-                    categoryLink="/products?category=storage"
+                    categoryLink="/collection/o-cung-ssd-hdd"
                     bannerImage={imgRAM}
                     products={products.filter(p => p.categoryName === 'storage')}
                 />

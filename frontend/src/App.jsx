@@ -11,14 +11,18 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import BuildPC from './pages/BuildPC';
+import OrderHistory from './pages/OrderHistory';
+import OrderDetail from './pages/OrderDetail';
 import VgaCategory from './pages/VgaCategory';
 import CpuCategory from './pages/CpuCategory';
+import MonitorCategory from './pages/MonitorCategory';
 import GenericCategory from './pages/GenericCategory';
 import BankAccount from './pages/BankAccount';
 import WarrantyPolicy from './pages/WarrantyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Chatbot from './components/Chatbot';
 import './index.css';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -53,8 +57,11 @@ const App = () => {
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/build-pc" element={<BuildPC />} />
+              <Route path="/order-history" element={<OrderHistory />} />
+              <Route path="/order-history/:id" element={<OrderDetail />} />
               <Route path="/category/vga" element={<VgaCategory />} />
               <Route path="/category/cpu" element={<CpuCategory />} />
+              <Route path="/collection/man-hinh-may-tinh" element={<MonitorCategory />} />
               <Route path="/collection/:alias" element={<GenericCategory />} />
               <Route path="/bank-account" element={<BankAccount />} />
               <Route path="/warranty-policy" element={<WarrantyPolicy />} />
@@ -68,6 +75,7 @@ const App = () => {
                 }
               />
             </Routes>
+            <Chatbot />
           </main>
           <Footer />
         </CartProvider>

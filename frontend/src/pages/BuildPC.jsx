@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
-import { Cpu, HardDrive, Filter, Monitor, Mouse, Keyboard, Plus, Minus, Trash2, X, RefreshCw, ShoppingCart, Info, Search } from 'lucide-react';
+import { Cpu, HardDrive, Filter, Monitor, Mouse, Keyboard, Plus, Minus, Trash2, X, RefreshCw, ShoppingCart, Info, Search, Sparkles } from 'lucide-react';
+import API_URL from '../config';
 
 // Custom icons based on lucide for various parts
 const partIcons = {
@@ -20,6 +21,7 @@ const partIcons = {
 };
 
 import ComponentPickerModal, { BUILD_SLOTS } from '../components/ComponentPickerModal';
+import RealtimeAiAssistant from '../components/RealtimeAiAssistant';
 
 const BuildPC = () => {
     const navigate = useNavigate();
@@ -187,7 +189,7 @@ const BuildPC = () => {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                                 <div style={{ width: '60px', height: '60px', backgroundColor: 'white', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
                                                     <img 
-                                                        src={resolvedImage ? `http://localhost:5285${resolvedImage}` : 'https://via.placeholder.com/60?text=No+Img'} 
+                                                        src={resolvedImage ? `${API_URL}${resolvedImage}` : 'https://via.placeholder.com/60?text=No+Img'} 
                                                         alt={selectedItem.product.name} 
                                                         style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
                                                         onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/60?text=No+Img'; }}
@@ -249,8 +251,10 @@ const BuildPC = () => {
                         </p>
                     </div>
 
+                    <RealtimeAiAssistant selectedParts={selectedParts} />
+
                     <div style={{ backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border-color)', padding: '1.5rem', textAlign: 'center' }}>
-                        <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155', marginBottom: '1rem' }}>Bạn cần thắc mắc về cấu hình ?</h3>
+                        <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155', marginBottom: '1rem' }}>Bạn cần thắc mắc về cấu hình?</h3>
                         <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', borderColor: '#7dd3fc', color: '#0284c7', backgroundColor: '#e0f2fe' }}>
                             <Info size={16} /> Liên hệ tư vấn
                         </button>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Minus, Plus, ChevronDown, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import api from '../services/api';
+import API_URL from '../config';
 import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
@@ -52,7 +53,7 @@ const ProductDetail = () => {
     // Mock images since DB doesn't have them yet
     const placeholderImg = "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80"; // CPU placeholder
     
-    const backendUrl = 'http://localhost:5285';
+    const backendUrl = API_URL;
     const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
     const mainImg = resolvedThumb ? `${backendUrl}${resolvedThumb}` : placeholderImg;
     const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => `${backendUrl}${u}`) : [];

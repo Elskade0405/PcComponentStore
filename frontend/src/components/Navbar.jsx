@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { Search, ShoppingCart, User, Settings, Facebook, Instagram, Menu, ChevronRight, ClipboardList, KeyRound, LogOut, ShieldAlert } from 'lucide-react';
 import api from '../services/api';
+import API_URL from '../config';
 import MegaMenu from './MegaMenu';
 const Navbar = () => {
     const { user, isAdmin, logout } = useAuth();
@@ -112,7 +113,7 @@ const Navbar = () => {
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px', zIndex: 120, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                 {suggestions.map(s => {
-                                    const imgUrl = s.imageUrl ? `http://localhost:5285${s.imageUrl}` : 'https://via.placeholder.com/50x50?text=SP';
+                                    const imgUrl = s.imageUrl ? `${API_URL}${s.imageUrl}` : 'https://via.placeholder.com/50x50?text=SP';
                                     return (
                                         <Link 
                                             key={s.id} 
@@ -197,7 +198,7 @@ const Navbar = () => {
                                         </button>
                                     )}
                                     <button 
-                                        onClick={() => { setShowAccountMenu(false); navigate('/profile'); }}
+                                        onClick={() => { setShowAccountMenu(false); navigate('/order-history'); }}
                                         style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem', border: 'none', background: 'none', textAlign: 'left', cursor: 'pointer', color: '#374151', borderBottom: '1px solid #f3f4f6' }}
                                         onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
                                         onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
@@ -270,10 +271,10 @@ const Navbar = () => {
                 <MegaMenu />
 
                 <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', color: 'var(--accent-blue)' }}>
-                    <Link to="#">Laptop</Link>
-                    <Link to="#">Màn hình</Link>
-                    <Link to="#">Thiết bị văn phòng</Link>
-                    <Link to="#">Linh kiện PC</Link>
+                    <Link to="/collection/laptop">Laptop</Link>
+                    <Link to="/collection/man-hinh-may-tinh">Màn hình</Link>
+                    <Link to="/collection/thiet-bi-van-phong">Thiết bị văn phòng</Link>
+                    <Link to="/products">Linh kiện PC</Link>
                 </div>
                 <Link to="/build-pc" className="text-blue" style={{ border: '1px solid var(--accent-blue)', borderRadius: 'var(--border-radius-full)', padding: '0.4rem 1rem', textDecoration: 'none' }}>
                     Xây dựng cấu hình PC

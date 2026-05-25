@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Trash2, Minus, Plus, Settings } from 'lucide-react'; // Settings as a placeholder for Print/Excel if needed
 import CheckoutModal from '../components/CheckoutModal';
+import API_URL from '../config';
 
 const Cart = () => {
     const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
     const [showCheckoutModal, setShowCheckoutModal] = React.useState(false);
-    const backendUrl = 'http://localhost:5285';
+    const backendUrl = API_URL;
 
     return (
         <div style={{ backgroundColor: '#f1f1f1', paddingBottom: '4rem', paddingTop: '1rem', minHeight: '80vh' }}>
