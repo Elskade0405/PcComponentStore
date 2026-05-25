@@ -12,10 +12,10 @@ const mysql = require('mysql2/promise');
 // 👇 SỬA THÔNG TIN DATABASE CLOUD CỦA BẠN Ở ĐÂY 👇
 // ============================================================
 const DB_CONFIG = {
-    host: 'monorail.proxy.rlwy.net',  // ← Host từ Railway
-    port: 43210,                       // ← Port từ Railway
+    host: 'mysql.railway.internal',  // ← Host từ Railway
+    port: 3306,                       // ← Port từ Railway
     user: 'root',                      // ← User từ Railway
-    password: 'aBcDeFgHiJkL',          // ← Password từ Railway
+    password: 'gVGxHDkBOODigkRoamwOdHuhayuoODlD',          // ← Password từ Railway
     database: 'railway'                // ← Database từ Railway
 };
 
