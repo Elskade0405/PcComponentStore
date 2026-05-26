@@ -189,8 +189,9 @@ namespace PcComponentStore.Api.Controllers
 
                 return new { p.Product, p.Category, Score = score };
             })
-            // Chỉ lấy những sản phẩm có điểm > 0 HOẶC nếu đã biết category thì lấy những cái cao điểm nhất
-            .Where(p => p.Score > 0 || !string.IsNullOrEmpty(targetCategory))
+            // Chỉ lấy những sản phẩm có điểm >= 0 (Loại bỏ những sản phẩm bị phạt điểm âm)
+            // Đồng thời Score > 0 HOẶC nếu đã biết category thì mới lấy
+            .Where(p => p.Score >= 0 && (p.Score > 0 || !string.IsNullOrEmpty(targetCategory)))
             .OrderByDescending(p => p.Score)
             .ThenBy(p => p.Product.Price) // Nếu cùng điểm thì ưu tiên giá rẻ lên trước
             .Take(5)
