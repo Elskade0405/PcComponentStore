@@ -141,6 +141,13 @@ const AdminDashboard = () => {
                         Tải ảnh lên
                     </button>
                 </div>
+                <button 
+                    onClick={() => setValue('')} 
+                    style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #ef4444', backgroundColor: '#fef2f2', color: '#ef4444', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
+                    title="Xóa ảnh này"
+                >
+                    <Trash2 size={18} />
+                </button>
             </div>
             {value && (
                 <div style={{ marginTop: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
