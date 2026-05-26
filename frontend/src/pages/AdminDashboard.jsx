@@ -24,8 +24,10 @@ const AdminDashboard = () => {
 
     // Settings state
     const [homeBannerUrl, setHomeBannerUrl] = useState('');
+    const [leftBannerUrl, setLeftBannerUrl] = useState('');
+    const [rightBannerUrl, setRightBannerUrl] = useState('');
     const [isSavingSetting, setIsSavingSetting] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
+    const [uploadingKey, setUploadingKey] = useState(null);
 
     const initialProductState = {
         type: 'cpu',
@@ -55,18 +57,31 @@ const AdminDashboard = () => {
 
     const fetchSettings = async () => {
         try {
-            const res = await api.get('/settings/HOME_BANNER_URL');
-            setHomeBannerUrl(res.data.value);
+            const res = await api.get('/settings');
+            const settings = res.data || [];
+            
+            const homeBanner = settings.find(s => s.key === 'HOME_BANNER_URL');
+            if (homeBanner) setHomeBannerUrl(homeBanner.value || '');
+            
+            const leftBanner = settings.find(s => s.key === 'LEFT_BANNER_URL');
+            if (leftBanner) setLeftBannerUrl(leftBanner.value || '');
+            
+            const rightBanner = settings.find(s => s.key === 'RIGHT_BANNER_URL');
+            if (rightBanner) setRightBannerUrl(rightBanner.value || '');
+            
         } catch (error) {
             console.error('Failed to fetch settings:', error);
-            // Ignore 404
         }
     };
 
     const handleSaveSetting = async () => {
         setIsSavingSetting(true);
         try {
-            await api.post('/settings', { key: 'HOME_BANNER_URL', value: homeBannerUrl });
+            await Promise.all([
+                api.post('/settings', { key: 'HOME_BANNER_URL', value: homeBannerUrl }),
+                api.post('/settings', { key: 'LEFT_BANNER_URL', value: leftBannerUrl }),
+                api.post('/settings', { key: 'RIGHT_BANNER_URL', value: rightBannerUrl })
+            ]);
             alert('Lưu cài đặt thành công!');
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -76,28 +91,64 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleFileUpload = async (event) => {
+    const handleFileUpload = async (event, key) => {
         const file = event.target.files[0];
         if (!file) return;
 
         const formData = new FormData();
         formData.append('file', file);
 
-        setIsUploading(true);
+        setUploadingKey(key);
         try {
             const res = await api.post('/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            setHomeBannerUrl(API_URL + res.data.url);
+            const url = API_URL + res.data.url;
+            if (key === 'HOME_BANNER_URL') setHomeBannerUrl(url);
+            else if (key === 'LEFT_BANNER_URL') setLeftBannerUrl(url);
+            else if (key === 'RIGHT_BANNER_URL') setRightBannerUrl(url);
         } catch (error) {
             console.error('Failed to upload image:', error);
             alert('Upload ảnh thất bại!');
         } finally {
-            setIsUploading(false);
+            setUploadingKey(null);
         }
     };
+
+    const renderBannerField = (label, key, value, setValue) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#374151' }}>{label}:</label>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+                <input
+                    type="text"
+                    placeholder="https://..."
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
+                />
+                <div style={{ position: 'relative' }}>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileUpload(e, key)} 
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} 
+                        disabled={uploadingKey === key}
+                    />
+                    <button style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #2563eb', backgroundColor: '#eff6ff', color: '#2563eb', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}>
+                        {uploadingKey === key ? <span className="spinner" style={{ width: '20px', height: '20px', border: '2px solid #2563eb', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : <Upload size={18} />}
+                        Tải ảnh lên
+                    </button>
+                </div>
+            </div>
+            {value && (
+                <div style={{ marginTop: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                    <img src={value} alt="Preview" style={{ width: '100%', height: 'auto', maxHeight: '150px', objectFit: 'cover', display: 'block' }} />
+                </div>
+            )}
+        </div>
+    );
 
     const handleOpenPcPicker = (slotId) => {
         setPcActiveSlot(slotId);
@@ -301,36 +352,12 @@ const AdminDashboard = () => {
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', color: '#1f2937' }}>Cài Đặt Trang Chủ</h2>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
-                            <label style={{ fontSize: '0.95rem', fontWeight: 500, color: '#374151' }}>Đường dẫn ảnh Banner chính (Hero Banner):</label>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <input
-                                    type="text"
-                                    placeholder="https://..."
-                                    value={homeBannerUrl}
-                                    onChange={(e) => setHomeBannerUrl(e.target.value)}
-                                    style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
-                                />
-                                <div style={{ position: 'relative' }}>
-                                    <input 
-                                        type="file" 
-                                        accept="image/*" 
-                                        onChange={handleFileUpload} 
-                                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} 
-                                        disabled={isUploading}
-                                    />
-                                    <button style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #2563eb', backgroundColor: '#eff6ff', color: '#2563eb', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}>
-                                        {isUploading ? <span className="spinner" style={{ width: '20px', height: '20px', border: '2px solid #2563eb', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : <Upload size={18} />}
-                                        Tải ảnh lên
-                                    </button>
-                                </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '800px' }}>
+                            {renderBannerField('Banner Chính giữa (Hero Banner)', 'HOME_BANNER_URL', homeBannerUrl, setHomeBannerUrl)}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                {renderBannerField('Banner Trái', 'LEFT_BANNER_URL', leftBannerUrl, setLeftBannerUrl)}
+                                {renderBannerField('Banner Phải', 'RIGHT_BANNER_URL', rightBannerUrl, setRightBannerUrl)}
                             </div>
-                            
-                            {homeBannerUrl && (
-                                <div style={{ marginTop: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
-                                    <img src={homeBannerUrl} alt="Preview" style={{ width: '100%', height: 'auto', maxHeight: '300px', objectFit: 'cover', display: 'block' }} />
-                                </div>
-                            )}
 
                             <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1.5rem' }}>
                                 <button

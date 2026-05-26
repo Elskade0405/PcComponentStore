@@ -19,6 +19,8 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
     const [homeBannerUrl, setHomeBannerUrl] = useState('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop');
+    const [leftBannerUrl, setLeftBannerUrl] = useState('');
+    const [rightBannerUrl, setRightBannerUrl] = useState('');
     const [loading, setLoading] = useState(true);
     const sliderRef = useRef(null);
     const suggestionSliderRef = useRef(null);
@@ -69,14 +71,18 @@ const Home = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const res = await api.get('/settings/HOME_BANNER_URL');
-                if (res.data && res.data.value) {
-                    // Check if it's a relative URL (uploaded image) or absolute
-                    const url = res.data.value.startsWith('http') 
-                        ? res.data.value 
-                        : `${API_URL}${res.data.value}`;
-                    setHomeBannerUrl(res.data.value);
-                }
+                const res = await api.get('/settings');
+                const settings = res.data || [];
+                
+                const homeBanner = settings.find(s => s.key === 'HOME_BANNER_URL');
+                if (homeBanner && homeBanner.value) setHomeBannerUrl(homeBanner.value);
+                
+                const leftBanner = settings.find(s => s.key === 'LEFT_BANNER_URL');
+                if (leftBanner && leftBanner.value) setLeftBannerUrl(leftBanner.value);
+                
+                const rightBanner = settings.find(s => s.key === 'RIGHT_BANNER_URL');
+                if (rightBanner && rightBanner.value) setRightBannerUrl(rightBanner.value);
+                
             } catch (err) {
                 console.error("Failed to load banner settings", err);
             }
@@ -84,15 +90,32 @@ const Home = () => {
         fetchSettings();
     }, []);
 
+    const getFullImageUrl = (url) => {
+        if (!url) return '';
+        return url.startsWith('http') ? url : `${API_URL}${url}`;
+    };
+
     return (
         <>
-            <div className="animate-fade-in" style={{ paddingBottom: '4rem', backgroundColor: '#f3f4f6' }}>
+            <div className="animate-fade-in" style={{ paddingBottom: '4rem', backgroundColor: '#f3f4f6', position: 'relative' }}>
+                
+                {/* Floating Side Banners */}
+                {leftBannerUrl && (
+                    <div style={{ position: 'absolute', top: '100px', left: '10px', width: '150px', zIndex: 5 }} className="side-banner">
+                        <img src={getFullImageUrl(leftBannerUrl)} alt="Left Banner" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                    </div>
+                )}
+                {rightBannerUrl && (
+                    <div style={{ position: 'absolute', top: '100px', right: '10px', width: '150px', zIndex: 5 }} className="side-banner">
+                        <img src={getFullImageUrl(rightBannerUrl)} alt="Right Banner" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                    </div>
+                )}
 
                 {/* Hero Banner Section */}
                 <section style={{ backgroundColor: 'white', borderBottom: '1px solid var(--border-color)' }}>
                     <div className="container" style={{ padding: '0 0' }}>
                         <img
-                            src={homeBannerUrl.startsWith('http') ? homeBannerUrl : `${API_URL}${homeBannerUrl}`}
+                            src={getFullImageUrl(homeBannerUrl)}
                             alt="Hero Banner"
                             style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'cover', display: 'block' }}
                         />

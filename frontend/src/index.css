@@ -218,3 +218,13 @@ ul {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Side Banners */
+.side-banner {
+  display: none;
+}
+@media (min-width: 1500px) {
+  .side-banner {
+    display: block;
+  }
+}

@@ -114,7 +114,10 @@ async function run() {
         // Seed default setting
         await con.execute(`
             INSERT IGNORE INTO settings (setting_key, setting_value) 
-            VALUES ('HOME_BANNER_URL', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop')
+            VALUES 
+                ('HOME_BANNER_URL', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'),
+                ('LEFT_BANNER_URL', ''),
+                ('RIGHT_BANNER_URL', '')
         `);
 
         // ============================
