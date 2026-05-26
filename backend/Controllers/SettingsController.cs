@@ -40,7 +40,7 @@ namespace PcComponentStore.Api.Controllers
 
         // POST: api/settings
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSetting([FromBody] SettingRequestDto request)
         {
             if (string.IsNullOrEmpty(request.Key))

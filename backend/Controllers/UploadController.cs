@@ -12,7 +12,7 @@ namespace PcComponentStore.Api.Controllers
     public class UploadController : ControllerBase
     {
         [HttpPost]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
