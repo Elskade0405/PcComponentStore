@@ -159,6 +159,19 @@ namespace PcComponentStore.Api.Controllers
                         score++;
                     }
                 }
+
+                // Heuristic chấm điểm cho nhu cầu đặc biệt (Render, 3D, Gaming)
+                if (msg.Contains("render") || msg.Contains("3d") || msg.Contains("đồ họa") || msg.Contains("làm việc")) {
+                    if (searchSpace.Contains("i9") || searchSpace.Contains("i7") || searchSpace.Contains("ryzen 9") || searchSpace.Contains("ryzen 7") || searchSpace.Contains("rtx 4090") || searchSpace.Contains("rtx 4080")) {
+                        score += 5; // Ưu tiên CPU nhiều nhân, VGA mạnh
+                    }
+                }
+                if (msg.Contains("game") || msg.Contains("gaming") || msg.Contains("chơi")) {
+                    if (searchSpace.Contains("x3d") || searchSpace.Contains("i5") || searchSpace.Contains("ryzen 5") || searchSpace.Contains("rtx 4060") || searchSpace.Contains("rx 7600")) {
+                        score += 5; // Ưu tiên CPU dòng X3D, i5, Ryzen 5 hoặc VGA tầm trung/cao
+                    }
+                }
+
                 return new { p.Product, p.Category, Score = score };
             })
             // Chỉ lấy những sản phẩm có điểm > 0 HOẶC nếu đã biết category thì lấy bừa 3 cái cao điểm nhất
