@@ -59,17 +59,23 @@ namespace PcComponentStore.Api.Controllers
             decimal? minPrice = null;
             decimal? exactBudget = null;
             
-            var matchUnder = System.Text.RegularExpressions.Regex.Match(msg, @"dưới\s+(\d+)\s*(triệu|tr|củ)");
-            if (matchUnder.Success && decimal.TryParse(matchUnder.Groups[1].Value, out decimal maxVal)) {
-                maxPrice = maxVal * 1000000;
+            var matchUnder = System.Text.RegularExpressions.Regex.Match(msg, @"(?:dưới\s+(\d+)\s*(?:triệu|tr|củ))|(?:(\d+)\s*(?:triệu|tr|củ)\s*(?:trở xuống|đổ lại|quay đầu))");
+            if (matchUnder.Success) {
+                string valStr = !string.IsNullOrEmpty(matchUnder.Groups[1].Value) ? matchUnder.Groups[1].Value : matchUnder.Groups[2].Value;
+                if (decimal.TryParse(valStr, out decimal maxVal)) {
+                    maxPrice = maxVal * 1000000;
+                }
             }
 
-            var matchOver = System.Text.RegularExpressions.Regex.Match(msg, @"(trên|hơn)\s+(\d+)\s*(triệu|tr|củ)");
-            if (matchOver.Success && decimal.TryParse(matchOver.Groups[2].Value, out decimal minVal)) {
-                minPrice = minVal * 1000000;
+            var matchOver = System.Text.RegularExpressions.Regex.Match(msg, @"(?:(?:trên|hơn)\s+(\d+)\s*(?:triệu|tr|củ))|(?:(\d+)\s*(?:triệu|tr|củ)\s*(?:trở lên))");
+            if (matchOver.Success) {
+                string valStr = !string.IsNullOrEmpty(matchOver.Groups[1].Value) ? matchOver.Groups[1].Value : matchOver.Groups[2].Value;
+                if (decimal.TryParse(valStr, out decimal minVal)) {
+                    minPrice = minVal * 1000000;
+                }
             }
 
-            var matchExact = System.Text.RegularExpressions.Regex.Match(msg, @"(?<!dưới\s|trên\s|hơn\s)\b(\d+)\s*(triệu|tr|củ)\b");
+            var matchExact = System.Text.RegularExpressions.Regex.Match(msg, @"(?<!dưới\s|trên\s|hơn\s)\b(\d+)\s*(triệu|tr|củ)\b(?!\s*(trở xuống|đổ lại|quay đầu|trở lên))");
             if (matchExact.Success && decimal.TryParse(matchExact.Groups[1].Value, out decimal exactVal)) {
                 exactBudget = exactVal * 1000000;
             }
