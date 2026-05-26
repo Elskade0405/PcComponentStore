@@ -160,6 +160,21 @@ namespace PcComponentStore.Api.Controllers
                     }
                 }
 
+                // Strict model matching (Tránh hỏi i5 ra i3/i7)
+                string[] strictModels = { "i3", "i5", "i7", "i9", "ryzen 3", "ryzen 5", "ryzen 7", "ryzen 9" };
+                foreach (var model in strictModels)
+                {
+                    // Nếu user đích danh hỏi dòng model này
+                    if (msg.Contains(model))
+                    {
+                        if (searchSpace.Contains(model)) {
+                            score += 10; // Điểm cộng tuyệt đối
+                        } else {
+                            score -= 20; // Trừ điểm rất nặng nếu lạc quẻ (vd: hỏi i5 mà đây là i3)
+                        }
+                    }
+                }
+
                 // Heuristic chấm điểm cho nhu cầu đặc biệt (Render, 3D, Gaming)
                 if (msg.Contains("render") || msg.Contains("3d") || msg.Contains("đồ họa") || msg.Contains("làm việc")) {
                     if (searchSpace.Contains("i9") || searchSpace.Contains("i7") || searchSpace.Contains("ryzen 9") || searchSpace.Contains("ryzen 7") || searchSpace.Contains("rtx 4090") || searchSpace.Contains("rtx 4080")) {
@@ -174,11 +189,11 @@ namespace PcComponentStore.Api.Controllers
 
                 return new { p.Product, p.Category, Score = score };
             })
-            // Chỉ lấy những sản phẩm có điểm > 0 HOẶC nếu đã biết category thì lấy bừa 3 cái cao điểm nhất
+            // Chỉ lấy những sản phẩm có điểm > 0 HOẶC nếu đã biết category thì lấy những cái cao điểm nhất
             .Where(p => p.Score > 0 || !string.IsNullOrEmpty(targetCategory))
             .OrderByDescending(p => p.Score)
             .ThenBy(p => p.Product.Price) // Nếu cùng điểm thì ưu tiên giá rẻ lên trước
-            .Take(3)
+            .Take(5)
             .ToList();
 
             // Nếu chỉ chào hỏi mà không có keyword cụ thể
