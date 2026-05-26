@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [users, setUsers] = useState([]);
-    const [activeTab, setActiveTab] = useState('products'); // Default to products for easier testing
+    const [activeTab, setActiveTab] = useState('settings'); // Default to settings
     const [loading, setLoading] = useState(true);
     const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
     const [pcPickerModalOpen, setPcPickerModalOpen] = useState(false);
@@ -255,11 +255,10 @@ const AdminDashboard = () => {
     };
 
     const navItems = [
-        { id: 'dashboard', label: 'Tóm tắt', icon: LayoutDashboard },
+        { id: 'settings', label: 'Đổi Banner', icon: Image },
         { id: 'orders', label: 'Đơn hàng', icon: Package },
         { id: 'products', label: 'Sản phẩm', icon: Truck },
         { id: 'users', label: 'Khách hàng', icon: Users },
-        { id: 'settings', label: 'Giao diện', icon: Image },
     ];
 
     return (
