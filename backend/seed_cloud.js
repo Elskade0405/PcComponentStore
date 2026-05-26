@@ -102,6 +102,21 @@ async function run() {
         `);
         console.log('  ✅ Bảng order_items');
 
+        await con.execute(`
+            CREATE TABLE IF NOT EXISTS settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                setting_key VARCHAR(100) NOT NULL UNIQUE,
+                setting_value TEXT NULL
+            )
+        `);
+        console.log('  ✅ Bảng settings');
+
+        // Seed default setting
+        await con.execute(`
+            INSERT IGNORE INTO settings (setting_key, setting_value) 
+            VALUES ('HOME_BANNER_URL', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop')
+        `);
+
         // ============================
         // Xóa data cũ trong products để seed lại
         // ============================

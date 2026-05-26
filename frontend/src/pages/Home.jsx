@@ -4,6 +4,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import CategoryBlock from '../components/CategoryBlock';
 import api from '../services/api';
+import API_URL from '../config';
 import { useAuth } from '../context/AuthContext';
 
 // Image Assets
@@ -17,6 +18,7 @@ const Home = () => {
     const { user } = useAuth();
     const [products, setProducts] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [homeBannerUrl, setHomeBannerUrl] = useState('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop');
     const [loading, setLoading] = useState(true);
     const sliderRef = useRef(null);
     const suggestionSliderRef = useRef(null);
@@ -64,6 +66,24 @@ const Home = () => {
         fetchSuggestions();
     }, [user]);
 
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/settings/HOME_BANNER_URL');
+                if (res.data && res.data.value) {
+                    // Check if it's a relative URL (uploaded image) or absolute
+                    const url = res.data.value.startsWith('http') 
+                        ? res.data.value 
+                        : `${API_URL}${res.data.value}`;
+                    setHomeBannerUrl(res.data.value);
+                }
+            } catch (err) {
+                console.error("Failed to load banner settings", err);
+            }
+        };
+        fetchSettings();
+    }, []);
+
     return (
         <>
             <div className="animate-fade-in" style={{ paddingBottom: '4rem', backgroundColor: '#f3f4f6' }}>
@@ -72,8 +92,8 @@ const Home = () => {
                 <section style={{ backgroundColor: 'white', borderBottom: '1px solid var(--border-color)' }}>
                     <div className="container" style={{ padding: '0 0' }}>
                         <img
-                            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop"
-                            alt="Hero Banner MSI"
+                            src={homeBannerUrl.startsWith('http') ? homeBannerUrl : `${API_URL}${homeBannerUrl}`}
+                            alt="Hero Banner"
                             style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'cover', display: 'block' }}
                         />
                     </div>

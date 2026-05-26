@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Package, Truck, Edit, Trash2, Plus, LayoutDashboard, Users, Tags, X } from 'lucide-react';
+import { Package, Truck, Edit, Trash2, Plus, LayoutDashboard, Users, Tags, X, Image, Upload } from 'lucide-react';
 import ComponentPickerModal from '../components/ComponentPickerModal';
 import API_URL from '../config';
 
@@ -21,6 +21,11 @@ const AdminDashboard = () => {
     // Filtering states for products
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('');
+
+    // Settings state
+    const [homeBannerUrl, setHomeBannerUrl] = useState('');
+    const [isSavingSetting, setIsSavingSetting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const initialProductState = {
         type: 'cpu',
@@ -43,7 +48,56 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         fetchAdminData();
+        if (activeTab === 'settings') {
+            fetchSettings();
+        }
     }, [activeTab]);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await api.get('/settings/HOME_BANNER_URL');
+            setHomeBannerUrl(res.data.value);
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+            // Ignore 404
+        }
+    };
+
+    const handleSaveSetting = async () => {
+        setIsSavingSetting(true);
+        try {
+            await api.post('/settings', { key: 'HOME_BANNER_URL', value: homeBannerUrl });
+            alert('Lưu cài đặt thành công!');
+        } catch (error) {
+            console.error('Failed to save settings:', error);
+            alert('Lưu cài đặt thất bại!');
+        } finally {
+            setIsSavingSetting(false);
+        }
+    };
+
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setIsUploading(true);
+        try {
+            const res = await api.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            setHomeBannerUrl(API_URL + res.data.url);
+        } catch (error) {
+            console.error('Failed to upload image:', error);
+            alert('Upload ảnh thất bại!');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const handleOpenPcPicker = (slotId) => {
         setPcActiveSlot(slotId);
@@ -205,6 +259,7 @@ const AdminDashboard = () => {
         { id: 'orders', label: 'Đơn hàng', icon: Package },
         { id: 'products', label: 'Sản phẩm', icon: Truck },
         { id: 'users', label: 'Khách hàng', icon: Users },
+        { id: 'settings', label: 'Giao diện', icon: Image },
     ];
 
     return (
@@ -241,6 +296,55 @@ const AdminDashboard = () => {
                 <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '2rem' }}>
                     {navItems.find(i => i.id === activeTab)?.label}
                 </h1>
+
+                {/* --- Settings Tab --- */}
+                {activeTab === 'settings' && (
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', color: '#1f2937' }}>Cài Đặt Trang Chủ</h2>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
+                            <label style={{ fontSize: '0.95rem', fontWeight: 500, color: '#374151' }}>Đường dẫn ảnh Banner chính (Hero Banner):</label>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <input
+                                    type="text"
+                                    placeholder="https://..."
+                                    value={homeBannerUrl}
+                                    onChange={(e) => setHomeBannerUrl(e.target.value)}
+                                    style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
+                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleFileUpload} 
+                                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} 
+                                        disabled={isUploading}
+                                    />
+                                    <button style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #2563eb', backgroundColor: '#eff6ff', color: '#2563eb', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}>
+                                        {isUploading ? <span className="spinner" style={{ width: '20px', height: '20px', border: '2px solid #2563eb', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : <Upload size={18} />}
+                                        Tải ảnh lên
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {homeBannerUrl && (
+                                <div style={{ marginTop: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                                    <img src={homeBannerUrl} alt="Preview" style={{ width: '100%', height: 'auto', maxHeight: '300px', objectFit: 'cover', display: 'block' }} />
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1.5rem' }}>
+                                <button
+                                    onClick={handleSaveSetting}
+                                    disabled={isSavingSetting}
+                                    style={{ padding: '0.75rem 2rem', border: 'none', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer', opacity: isSavingSetting ? 0.7 : 1 }}
+                                >
+                                    {isSavingSetting ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* --- Orders Tab --- */}
                 {activeTab === 'orders' && (
