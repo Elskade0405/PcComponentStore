@@ -17,6 +17,16 @@ builder.Services.AddMemoryCache();
 
 // Configure Entity Framework Core with MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Auto-detect Railway MySQL URL
+var railwayMySqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL");
+if (!string.IsNullOrEmpty(railwayMySqlUrl))
+{
+    var uri = new Uri(railwayMySqlUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    var dbName = uri.AbsolutePath.Trim('/');
+    connectionString = $"Server={uri.Host};Port={(uri.Port > 0 ? uri.Port : 3306)};Database={dbName};User={userInfo[0]};Password={(userInfo.Length > 1 ? userInfo[1] : "")};";
+}
 builder.Services.AddDbContext<PcComponentStoreDbContext>(options =>
 {
     // Use an explicit version instead of AutoDetect to prevent segmentation fault (139) 
@@ -57,12 +67,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:5173" };
-        
-        policy.WithOrigins(allowedOrigins)
+        policy.SetIsOriginAllowed(_ => true) // Allow any origin for deployment flexibility
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // Often needed for auth
     });
 });
 
