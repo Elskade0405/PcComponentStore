@@ -263,7 +263,7 @@ namespace PcComponentStore.Api.Controllers
                     // Accept all SSL certificates (in case of local proxy/antivirus issues)
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
+                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.Auto);
                     await client.AuthenticateAsync(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
