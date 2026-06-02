@@ -248,8 +248,9 @@ namespace PcComponentStore.Api.Controllers
                 var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
                 {
                     Port = int.Parse(emailSettings["SmtpPort"]),
-                    Credentials = new NetworkCredential(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]),
                     EnableSsl = true,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"])
                 };
 
                 var mailMessage = new MailMessage
