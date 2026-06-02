@@ -241,3 +241,8 @@ F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\runtimes\win\lib\net7.0\S
 F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\package-lock.json
 F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\package.json
 F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\appsettings.Production.json
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\MailKit.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\MimeKit.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+F:\workspace\PcComponentStore\backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

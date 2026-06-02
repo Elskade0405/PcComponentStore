@@ -9,9 +9,9 @@ using PcComponentStore.Api.Data;
 using PcComponentStore.Api.DTOs;
 using PcComponentStore.Api.Models;
 using Google.Apis.Auth;
-using System.Net.Mail;
-using System.Net;
-
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 namespace PcComponentStore.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -245,26 +245,29 @@ namespace PcComponentStore.Api.Controllers
             try
             {
                 var emailSettings = _configuration.GetSection("EmailSettings");
-                var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
-                {
-                    Port = int.Parse(emailSettings["SmtpPort"]),
-                    EnableSsl = true,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]),
-                    Timeout = 10000 // 10 seconds timeout
-                };
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(emailSettings["SenderName"], emailSettings["SenderEmail"]));
+                message.To.Add(new MailboxAddress("", model.Email));
+                message.Subject = "Mã xác thực Khôi phục mật khẩu - PC Component Store";
 
-                var mailMessage = new MailMessage
+                var bodyBuilder = new BodyBuilder
                 {
-                    From = new MailAddress(emailSettings["SenderEmail"], emailSettings["SenderName"]),
-                    Subject = "Mã xác thực Khôi phục mật khẩu - PC Component Store",
-                    Body = $"<h3>Mã xác thực OTP của bạn là: <strong style='font-size:24px;color:#2563eb'>{otp}</strong></h3><p>Mã này có hiệu lực trong vòng 5 phút. Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>",
-                    IsBodyHtml = true,
+                    HtmlBody = $"<h3>Mã xác thực OTP của bạn là: <strong style='font-size:24px;color:#2563eb'>{otp}</strong></h3><p>Mã này có hiệu lực trong vòng 5 phút. Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>"
                 };
-                mailMessage.To.Add(model.Email);
+                message.Body = bodyBuilder.ToMessageBody();
 
-                // Use Task.Run to ensure it doesn't block infinitely if SendMailAsync hangs
-                await Task.Run(() => smtpClient.Send(mailMessage));
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+                    client.Timeout = 10000; // 10 seconds
+                    
+                    // Accept all SSL certificates (in case of local proxy/antivirus issues)
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
             }
             catch (Exception ex)
             {
