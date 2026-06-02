@@ -32,7 +32,7 @@ const ShippingPolicy = () => {
                 Khách hàng sẽ nhận được hàng chậm nhất là bảy (07) ngày sau khi hoàn tất đơn hàng của mình. Thời gian luân chuyển và giao hàng nhanh hay chậm tùy theo đơn vị chuyển phát tại địa chỉ mà khách hàng đã cung cấp khi đặt hàng.
             </p>
             <p style={{ marginBottom: '1.5rem', textAlign: 'justify' }}>
-                Khách hàng sẽ nhận và kiểm tra hàng hóa trước khi thanh toán. Các khiếu nại về sản phẩm, chứng từ sẽ được giải quyết theo <Link to="/warranty-policy" style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 600 }}>quy định bảo hành</Link> và <Link to="#" style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 600 }}>chính sách đổi trả, hoàn tiền</Link>.
+                Khách hàng sẽ nhận và kiểm tra hàng hóa trước khi thanh toán. Các khiếu nại về sản phẩm, chứng từ sẽ được giải quyết theo <Link to="/warranty-policy" style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 600 }}>quy định bảo hành</Link> và <Link to="/return-policy" style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 600 }}>chính sách đổi trả, hoàn tiền</Link>.
             </p>
 
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>2. Trách nhiệm với hàng hóa vận chuyển</h3>

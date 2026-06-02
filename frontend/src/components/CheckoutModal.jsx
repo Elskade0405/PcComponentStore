@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, CreditCard, ShoppingBag, ShieldCheck, ArrowLeft, QrCode, CreditCard as CardIcon, Banknote, Building2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -406,9 +407,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     color: '#6b7280'
                 }}>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                        <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Điều khoản sử dụng</a>
-                        <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Câu hỏi thường gặp</a>
-                        <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Chính sách bảo mật</a>
+                        <Link to="/terms-of-use" style={{ color: '#6b7280', textDecoration: 'none' }}>Điều khoản sử dụng</Link>
+                        <Link to="/faq" style={{ color: '#6b7280', textDecoration: 'none' }}>Câu hỏi thường gặp</Link>
+                        <Link to="/privacy-policy" style={{ color: '#6b7280', textDecoration: 'none' }}>Chính sách bảo mật</Link>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1rem' }}>
                             <ShieldCheck size={18} color="#059669" />
                             <span style={{ fontWeight: 700, color: '#059669' }}>PCI DSS</span>

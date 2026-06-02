@@ -12,8 +12,8 @@ const Footer = () => {
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Về HGEARS</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                            <li><Link to="#">Giới thiệu</Link></li>
-                            <li><Link to="#">Tuyển dụng</Link></li>
+                            <li><Link to="/about-us">Giới thiệu</Link></li>
+                            <li><Link to="/careers">Tuyển dụng</Link></li>
                         </ul>
                     </div>
 
@@ -23,9 +23,9 @@ const Footer = () => {
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                             <li><Link to="/warranty-policy">Chính Sách Bảo Hành</Link></li>
                             <li><Link to="/shipping-policy">Chính Sách Giao Hàng</Link></li>
-                            <li><Link to="#">Chính Sách Bảo Mật</Link></li>
-                            <li><Link to="#">Chính Sách Đổi Trả</Link></li>
-                            <li><Link to="#">Điều Khoản Sử Dụng</Link></li>
+                            <li><Link to="/privacy-policy">Chính Sách Bảo Mật</Link></li>
+                            <li><Link to="/return-policy">Chính Sách Đổi Trả</Link></li>
+                            <li><Link to="/terms-of-use">Điều Khoản Sử Dụng</Link></li>
                         </ul>
                     </div>
 
@@ -47,7 +47,7 @@ const Footer = () => {
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Tài khoản ngân hàng</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                             <li><Link to="/bank-account">Tài Khoản Ngân Hàng</Link></li>
-                            <li><Link to="#">Tìm Kiếm Phương Thức Thanh Toán</Link></li>
+                            <li><Link to="/payment-methods">Tìm Kiếm Phương Thức Thanh Toán</Link></li>
                         </ul>
                     </div>
 

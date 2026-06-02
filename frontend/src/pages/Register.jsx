@@ -60,7 +60,7 @@ const Register = () => {
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
-                        <Link to="#" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'underline' }}>
+                        <Link to="/phone-login" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'underline' }}>
                             Đăng ký bằng số điện thoại
                         </Link>
                     </div>

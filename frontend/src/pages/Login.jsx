@@ -48,7 +48,7 @@ const Login = () => {
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
-                        <Link to="#" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'none' }}>
+                        <Link to="/phone-login" style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'none' }}>
                             Đăng nhập bằng số điện thoại
                         </Link>
                     </div>

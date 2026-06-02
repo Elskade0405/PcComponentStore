@@ -20,6 +20,15 @@ import GenericCategory from './pages/GenericCategory';
 import BankAccount from './pages/BankAccount';
 import WarrantyPolicy from './pages/WarrantyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
+import AboutUs from './pages/AboutUs';
+import Careers from './pages/Careers';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ReturnPolicy from './pages/ReturnPolicy';
+import TermsOfUse from './pages/TermsOfUse';
+import PaymentMethods from './pages/PaymentMethods';
+import Faq from './pages/Faq';
+import PromotionInfo from './pages/PromotionInfo';
+import PhoneLogin from './pages/PhoneLogin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
@@ -66,6 +75,15 @@ const App = () => {
               <Route path="/bank-account" element={<BankAccount />} />
               <Route path="/warranty-policy" element={<WarrantyPolicy />} />
               <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/return-policy" element={<ReturnPolicy />} />
+              <Route path="/terms-of-use" element={<TermsOfUse />} />
+              <Route path="/payment-methods" element={<PaymentMethods />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="/promotions" element={<PromotionInfo />} />
+              <Route path="/phone-login" element={<PhoneLogin />} />
               <Route
                 path="/admin"
                 element={

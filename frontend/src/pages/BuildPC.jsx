@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { Cpu, HardDrive, Filter, Monitor, Mouse, Keyboard, Plus, Minus, Trash2, X, RefreshCw, ShoppingCart, Info, Search, Sparkles } from 'lucide-react';
@@ -247,7 +247,7 @@ const BuildPC = () => {
                             <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-red)' }}>{totalCost.toLocaleString('vi-VN')}đ</span>
                         </div>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', margin: 0 }}>
-                            Giá chưa bao gồm ưu đãi Build PC. <a href="#" style={{ color: 'var(--accent-blue)', textDecoration: 'underline' }}>Xem chi tiết</a>
+                            Giá chưa bao gồm ưu đãi Build PC. <Link to="/promotions" target="_blank" style={{ color: 'var(--accent-blue)', textDecoration: 'underline' }}>Xem chi tiết</Link>
                         </p>
                     </div>
 
