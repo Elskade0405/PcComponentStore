@@ -250,7 +250,8 @@ namespace PcComponentStore.Api.Controllers
                     Port = int.Parse(emailSettings["SmtpPort"]),
                     EnableSsl = true,
                     UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"])
+                    Credentials = new NetworkCredential(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]),
+                    Timeout = 10000 // 10 seconds timeout
                 };
 
                 var mailMessage = new MailMessage
@@ -262,11 +263,13 @@ namespace PcComponentStore.Api.Controllers
                 };
                 mailMessage.To.Add(model.Email);
 
-                await smtpClient.SendMailAsync(mailMessage);
+                // Use Task.Run to ensure it doesn't block infinitely if SendMailAsync hangs
+                await Task.Run(() => smtpClient.Send(mailMessage));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Lỗi khi gửi email", Details = ex.Message });
+                var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return StatusCode(500, new { Message = "Lỗi SMTP: " + errorMsg });
             }
 
             return Ok(new { Message = "Nếu email hợp lệ, một mã OTP đã được gửi đến bạn." });
