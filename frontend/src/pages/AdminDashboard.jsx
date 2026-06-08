@@ -10,7 +10,13 @@ const AdminDashboard = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [users, setUsers] = useState([]);
-    const [activeTab, setActiveTab] = useState('settings'); // Default to settings
+    const { user } = useAuth();
+    const userRole = user?.roleType || '';
+    const getDefaultTab = () => {
+        if (userRole === 'SalesStaff') return 'orders';
+        return 'settings';
+    };
+    const [activeTab, setActiveTab] = useState(getDefaultTab());
     const [loading, setLoading] = useState(true);
     const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
     const [pcPickerModalOpen, setPcPickerModalOpen] = useState(false);
@@ -46,7 +52,7 @@ const AdminDashboard = () => {
     const [newProduct, setNewProduct] = useState(initialProductState);
     const [editingProductId, setEditingProductId] = useState(null);
 
-    const { user } = useAuth();
+
 
     useEffect(() => {
         fetchAdminData();
@@ -312,12 +318,24 @@ const AdminDashboard = () => {
         }
     };
 
-    const navItems = [
-        { id: 'settings', label: 'Đổi Banner', icon: Image },
-        { id: 'orders', label: 'Đơn hàng', icon: Package },
-        { id: 'products', label: 'Sản phẩm', icon: Truck },
-        { id: 'users', label: 'Khách hàng', icon: Users },
-    ];
+    let navItems = [];
+    if (userRole === 'Admin' || userRole === 'Manager') {
+        navItems = [
+            { id: 'settings', label: 'Cấu hình Web', icon: Image },
+            { id: 'orders', label: 'Đơn hàng', icon: Package },
+            { id: 'products', label: 'Sản phẩm', icon: Truck },
+            { id: 'users', label: 'Tài khoản', icon: Users },
+        ];
+    } else if (userRole === 'Editor') {
+        navItems = [
+            { id: 'settings', label: 'Cấu hình Web', icon: Image },
+            { id: 'products', label: 'Sản phẩm', icon: Truck },
+        ];
+    } else if (userRole === 'SalesStaff') {
+        navItems = [
+            { id: 'orders', label: 'Đơn hàng', icon: Package },
+        ];
+    }
 
     return (
         <div style={{ display: 'flex', minHeight: 'calc(100vh - 120px)', backgroundColor: '#f9fafb' }}>

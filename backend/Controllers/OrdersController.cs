@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PcComponentStore.Api.Data;
@@ -17,6 +18,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = "Admin,Manager,SalesStaff")]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetAllOrders()
         {
             var orders = await _context.Orders
@@ -99,6 +101,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpPut("{id}/status")]
+        [Authorize(Roles = "Admin,Manager,SalesStaff")]
         public async Task<ActionResult<dynamic>> UpdateStatus(string id, [FromBody] string status)
         {
             var order = await _context.Orders.FindAsync(id);

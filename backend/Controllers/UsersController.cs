@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PcComponentStore.Api.Data;
@@ -17,6 +18,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _context.Users.ToListAsync();

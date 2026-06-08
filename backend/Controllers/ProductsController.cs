@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PcComponentStore.Api.Data;
@@ -56,6 +57,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public async Task<ActionResult<dynamic>> CreateProduct([FromBody] ProductCreateDto productDto)
         {
             var attributesObj = new Dictionary<string, object> {
@@ -160,6 +162,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductCreateDto productDto)
         {
             var product = await _context.Products.FindAsync(id);
@@ -265,6 +268,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpPost("upload-image")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public async Task<IActionResult> UploadImage(IFormFile image)
         {
             if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
@@ -285,6 +289,7 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
