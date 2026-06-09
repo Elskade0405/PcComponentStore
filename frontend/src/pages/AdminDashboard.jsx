@@ -287,7 +287,18 @@ const AdminDashboard = () => {
 
     const openEditProduct = (product) => {
         let parsedAttr = {};
-        try { if (product.attributes) parsedAttr = JSON.parse(product.attributes); } catch (e) {}
+        try { 
+            if (product.attributes) {
+                const rawAttr = JSON.parse(product.attributes); 
+                for (const key in rawAttr) {
+                    if (key === 'originalPrice' || key === 'category' || key === 'detailImageUrls' || key === 'thumbnailUrl') {
+                        parsedAttr[key] = rawAttr[key];
+                    } else {
+                        parsedAttr[key] = rawAttr[key] != null ? String(rawAttr[key]) : '';
+                    }
+                }
+            }
+        } catch (e) {}
         
         setNewProduct({
             ...initialProductState,
