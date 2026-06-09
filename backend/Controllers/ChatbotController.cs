@@ -367,7 +367,7 @@ namespace PcComponentStore.Api.Controllers
             for (int i = 0; i < GEMINI_API_KEYS.Length; i++)
             {
                 string currentKey = GEMINI_API_KEYS[_currentKeyIndex];
-                string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={currentKey}";
+                string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={currentKey}";
                 
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(url, content);
@@ -396,8 +396,9 @@ namespace PcComponentStore.Api.Controllers
                 }
                 else
                 {
+                    var errorStr = await response.Content.ReadAsStringAsync();
                     // Lỗi khác, trả về thông báo lỗi
-                    return $"Hệ thống AI đang bảo trì (Lỗi: {response.StatusCode}). Xin vui lòng quay lại sau.";
+                    return $"Hệ thống AI đang bảo trì (Lỗi: {response.StatusCode} - {errorStr}). Xin vui lòng quay lại sau.";
                 }
             }
 

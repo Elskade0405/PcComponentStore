@@ -687,7 +687,7 @@ const AdminDashboard = () => {
                                         }}
                                     />
                                     {newProduct.thumbnailUrl && (
-                                        <img src={`${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <img src={newProduct.thumbnailUrl.startsWith('http') || newProduct.thumbnailUrl.startsWith('data:image') ? newProduct.thumbnailUrl : `${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     )}
                                 </div>
                             </div>

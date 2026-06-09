@@ -273,18 +273,15 @@ namespace PcComponentStore.Api.Controllers
         {
             if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
             
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+            // Giới hạn dung lượng 2MB để tránh Base64 quá dài
+            if (image.Length > 2 * 1024 * 1024) return BadRequest("File quá lớn (Tối đa 2MB). Vui lòng nén ảnh lại.");
+
+            using var ms = new MemoryStream();
+            await image.CopyToAsync(ms);
+            var fileBytes = ms.ToArray();
+            var base64String = Convert.ToBase64String(fileBytes);
             
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-            
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
-            
-            var fileUrl = $"/uploads/{uniqueFileName}";
+            var fileUrl = $"data:{image.ContentType};base64,{base64String}";
             return Ok(new { url = fileUrl });
         }
 

@@ -20,7 +20,7 @@ const ProductCard = ({ product, onAdd }) => {
 
     const resolvedImage = parsedAttributes?.thumbnailUrl || parsedAttributes?.imageUrl || product.imageUrl;
     const imgUrl = resolvedImage
-        ? `${backendUrl}${resolvedImage}`
+        ? (resolvedImage.startsWith('http') || resolvedImage.startsWith('data:image') ? resolvedImage : `${backendUrl}${resolvedImage}`)
         : 'https://via.placeholder.com/200x200?text=No+Image';
 
     // Parse the original price from Attributes (fallback to normal price if it's 0 or missing to avoid weird displays)
