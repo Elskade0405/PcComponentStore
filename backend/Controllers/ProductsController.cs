@@ -269,7 +269,7 @@ namespace PcComponentStore.Api.Controllers
 
         [HttpPost("upload-image")]
         [Authorize(Roles = "Admin,Manager,Editor")]
-        public async Task<IActionResult> UploadImage(IFormFile image)
+        public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
         {
             if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
             

@@ -106,11 +106,7 @@ const AdminDashboard = () => {
 
         setUploadingKey(key);
         try {
-            const res = await api.post('/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const res = await api.post('/upload', formData);
             const url = API_URL + res.data.url;
             if (key === 'HOME_BANNER_URL') setHomeBannerUrl(url);
             else if (key === 'LEFT_BANNER_URL') setLeftBannerUrl(url);
@@ -671,9 +667,7 @@ const AdminDashboard = () => {
                                             try {
                                                 const formData = new FormData();
                                                 formData.append('image', file);
-                                                const res = await api.post('/products/upload-image', formData, {
-                                                    headers: { 'Content-Type': 'multipart/form-data' }
-                                                });
+                                                const res = await api.post('/products/upload-image', formData);
                                                 setNewProduct({ ...newProduct, thumbnailUrl: res.data.url });
                                             } catch (error) {
                                                 console.error('Lỗi upload ảnh:', error);
@@ -702,9 +696,7 @@ const AdminDashboard = () => {
                                                     files.map(async (file) => {
                                                         const formData = new FormData();
                                                         formData.append('image', file);
-                                                        const res = await api.post('/products/upload-image', formData, {
-                                                            headers: { 'Content-Type': 'multipart/form-data' }
-                                                        });
+                                                        const res = await api.post('/products/upload-image', formData);
                                                         return res.data.url;
                                                     })
                                                 );
