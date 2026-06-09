@@ -5,6 +5,35 @@ import { Package, Truck, Edit, Trash2, Plus, LayoutDashboard, Users, Tags, X, Im
 import ComponentPickerModal from '../components/ComponentPickerModal';
 import API_URL from '../config';
 
+const compressImage = (file, maxWidth = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = event => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = error => reject(error);
+        };
+        reader.onerror = error => reject(error);
+    });
+};
+
 const AdminDashboard = () => {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
@@ -281,7 +310,7 @@ const AdminDashboard = () => {
             fetchAdminData();
         } catch (error) {
             console.error('Lỗi khi lưu sản phẩm:', error);
-            alert('Có lỗi xảy ra khi lưu sản phẩm vào DB.');
+            alert(error.response?.data?.message || error.response?.data || error.message || 'Có lỗi xảy ra khi lưu sản phẩm vào DB.');
         }
     };
 
@@ -676,8 +705,9 @@ const AdminDashboard = () => {
                                             const file = e.target.files[0];
                                             if (!file) return;
                                             try {
+                                                const compressedFile = await compressImage(file);
                                                 const formData = new FormData();
-                                                formData.append('image', file);
+                                                formData.append('image', compressedFile);
                                                 const res = await api.post('/products/upload-image', formData);
                                                 setNewProduct({ ...newProduct, thumbnailUrl: res.data.url });
                                             } catch (error) {
@@ -705,8 +735,9 @@ const AdminDashboard = () => {
                                             try {
                                                 const uploadedUrls = await Promise.all(
                                                     files.map(async (file) => {
+                                                        const compressedFile = await compressImage(file);
                                                         const formData = new FormData();
-                                                        formData.append('image', file);
+                                                        formData.append('image', compressedFile);
                                                         const res = await api.post('/products/upload-image', formData);
                                                         return res.data.url;
                                                     })
