@@ -11,7 +11,7 @@ const AdminDashboard = () => {
     const [categories, setCategories] = useState([]);
     const [users, setUsers] = useState([]);
     const { user } = useAuth();
-    const userRole = user?.roleType || '';
+    const userRole = user?.role || '';
     const getDefaultTab = () => {
         if (userRole === 'SalesStaff') return 'orders';
         return 'settings';

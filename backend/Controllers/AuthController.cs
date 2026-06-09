@@ -77,7 +77,7 @@ namespace PcComponentStore.Api.Controllers
                     new Claim(ClaimTypes.Name, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.RoleType == "admin" ? "Admin" : "Customer")
+                    new Claim(ClaimTypes.Role, user.RoleType == "admin" ? "Admin" : (user.RoleType == "customer" ? "Customer" : user.RoleType))
                 };
 
                 var token = GetToken(authClaims);
@@ -86,7 +86,7 @@ namespace PcComponentStore.Api.Controllers
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     Email = user.Email,
-                    Role = user.RoleType == "admin" ? "Admin" : "Customer", UserId = user.Id
+                    Role = user.RoleType == "admin" ? "Admin" : (user.RoleType == "customer" ? "Customer" : user.RoleType), UserId = user.Id
                 });
             }
             return Unauthorized();
@@ -147,7 +147,7 @@ namespace PcComponentStore.Api.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.RoleType == "admin" ? "Admin" : "Customer")
+                new Claim(ClaimTypes.Role, user.RoleType == "admin" ? "Admin" : (user.RoleType == "customer" ? "Customer" : user.RoleType))
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "ThisIsAVerySecretKeyThatNeedsToBeAtLeast32BytesLong"));
@@ -212,7 +212,7 @@ namespace PcComponentStore.Api.Controllers
                         Id = user.Id,
                         Username = user.Username,
                         Email = user.Email,
-                        Role = user.RoleType == "admin" ? "Admin" : "Customer", UserId = user.Id
+                        Role = user.RoleType == "admin" ? "Admin" : (user.RoleType == "customer" ? "Customer" : user.RoleType), UserId = user.Id
                     }
                 });
             }
