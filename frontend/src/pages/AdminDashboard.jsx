@@ -297,7 +297,7 @@ const AdminDashboard = () => {
             brand: product.brand || '',
             price: product.price || 0,
             originalPrice: parsedAttr.originalPrice || 0,
-            stockQuantity: product.stockQuantity || 0,
+            stockQuantity: product.stock || 0,
         });
         setEditingProductId(product.id);
         setIsAddProductModalOpen(true);

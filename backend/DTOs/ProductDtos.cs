@@ -2,13 +2,13 @@ namespace PcComponentStore.Api.DTOs
 {
     public class ProductCreateDto
     {
-        public string Name { get; set; } = null!;
-        public string Description { get; set; } = string.Empty;
+        public string? Name { get; set; }
+        public string? Description { get; set; }
         public decimal Price { get; set; }
         public decimal? OriginalPrice { get; set; }
         public int StockQuantity { get; set; }
         public int CategoryId { get; set; }
-        public string Brand { get; set; } = string.Empty;
+        public string? Brand { get; set; }
         public string? ThumbnailUrl { get; set; }
         public List<string>? DetailImageUrls { get; set; }
         
@@ -28,7 +28,7 @@ namespace PcComponentStore.Api.DTOs
         public string? PcieLanes { get; set; }
         public string? Cooling { get; set; }
 
-        public string Type { get; set; } = "cpu"; // "cpu", "vga", "ram", "monitor", "pc"
+        public string? Type { get; set; } = "cpu"; // "cpu", "vga", "ram", "monitor", "pc"
 
         // VGA
         public string? GraphicEngine { get; set; }
