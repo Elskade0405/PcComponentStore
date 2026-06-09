@@ -698,9 +698,16 @@ const AdminDashboard = () => {
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Thumbnail (Trang Chủ)</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                     <input
+                                        type="text"
+                                        placeholder="Dán link ảnh (http...) hoặc tải file"
+                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1, outline: 'none' }}
+                                        value={newProduct.thumbnailUrl}
+                                        onChange={(e) => setNewProduct({ ...newProduct, thumbnailUrl: e.target.value })}
+                                    />
+                                    <input
                                         type="file"
                                         accept="image/*"
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
+                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', width: '150px' }}
                                         onChange={async (e) => {
                                             const file = e.target.files[0];
                                             if (!file) return;
@@ -725,10 +732,41 @@ const AdminDashboard = () => {
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Chi Tiết Khác (Nhiều ảnh)</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                     <input
+                                        type="text"
+                                        placeholder="Dán link ảnh (http...) rồi bấm Thêm Link"
+                                        id="detailLinkInput"
+                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1, outline: 'none' }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const url = e.target.value;
+                                                if (url) {
+                                                    setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, url] });
+                                                    e.target.value = '';
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            const input = document.getElementById('detailLinkInput');
+                                            const url = input.value;
+                                            if (url) {
+                                                setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, url] });
+                                                input.value = '';
+                                            }
+                                        }}
+                                        style={{ padding: '0.6rem 1rem', backgroundColor: '#3b82f6', color: 'white', borderRadius: '0.5rem', border: 'none', cursor: 'pointer' }}
+                                    >
+                                        Thêm Link
+                                    </button>
+                                    <input
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
+                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', width: '150px' }}
                                         onChange={async (e) => {
                                             const files = Array.from(e.target.files);
                                             if (files.length === 0) return;
