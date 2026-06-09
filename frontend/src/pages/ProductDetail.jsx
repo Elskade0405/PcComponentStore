@@ -52,12 +52,12 @@ const ProductDetail = () => {
 
     // Mock images since DB doesn't have them yet
     const placeholderImg = "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80"; // CPU placeholder
-    
+
     const backendUrl = API_URL;
     const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
     const mainImg = resolvedThumb ? `${backendUrl}${resolvedThumb}` : placeholderImg;
     const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => `${backendUrl}${u}`) : [];
-    
+
     // Combined list of images
     const allImages = Array.from(new Set([mainImg, ...detailList]));
 
@@ -290,7 +290,7 @@ const ProductDetail = () => {
                         {/* Contact Box */}
                         <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1rem', backgroundColor: '#f9f9f9', textAlign: 'center' }}>
                             <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Hotline tư vấn online</div>
-                            <div style={{ color: '#e30019', fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>6767 6767</div>
+                            <div style={{ color: '#e30019', fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>********</div>
                             <div style={{ fontSize: '0.8rem', color: '#666' }}>Zalo báo giá dự án: 098x xxx xxx</div>
                         </div>
                     </div>
@@ -390,13 +390,13 @@ const ProductDetail = () => {
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
                     <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', borderRadius: '4px', overflow: 'hidden' }}>
                         {/* Nút Close đỏ góc trên phải */}
-                        <button 
+                        <button
                             onClick={() => setIsSpecModalOpen(false)}
                             style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#f44336', color: 'white', border: 'none', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
                         >
                             <X size={20} />
                         </button>
-                        
+
                         <div style={{ padding: '2rem', overflowY: 'auto' }}>
                             <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', color: '#333', textTransform: 'uppercase' }}>Thông số kỹ thuật chi tiết</h2>
                             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e5e7eb', fontSize: '0.9rem' }}>
