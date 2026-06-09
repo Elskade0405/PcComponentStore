@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text;
 using PcComponentStore.Api.Helpers;
 
 namespace PcComponentStore.Api.Controllers
@@ -15,6 +17,15 @@ namespace PcComponentStore.Api.Controllers
     public class ChatbotController : ControllerBase
     {
         private readonly PcComponentStoreDbContext _context;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly string[] GEMINI_API_KEYS = new[] {
+            "AIzaSyCs3VU9NhqJ-i7khcQjzDavn29GIh3I1Q0",
+            "AIzaSyAp1B3h9BWfPN_mNKwQZR7bw_WHzX9wqTo",
+            "AIzaSyBagJKInIlGQcfHdeZ1ugHjNqgHN6iLxic",
+            "AIzaSyBfDJoyqr4dpH0aiAQPZbeH1edTo_o_WLE",
+            "AIzaSyBOVTfqv3Duk3bVmsE8p14sLe9UmUkemYc"
+        };
+        private static int _currentKeyIndex = 0;
 
         public ChatbotController(PcComponentStoreDbContext context)
         {
@@ -100,7 +111,12 @@ namespace PcComponentStore.Api.Controllers
                 }
 
                 decimal totalPrice = build.Sum(p => p.Price ?? 0);
-                string buildReplyText = $"Dạ vâng! Đây là cấu hình PC tối ưu nhất trong tầm giá **{totalPrice.ToString("N0")}đ** mà AI của cửa hàng vừa xây dựng cho bạn:\n\n";
+                
+                string buildPrompt = $"Bạn là nhân viên tư vấn PC Component Store. Khách hàng nhắn: \"{request.Message}\". ";
+                buildPrompt += $"Bạn đã build được cấu hình giá {totalPrice:N0}đ gồm: {string.Join(", ", build.Select(p => p.Name))}. ";
+                buildPrompt += "Hãy tư vấn thân thiện, in đậm tên linh kiện. KHÔNG bịa ra linh kiện khác ngoài danh sách. TRẢ LỜI NGẮN GỌN DƯỚI 150 TỪ.";
+                
+                string buildReplyText = await CallGeminiWithRotation(buildPrompt);
 
                 var buildItemsResult = build.Select(p => new {
                     Id = p.Id,
@@ -112,8 +128,6 @@ namespace PcComponentStore.Api.Controllers
                     Attributes = p.Attributes
                 }).ToList();
 
-                buildReplyText += "Bạn có thể xem danh sách linh kiện bên dưới và bấm nút thêm vào giỏ hàng nhé!";
-                
                 return Ok(new { reply = buildReplyText, buildItems = buildItemsResult });
             }
             
@@ -197,27 +211,30 @@ namespace PcComponentStore.Api.Controllers
             .Take(5)
             .ToList();
 
+            string replyText = "";
+            string prompt = "Bạn là nhân viên tư vấn bán hàng chuyên nghiệp của PC Component Store. ";
+            prompt += $"Khách hàng nhắn: \"{request.Message}\".\n\n";
+
             // Nếu chỉ chào hỏi mà không có keyword cụ thể
             if (isGreeting && rankedProducts.Count() == 0 && string.IsNullOrEmpty(targetCategory))
             {
-                return Ok(new { reply = "Chào bạn! Mình là trợ lý AI của PC Component Store. Bạn đang cần tìm mua linh kiện gì, laptop hay muốn build PC ạ?" });
+                prompt += "Hãy chào lại khách hàng một cách thân thiện và hỏi xem họ cần tư vấn mua linh kiện gì. TRẢ LỜI DƯỚI 50 TỪ.";
+            }
+            else if (rankedProducts.Count() == 0)
+            {
+                prompt += "Không tìm thấy linh kiện nào phù hợp. Hãy xin lỗi khách và gợi ý họ cung cấp thêm thông tin. TRẢ LỜI DƯỚI 50 TỪ.";
+            }
+            else
+            {
+                prompt += "Dưới đây là danh sách linh kiện có sẵn trong kho khớp với yêu cầu:\n";
+                foreach (var item in rankedProducts)
+                {
+                    prompt += $"- {item.Product.Name} (Giá: {item.Product.Price?.ToString("N0")}đ)\n";
+                }
+                prompt += "\nHãy tư vấn khách hàng, giới thiệu sơ qua về các sản phẩm này. IN ĐẬM tên sản phẩm. CHỈ DÙNG THÔNG TIN ĐƯỢC CUNG CẤP, KHÔNG ĐƯỢC BỊA THÊM SẢN PHẨM KHÁC. TRẢ LỜI DƯỚI 150 TỪ.";
             }
 
-            if (rankedProducts.Count() == 0)
-            {
-                return Ok(new { reply = "Dạ hiện tại mình chưa tìm thấy sản phẩm nào khớp với yêu cầu của bạn. Bạn có thể nói rõ hơn tên thương hiệu hoặc loại sản phẩm được không ạ?" });
-            }
-
-            // Sinh câu trả lời
-            string replyText = $"Dạ, cửa hàng em đang có một số mẫu cực kỳ phù hợp với yêu cầu của bạn ạ:\n\n";
-            
-            foreach (var item in rankedProducts)
-            {
-                string priceFmt = item.Product.Price?.ToString("N0") + "đ";
-                replyText += $"- **{item.Product.Name}**\n  💵 Giá chỉ: {priceFmt}\n\n";
-            }
-            
-            replyText += "Bạn thấy ưng mẫu nào chưa ạ? Bạn có thể bấm vào mục tìm kiếm trên Web để xem hình ảnh và chi tiết nhé!";
+            replyText = await CallGeminiWithRotation(prompt);
 
             // Lưu lịch sử nếu có UserId
             if (request.UserId.HasValue)
@@ -331,6 +348,60 @@ namespace PcComponentStore.Api.Controllers
             .ToList();
 
             return Ok(rankedProducts);
+        }
+
+        private async Task<string> CallGeminiWithRotation(string prompt)
+        {
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                    new
+                    {
+                        parts = new[] { new { text = prompt } }
+                    }
+                }
+            };
+            string jsonBody = JsonSerializer.Serialize(requestBody);
+
+            for (int i = 0; i < GEMINI_API_KEYS.Length; i++)
+            {
+                string currentKey = GEMINI_API_KEYS[_currentKeyIndex];
+                string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={currentKey}";
+                
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseStr = await response.Content.ReadAsStringAsync();
+                    using (JsonDocument doc = JsonDocument.Parse(responseStr))
+                    {
+                        var root = doc.RootElement;
+                        if (root.TryGetProperty("candidates", out JsonElement candidates) && candidates.GetArrayLength() > 0)
+                        {
+                            var parts = candidates[0].GetProperty("content").GetProperty("parts");
+                            if (parts.GetArrayLength() > 0)
+                            {
+                                return parts[0].GetProperty("text").GetString() ?? "Xin lỗi, hiện tại AI không thể trả lời.";
+                            }
+                        }
+                    }
+                    return "Xin lỗi, hiện tại AI không thể trả lời. Vui lòng thử lại sau.";
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests || (int)response.StatusCode == 429)
+                {
+                    // Quá giới hạn, chuyển sang key tiếp theo
+                    _currentKeyIndex = (_currentKeyIndex + 1) % GEMINI_API_KEYS.Length;
+                }
+                else
+                {
+                    // Lỗi khác, trả về thông báo lỗi
+                    return $"Hệ thống AI đang bảo trì (Lỗi: {response.StatusCode}). Xin vui lòng quay lại sau.";
+                }
+            }
+
+            return "Hệ thống AI hiện đang quá tải. Vui lòng thử lại sau ít phút.";
         }
     }
 }
