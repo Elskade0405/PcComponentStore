@@ -1,20 +1,8 @@
-const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCs3VU9NhqJ-i7khcQjzDavn29GIh3I1Q0';
-const body = JSON.stringify({
-    contents: [{
-        parts: [{
-            text: "hello"
-        }]
-    }]
-});
+const url = 'https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyCs3VU9NhqJ-i7khcQjzDavn29GIh3I1Q0';
 
-fetch(url, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: body
-})
+fetch(url)
 .then(async r => {
-    console.log(r.status);
-    console.log(await r.text());
+    let json = await r.json();
+    let names = json.models.map(m => m.name).filter(n => n.includes('gemini'));
+    console.log(names.join('\n'));
 }).catch(console.error);

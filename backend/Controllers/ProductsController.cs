@@ -273,8 +273,8 @@ namespace PcComponentStore.Api.Controllers
         {
             if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
             
-            // Giới hạn dung lượng 2MB để tránh Base64 quá dài
-            if (image.Length > 2 * 1024 * 1024) return BadRequest("File quá lớn (Tối đa 2MB). Vui lòng nén ảnh lại.");
+            // Giới hạn dung lượng 5MB để tránh Base64 quá dài
+            if (image.Length > 5 * 1024 * 1024) return BadRequest("File quá lớn (Tối đa 5MB). Vui lòng nén ảnh lại.");
 
             using var ms = new MemoryStream();
             await image.CopyToAsync(ms);

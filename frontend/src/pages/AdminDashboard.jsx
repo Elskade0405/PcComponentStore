@@ -682,7 +682,7 @@ const AdminDashboard = () => {
                                                 setNewProduct({ ...newProduct, thumbnailUrl: res.data.url });
                                             } catch (error) {
                                                 console.error('Lỗi upload ảnh:', error);
-                                                alert('Không thể upload ảnh!');
+                                                alert(error.response?.data || 'Không thể upload ảnh!');
                                             }
                                         }}
                                     />
@@ -714,7 +714,7 @@ const AdminDashboard = () => {
                                                 setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, ...uploadedUrls] });
                                             } catch (error) {
                                                 console.error('Lỗi upload ảnh chi tiết:', error);
-                                                alert('Có lỗi khi tải lên nhiều ảnh!');
+                                                alert(error.response?.data || 'Có lỗi khi tải lên nhiều ảnh!');
                                             }
                                         }}
                                     />

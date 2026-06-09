@@ -389,9 +389,11 @@ namespace PcComponentStore.Api.Controllers
                     }
                     return "Xin lỗi, hiện tại AI không thể trả lời. Vui lòng thử lại sau.";
                 }
-                else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests || (int)response.StatusCode == 429)
+                else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests || (int)response.StatusCode == 429 ||
+                         response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable || (int)response.StatusCode == 503 ||
+                         response.StatusCode == System.Net.HttpStatusCode.InternalServerError || (int)response.StatusCode == 500)
                 {
-                    // Quá giới hạn, chuyển sang key tiếp theo
+                    // Quá giới hạn hoặc bảo trì, chuyển sang key tiếp theo
                     _currentKeyIndex = (_currentKeyIndex + 1) % GEMINI_API_KEYS.Length;
                 }
                 else
