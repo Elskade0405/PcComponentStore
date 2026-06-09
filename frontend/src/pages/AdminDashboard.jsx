@@ -750,7 +750,20 @@ const AdminDashboard = () => {
                                         }}
                                     />
                                     {newProduct.detailImageUrls && newProduct.detailImageUrls.map((url, index) => (
-                                        <img key={index} src={`${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <div key={index} style={{position: 'relative', display: 'inline-block'}}>
+                                            <img key={`img-${index}`} src={url.startsWith('http') || url.startsWith('data:image') ? url : `${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                            <button 
+                                                onClick={() => {
+                                                    const newUrls = [...newProduct.detailImageUrls];
+                                                    newUrls.splice(index, 1);
+                                                    setNewProduct({...newProduct, detailImageUrls: newUrls});
+                                                }}
+                                                style={{position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', padding: 0}}
+                                                title="Xóa ảnh"
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
