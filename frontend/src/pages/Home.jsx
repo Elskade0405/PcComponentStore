@@ -117,7 +117,7 @@ const Home = () => {
                         <img
                             src={getFullImageUrl(homeBannerUrl)}
                             alt="Hero Banner"
-                            style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'cover', display: 'block' }}
+                            style={{ width: '100%', height: 'auto', display: 'block' }}
                         />
                     </div>
                 </section>
