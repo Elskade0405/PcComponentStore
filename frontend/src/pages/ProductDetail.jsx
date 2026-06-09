@@ -55,8 +55,8 @@ const ProductDetail = () => {
     
     const backendUrl = API_URL;
     const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
-    const mainImg = resolvedThumb ? (resolvedThumb.startsWith('http') || resolvedThumb.startsWith('data:image') ? resolvedThumb : `${backendUrl}${resolvedThumb}`) : placeholderImg;
-    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => (u.startsWith('http') || u.startsWith('data:image') ? u : `${backendUrl}${u}`)) : [];
+    const mainImg = resolvedThumb ? `${backendUrl}${resolvedThumb}` : placeholderImg;
+    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => `${backendUrl}${u}`) : [];
     
     // Combined list of images
     const allImages = Array.from(new Set([mainImg, ...detailList]));

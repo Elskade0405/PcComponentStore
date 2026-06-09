@@ -274,6 +274,13 @@ namespace PcComponentStore.Api.Controllers
                     currentHistory = currentHistory.Distinct().TakeLast(20).ToList();
 
                     attrDict["searchHistory"] = currentHistory;
+
+                    if (minPrice.HasValue) attrDict["lastMinPrice"] = minPrice.Value;
+                    else attrDict.Remove("lastMinPrice");
+                    
+                    if (maxPrice.HasValue) attrDict["lastMaxPrice"] = maxPrice.Value;
+                    else attrDict.Remove("lastMaxPrice");
+
                     userObj.Attributes = JsonSerializer.Serialize(attrDict);
                     await _context.SaveChangesAsync();
                 }
@@ -290,16 +297,26 @@ namespace PcComponentStore.Api.Controllers
                 return Ok(new List<object>());
 
             var currentHistory = new List<string>();
+            decimal? lastMinPrice = null;
+            decimal? lastMaxPrice = null;
             try {
                 var attrDict = JsonSerializer.Deserialize<Dictionary<string, object>>(userObj.Attributes);
-                if (attrDict != null && attrDict.TryGetValue("searchHistory", out object? historyObj) && historyObj is JsonElement jsonEl)
-                {
-                    if (jsonEl.ValueKind == JsonValueKind.Array)
+                if (attrDict != null) {
+                    if (attrDict.TryGetValue("searchHistory", out object? historyObj) && historyObj is JsonElement jsonEl)
                     {
-                        foreach (var item in jsonEl.EnumerateArray())
+                        if (jsonEl.ValueKind == JsonValueKind.Array)
                         {
-                            currentHistory.Add(item.GetString() ?? "");
+                            foreach (var item in jsonEl.EnumerateArray())
+                            {
+                                currentHistory.Add(item.GetString() ?? "");
+                            }
                         }
+                    }
+                    if (attrDict.TryGetValue("lastMinPrice", out object? minObj) && minObj is JsonElement minEl && minEl.TryGetDecimal(out decimal minVal)) {
+                        lastMinPrice = minVal;
+                    }
+                    if (attrDict.TryGetValue("lastMaxPrice", out object? maxObj) && maxObj is JsonElement maxEl && maxEl.TryGetDecimal(out decimal maxVal)) {
+                        lastMaxPrice = maxVal;
                     }
                 }
             } catch { return Ok(new List<object>()); }
@@ -321,6 +338,13 @@ namespace PcComponentStore.Api.Controllers
                 } catch { }
                 return new { Product = c, Category = catName };
             });
+
+            if (lastMinPrice.HasValue) {
+                matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price >= lastMinPrice.Value);
+            }
+            if (lastMaxPrice.HasValue) {
+                matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price <= lastMaxPrice.Value);
+            }
 
             var rankedProducts = matchedProducts.Select(p => {
                 int score = 0;

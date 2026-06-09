@@ -5,35 +5,6 @@ import { Package, Truck, Edit, Trash2, Plus, LayoutDashboard, Users, Tags, X, Im
 import ComponentPickerModal from '../components/ComponentPickerModal';
 import API_URL from '../config';
 
-const compressImage = (file, maxWidth = 800, quality = 0.7) => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = event => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toBlob((blob) => {
-                    resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                }, 'image/jpeg', quality);
-            };
-            img.onerror = error => reject(error);
-        };
-        reader.onerror = error => reject(error);
-    });
-};
-
 const AdminDashboard = () => {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
@@ -310,7 +281,7 @@ const AdminDashboard = () => {
             fetchAdminData();
         } catch (error) {
             console.error('Lỗi khi lưu sản phẩm:', error);
-            alert(error.response?.data?.message || error.response?.data || error.message || 'Có lỗi xảy ra khi lưu sản phẩm vào DB.');
+            alert('Có lỗi xảy ra khi lưu sản phẩm vào DB.');
         }
     };
 
@@ -698,33 +669,25 @@ const AdminDashboard = () => {
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Thumbnail (Trang Chủ)</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                     <input
-                                        type="text"
-                                        placeholder="Dán link ảnh (http...) hoặc tải file"
-                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1, outline: 'none' }}
-                                        value={newProduct.thumbnailUrl}
-                                        onChange={(e) => setNewProduct({ ...newProduct, thumbnailUrl: e.target.value })}
-                                    />
-                                    <input
                                         type="file"
                                         accept="image/*"
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', width: '150px' }}
+                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
                                         onChange={async (e) => {
                                             const file = e.target.files[0];
                                             if (!file) return;
                                             try {
-                                                const compressedFile = await compressImage(file);
                                                 const formData = new FormData();
-                                                formData.append('image', compressedFile);
+                                                formData.append('image', file);
                                                 const res = await api.post('/products/upload-image', formData);
                                                 setNewProduct({ ...newProduct, thumbnailUrl: res.data.url });
                                             } catch (error) {
                                                 console.error('Lỗi upload ảnh:', error);
-                                                alert(error.response?.data || 'Không thể upload ảnh!');
+                                                alert('Không thể upload ảnh!');
                                             }
                                         }}
                                     />
                                     {newProduct.thumbnailUrl && (
-                                        <img src={newProduct.thumbnailUrl.startsWith('http') || newProduct.thumbnailUrl.startsWith('data:image') ? newProduct.thumbnailUrl : `${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <img src={`${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     )}
                                 </div>
                             </div>
@@ -732,50 +695,18 @@ const AdminDashboard = () => {
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Chi Tiết Khác (Nhiều ảnh)</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                     <input
-                                        type="text"
-                                        placeholder="Dán link ảnh (http...) rồi bấm Thêm Link"
-                                        id="detailLinkInput"
-                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1, outline: 'none' }}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                const url = e.target.value;
-                                                if (url) {
-                                                    setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, url] });
-                                                    e.target.value = '';
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            const input = document.getElementById('detailLinkInput');
-                                            const url = input.value;
-                                            if (url) {
-                                                setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, url] });
-                                                input.value = '';
-                                            }
-                                        }}
-                                        style={{ padding: '0.6rem 1rem', backgroundColor: '#3b82f6', color: 'white', borderRadius: '0.5rem', border: 'none', cursor: 'pointer' }}
-                                    >
-                                        Thêm Link
-                                    </button>
-                                    <input
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', width: '150px' }}
+                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
                                         onChange={async (e) => {
                                             const files = Array.from(e.target.files);
                                             if (files.length === 0) return;
                                             try {
                                                 const uploadedUrls = await Promise.all(
                                                     files.map(async (file) => {
-                                                        const compressedFile = await compressImage(file);
                                                         const formData = new FormData();
-                                                        formData.append('image', compressedFile);
+                                                        formData.append('image', file);
                                                         const res = await api.post('/products/upload-image', formData);
                                                         return res.data.url;
                                                     })
@@ -783,25 +714,12 @@ const AdminDashboard = () => {
                                                 setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, ...uploadedUrls] });
                                             } catch (error) {
                                                 console.error('Lỗi upload ảnh chi tiết:', error);
-                                                alert(error.response?.data || 'Có lỗi khi tải lên nhiều ảnh!');
+                                                alert('Có lỗi khi tải lên nhiều ảnh!');
                                             }
                                         }}
                                     />
                                     {newProduct.detailImageUrls && newProduct.detailImageUrls.map((url, index) => (
-                                        <div key={index} style={{position: 'relative', display: 'inline-block'}}>
-                                            <img key={`img-${index}`} src={url.startsWith('http') || url.startsWith('data:image') ? url : `${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
-                                            <button 
-                                                onClick={() => {
-                                                    const newUrls = [...newProduct.detailImageUrls];
-                                                    newUrls.splice(index, 1);
-                                                    setNewProduct({...newProduct, detailImageUrls: newUrls});
-                                                }}
-                                                style={{position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', padding: 0}}
-                                                title="Xóa ảnh"
-                                            >
-                                                <X size={10} />
-                                            </button>
-                                        </div>
+                                        <img key={index} src={`${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     ))}
                                 </div>
                             </div>

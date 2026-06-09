@@ -268,20 +268,23 @@ namespace PcComponentStore.Api.Controllers
         }
 
         [HttpPost("upload-image")]
-        // [Authorize(Roles = "Admin,Manager,Editor")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
         {
             if (image == null || image.Length == 0) return BadRequest("Nội dung file rỗng.");
             
-            // Giới hạn dung lượng 5MB để tránh Base64 quá dài
-            if (image.Length > 5 * 1024 * 1024) return BadRequest("File quá lớn (Tối đa 5MB). Vui lòng nén ảnh lại.");
-
-            using var ms = new MemoryStream();
-            await image.CopyToAsync(ms);
-            var fileBytes = ms.ToArray();
-            var base64String = Convert.ToBase64String(fileBytes);
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
             
-            var fileUrl = $"data:{image.ContentType};base64,{base64String}";
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+            
+            var fileUrl = $"/uploads/{uniqueFileName}";
             return Ok(new { url = fileUrl });
         }
 
