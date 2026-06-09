@@ -128,6 +128,22 @@ namespace PcComponentStore.Api.Controllers
                     Attributes = p.Attributes
                 }).ToList();
 
+                if (request.UserId.HasValue)
+                {
+                    var userObj = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId.Value);
+                    if (userObj != null)
+                    {
+                        var attrDict = new Dictionary<string, object>();
+                        if (!string.IsNullOrEmpty(userObj.Attributes))
+                        {
+                            try { attrDict = JsonSerializer.Deserialize<Dictionary<string, object>>(userObj.Attributes) ?? new Dictionary<string, object>(); } catch { }
+                        }
+                        attrDict["lastSuggestedProductIds"] = build.Select(p => p.Id).ToList();
+                        userObj.Attributes = JsonSerializer.Serialize(attrDict);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 return Ok(new { reply = buildReplyText, buildItems = buildItemsResult });
             }
             
@@ -281,6 +297,9 @@ namespace PcComponentStore.Api.Controllers
                     if (maxPrice.HasValue) attrDict["lastMaxPrice"] = maxPrice.Value;
                     else attrDict.Remove("lastMaxPrice");
 
+                    // Save the exact product IDs we are suggesting
+                    attrDict["lastSuggestedProductIds"] = rankedProducts.Select(p => p.Product.Id).ToList();
+
                     userObj.Attributes = JsonSerializer.Serialize(attrDict);
                     await _context.SaveChangesAsync();
                 }
@@ -296,82 +315,41 @@ namespace PcComponentStore.Api.Controllers
             if (userObj == null || string.IsNullOrEmpty(userObj.Attributes))
                 return Ok(new List<object>());
 
-            var currentHistory = new List<string>();
-            decimal? lastMinPrice = null;
-            decimal? lastMaxPrice = null;
+            var suggestedIds = new List<int>();
             try {
                 var attrDict = JsonSerializer.Deserialize<Dictionary<string, object>>(userObj.Attributes);
                 if (attrDict != null) {
-                    if (attrDict.TryGetValue("searchHistory", out object? historyObj) && historyObj is JsonElement jsonEl)
+                    if (attrDict.TryGetValue("lastSuggestedProductIds", out object? idsObj) && idsObj is JsonElement jsonEl)
                     {
                         if (jsonEl.ValueKind == JsonValueKind.Array)
                         {
                             foreach (var item in jsonEl.EnumerateArray())
                             {
-                                currentHistory.Add(item.GetString() ?? "");
+                                if (item.TryGetInt32(out int id)) suggestedIds.Add(id);
                             }
                         }
-                    }
-                    if (attrDict.TryGetValue("lastMinPrice", out object? minObj) && minObj is JsonElement minEl && minEl.TryGetDecimal(out decimal minVal)) {
-                        lastMinPrice = minVal;
-                    }
-                    if (attrDict.TryGetValue("lastMaxPrice", out object? maxObj) && maxObj is JsonElement maxEl && maxEl.TryGetDecimal(out decimal maxVal)) {
-                        lastMaxPrice = maxVal;
                     }
                 }
             } catch { return Ok(new List<object>()); }
 
-            if (currentHistory.Count == 0) return Ok(new List<object>());
+            if (suggestedIds.Count == 0) return Ok(new List<object>());
 
-            var allProducts = await _context.Products.ToListAsync();
+            var allProducts = await _context.Products.Where(p => suggestedIds.Contains(p.Id)).ToListAsync();
             
-            var matchedProducts = allProducts.Select(c => {
-                string catName = c.Category;
-                try {
-                    if (!string.IsNullOrEmpty(c.Attributes)) {
-                        using (JsonDocument doc = JsonDocument.Parse(c.Attributes)) {
-                            if (doc.RootElement.TryGetProperty("category", out JsonElement catElement)) {
-                                catName = catElement.GetString()?.ToLower() ?? "cpu";
-                            }
-                        }
-                    }
-                } catch { }
-                return new { Product = c, Category = catName };
-            });
+            var finalProducts = suggestedIds
+                .Select(id => allProducts.FirstOrDefault(p => p.Id == id))
+                .Where(p => p != null)
+                .Select(p => new {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Brand = p.Brand,
+                    Price = p.Price ?? 0,
+                    StockQuantity = p.Stock,
+                    CategoryName = p.Category,
+                    Attributes = p.Attributes
+                }).ToList();
 
-            if (lastMinPrice.HasValue) {
-                matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price >= lastMinPrice.Value);
-            }
-            if (lastMaxPrice.HasValue) {
-                matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price <= lastMaxPrice.Value);
-            }
-
-            var rankedProducts = matchedProducts.Select(p => {
-                int score = 0;
-                string searchSpace = $"{p.Product.Name?.ToLower()} {p.Product.Brand?.ToLower()} {p.Category}".ToLower();
-                
-                foreach (var kw in currentHistory) {
-                    if (searchSpace.Contains(kw.ToLower())) {
-                        score++;
-                    }
-                }
-                return new { p.Product, p.Category, Score = score };
-            })
-            .Where(p => p.Score > 0)
-            .OrderByDescending(p => p.Score)
-            .Take(8)
-            .Select(p => new {
-                Id = p.Product.Id,
-                Name = p.Product.Name,
-                Brand = p.Product.Brand,
-                Price = p.Product.Price ?? 0,
-                StockQuantity = p.Product.Stock,
-                CategoryName = p.Category,
-                Attributes = p.Product.Attributes
-            })
-            .ToList();
-
-            return Ok(rankedProducts);
+            return Ok(finalProducts);
         }
 
         private async Task<string> CallGeminiWithRotation(string prompt)
