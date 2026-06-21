@@ -116,10 +116,20 @@ const Login = () => {
                                     setLoading(true);
                                     try {
                                         const res = await api.post('/auth/google-login', { credential: credentialResponse.credential });
-                                        if (res.data && res.data.token) {
-                                            localStorage.setItem('token', res.data.token);
-                                            localStorage.setItem('user', JSON.stringify(res.data.user));
+                                        
+                                        const token = res.data.token || res.data.Token;
+                                        const email = res.data.email || res.data.Email;
+                                        const role = res.data.role || res.data.Role;
+                                        const userId = res.data.userId || res.data.UserId;
+
+                                        if (token && email) {
+                                            localStorage.setItem('token', token);
+                                            localStorage.setItem('email', email);
+                                            localStorage.setItem('role', role);
+                                            if (userId) localStorage.setItem('userId', userId);
                                             window.location.href = '/';
+                                        } else {
+                                            setError('Không nhận được dữ liệu hợp lệ từ máy chủ');
                                         }
                                     } catch (err) {
                                         console.error(err);
