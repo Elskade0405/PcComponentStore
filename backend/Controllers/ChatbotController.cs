@@ -18,18 +18,24 @@ namespace PcComponentStore.Api.Controllers
     {
         private readonly PcComponentStoreDbContext _context;
         private static readonly HttpClient _httpClient = new HttpClient();
-        private static readonly string[] GEMINI_API_KEYS = new[] {
-            "AIzaSyCs3VU9NhqJ-i7khcQjzDavn29GIh3I1Q0",
-            "AIzaSyAp1B3h9BWfPN_mNKwQZR7bw_WHzX9wqTo",
-            "AIzaSyBagJKInIlGQcfHdeZ1ugHjNqgHN6iLxic",
-            "AIzaSyBfDJoyqr4dpH0aiAQPZbeH1edTo_o_WLE",
-            "AIzaSyBOVTfqv3Duk3bVmsE8p14sLe9UmUkemYc"
-        };
+        private static string[] GEMINI_API_KEYS = Array.Empty<string>();
         private static int _currentKeyIndex = 0;
 
-        public ChatbotController(PcComponentStoreDbContext context)
+        private readonly IConfiguration _configuration;
+
+        public ChatbotController(PcComponentStoreDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+            
+            if (GEMINI_API_KEYS.Length == 0)
+            {
+                var keys = _configuration["GEMINI_API_KEYS"];
+                if (!string.IsNullOrEmpty(keys))
+                {
+                    GEMINI_API_KEYS = keys.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                }
+            }
         }
 
         [HttpPost("ask")]
