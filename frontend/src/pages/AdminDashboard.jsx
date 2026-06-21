@@ -130,19 +130,6 @@ const AdminDashboard = () => {
                     onChange={(e) => setValue(e.target.value)}
                     style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none' }}
                 />
-                <div style={{ position: 'relative' }}>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={(e) => handleFileUpload(e, key)} 
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} 
-                        disabled={uploadingKey === key}
-                    />
-                    <button style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #2563eb', backgroundColor: '#eff6ff', color: '#2563eb', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}>
-                        {uploadingKey === key ? <span className="spinner" style={{ width: '20px', height: '20px', border: '2px solid #2563eb', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : <Upload size={18} />}
-                        Tải ảnh lên
-                    </button>
-                </div>
                 <button 
                     onClick={() => setValue('')} 
                     style={{ height: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 1rem', border: '1px solid #ef4444', backgroundColor: '#fef2f2', color: '#ef4444', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
