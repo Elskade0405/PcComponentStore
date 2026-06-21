@@ -174,11 +174,14 @@ namespace PcComponentStore.Api.Controllers
         {
             try
             {
-                // Note: For production, you should pass ValidationSettings with your Client ID.
-                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential, new GoogleJsonWebSignature.ValidationSettings
+                var clientId = _configuration["Google:ClientId"];
+                var validationSettings = new GoogleJsonWebSignature.ValidationSettings();
+                if (!string.IsNullOrEmpty(clientId))
                 {
-                    // Audience = new[] { "YOUR_GOOGLE_CLIENT_ID" } 
-                });
+                    validationSettings.Audience = new[] { clientId };
+                }
+
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential, validationSettings);
 
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == payload.Email);
                 if (user == null)

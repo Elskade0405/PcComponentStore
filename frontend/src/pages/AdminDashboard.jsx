@@ -268,11 +268,19 @@ const AdminDashboard = () => {
 
     const handleSaveProduct = async () => {
         try {
+            // Ensure detailImageUrls is an array before saving
+            let payload = { ...newProduct };
+            if (typeof payload.detailImageUrls === 'string') {
+                payload.detailImageUrls = payload.detailImageUrls.split(/\s+/).filter(u => u.trim() !== '');
+            } else if (!payload.detailImageUrls) {
+                payload.detailImageUrls = [];
+            }
+
             if (editingProductId) {
-                await api.put(`/products/${editingProductId}`, newProduct);
+                await api.put(`/products/${editingProductId}`, payload);
                 alert('Cập nhật sản phẩm thành công!');
             } else {
-                await api.post('/products', newProduct);
+                await api.post('/products', payload);
                 alert('Thêm sản phẩm thành công!');
             }
             setIsAddProductModalOpen(false);
@@ -666,61 +674,42 @@ const AdminDashboard = () => {
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Thumbnail (Trang Chủ)</label>
+                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Thumbnail (Trang Chủ - Nhập URL)</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                     <input
-                                        type="file"
-                                        accept="image/*"
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
-                                        onChange={async (e) => {
-                                            const file = e.target.files[0];
-                                            if (!file) return;
-                                            try {
-                                                const formData = new FormData();
-                                                formData.append('image', file);
-                                                const res = await api.post('/products/upload-image', formData);
-                                                setNewProduct({ ...newProduct, thumbnailUrl: res.data.url });
-                                            } catch (error) {
-                                                console.error('Lỗi upload ảnh:', error);
-                                                alert('Không thể upload ảnh!');
-                                            }
-                                        }}
+                                        type="text"
+                                        placeholder="https://..."
+                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none', flex: 1 }}
+                                        value={newProduct.thumbnailUrl || ''}
+                                        onChange={(e) => setNewProduct({ ...newProduct, thumbnailUrl: e.target.value })}
                                     />
                                     {newProduct.thumbnailUrl && (
-                                        <img src={`${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                        <img src={newProduct.thumbnailUrl.startsWith('http') ? newProduct.thumbnailUrl : `${API_URL}${newProduct.thumbnailUrl}`} alt="preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
                                     )}
                                 </div>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Chi Tiết Khác (Nhiều ảnh)</label>
-                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        style={{ padding: '0.4rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', flex: 1 }}
-                                        onChange={async (e) => {
-                                            const files = Array.from(e.target.files);
-                                            if (files.length === 0) return;
-                                            try {
-                                                const uploadedUrls = await Promise.all(
-                                                    files.map(async (file) => {
-                                                        const formData = new FormData();
-                                                        formData.append('image', file);
-                                                        const res = await api.post('/products/upload-image', formData);
-                                                        return res.data.url;
-                                                    })
-                                                );
-                                                setNewProduct({ ...newProduct, detailImageUrls: [...newProduct.detailImageUrls, ...uploadedUrls] });
-                                            } catch (error) {
-                                                console.error('Lỗi upload ảnh chi tiết:', error);
-                                                alert('Có lỗi khi tải lên nhiều ảnh!');
-                                            }
+                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Ảnh Chi Tiết Khác (Nhập các URL cách nhau bằng khoảng trắng hoặc xuống dòng)</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <textarea
+                                        placeholder="https://image1.jpg&#10;https://image2.jpg"
+                                        rows="3"
+                                        style={{ padding: '0.6rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', outline: 'none', resize: 'vertical' }}
+                                        value={Array.isArray(newProduct.detailImageUrls) ? newProduct.detailImageUrls.join('\n') : newProduct.detailImageUrls}
+                                        onChange={(e) => {
+                                            setNewProduct({ ...newProduct, detailImageUrls: e.target.value });
                                         }}
                                     />
-                                    {newProduct.detailImageUrls && newProduct.detailImageUrls.map((url, index) => (
-                                        <img key={index} src={`${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
-                                    ))}
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {(() => {
+                                            const urls = Array.isArray(newProduct.detailImageUrls) 
+                                                ? newProduct.detailImageUrls 
+                                                : (newProduct.detailImageUrls || '').split(/\s+/).filter(u => u.trim() !== '');
+                                            return urls.map((url, index) => (
+                                                <img key={index} src={url.startsWith('http') ? url : `${API_URL}${url}`} alt="detail-preview" style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.25rem'}} />
+                                            ));
+                                        })()}
+                                    </div>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

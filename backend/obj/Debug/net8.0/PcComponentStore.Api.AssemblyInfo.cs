@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PcComponentStore.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20f47ae6cad7421fe7d10995edfb224ad519942c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1b87b376406accab7894f38471528323fed53500")]
 [assembly: System.Reflection.AssemblyProductAttribute("PcComponentStore.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PcComponentStore.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
