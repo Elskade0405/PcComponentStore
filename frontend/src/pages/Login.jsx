@@ -118,9 +118,10 @@ const Login = () => {
                                         const res = await api.post('/auth/google-login', { credential: credentialResponse.credential });
                                         
                                         const token = res.data.token || res.data.Token;
-                                        const email = res.data.email || res.data.Email;
-                                        const role = res.data.role || res.data.Role;
-                                        const userId = res.data.userId || res.data.UserId;
+                                        const userObj = res.data.user || res.data.User || {};
+                                        const email = res.data.email || res.data.Email || userObj.email || userObj.Email;
+                                        const role = res.data.role || res.data.Role || userObj.role || userObj.Role;
+                                        const userId = res.data.userId || res.data.UserId || userObj.id || userObj.Id;
 
                                         if (token && email) {
                                             localStorage.setItem('token', token);
