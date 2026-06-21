@@ -113,6 +113,7 @@ const Login = () => {
                         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                             <GoogleLogin
                                 onSuccess={async (credentialResponse) => {
+                                    // alert('Google trả về token thành công! Bắt đầu gửi lên server...');
                                     setLoading(true);
                                     try {
                                         const res = await api.post('/auth/google-login', { credential: credentialResponse.credential });
@@ -128,21 +129,24 @@ const Login = () => {
                                             localStorage.setItem('email', email);
                                             localStorage.setItem('role', role);
                                             if (userId) localStorage.setItem('userId', userId);
+                                            // alert('Lưu thông tin thành công! Đang chuyển hướng...');
                                             window.location.href = '/';
                                         } else {
                                             setError('Không nhận được dữ liệu hợp lệ từ máy chủ');
                                         }
                                     } catch (err) {
-                                        console.error(err);
-                                        setError('Đăng nhập bằng Google thất bại');
+                                        console.error('Lỗi khi gửi API:', err);
+                                        setError('Đăng nhập bằng Google thất bại (Lỗi Server)');
+                                        alert('Lỗi Server: ' + (err.response?.data?.Message || err.message));
                                     } finally {
                                         setLoading(false);
                                     }
                                 }}
                                 onError={() => {
-                                    setError('Đăng nhập bằng Google thất bại');
+                                    console.error('Google Login Error triggered');
+                                    setError('Đăng nhập bằng Google bị từ chối hoặc lỗi cấu hình');
+                                    alert('Đăng nhập Google thất bại! Vui lòng kiểm tra lại cấu hình Client ID và URL (Authorized JavaScript origins) trên Google Cloud Console.');
                                 }}
-                                useOneTap
                             />
                         </div>
                     </div>
