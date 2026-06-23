@@ -28,6 +28,10 @@ const AdminDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('');
 
+    // Filtering and state for users
+    const [userSearch, setUserSearch] = useState('');
+    const [visiblePasswords, setVisiblePasswords] = useState({});
+
     // Settings state
     const [homeBannerUrl, setHomeBannerUrl] = useState('');
     const [leftBannerUrl, setLeftBannerUrl] = useState('');
@@ -250,6 +254,20 @@ const AdminDashboard = () => {
         } catch (error) {
             console.error('Failed to delete product', error);
             alert('Không thể xóa sản phẩm. Có thể sản phẩm đang nằm trong một đơn hàng.');
+        }
+    };
+
+    const handleToggleLockUser = async (userId, currentLockStatus) => {
+        try {
+            const newLockStatus = !currentLockStatus;
+            await api.put(`/users/${userId}/lock`, JSON.stringify(newLockStatus), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            alert(`Đã ${newLockStatus ? 'khóa' : 'mở khóa'} tài khoản thành công!`);
+            fetchAdminData();
+        } catch (error) {
+            console.error('Failed to toggle lock', error);
+            alert(error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản.');
         }
     };
 
@@ -577,38 +595,104 @@ const AdminDashboard = () => {
 
                 {/* --- Users Tab --- */}
                 {activeTab === 'users' && (
-                    <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                                <tr>
-                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>ID</th>
-                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Tài khoản (Username)</th>
-                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Mật khẩu (Password)</th>
-                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Email</th>
-                                    <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Loại (Role)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>Đang tải...</td></tr>
-                                ) : users.map(u => (
-                                    <tr key={u.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                                        <td style={{ padding: '1rem', color: '#6b7280', fontSize: '0.9rem' }}>{u.id}</td>
-                                        <td style={{ padding: '1rem', color: '#111827', fontWeight: 500 }}>{u.username}</td>
-                                        <td style={{ padding: '1rem', color: '#dc2626', fontWeight: 500 }}>{u.passwordHash}</td>
-                                        <td style={{ padding: '1rem', color: '#4b5563', fontSize: '0.9rem' }}>{u.email}</td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <span style={{ backgroundColor: u.roleType === 'admin' ? '#fef3c7' : '#f3f4f6', color: u.roleType === 'admin' ? '#92400e' : '#4b5563', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize' }}>
-                                                {u.roleType}
-                                            </span>
-                                        </td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {/* User Search Bar */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: '#fff', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                            <div style={{ flex: 1, position: 'relative' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm người dùng theo tên, email, vai trò..."
+                                    value={userSearch}
+                                    onChange={e => setUserSearch(e.target.value)}
+                                    style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '0.5rem', border: '1px solid #d1d5db', outline: 'none' }}
+                                />
+                                <span style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }}>🔍</span>
+                            </div>
+                        </div>
+
+                        <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                    <tr>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>ID</th>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Tài khoản (Username)</th>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Mật khẩu (Password)</th>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Email</th>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Loại (Role)</th>
+                                        <th style={{ padding: '1rem', fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>Hành động</th>
                                     </tr>
-                                ))}
-                                {users.length === 0 && !loading && (
-                                    <tr><td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Chưa có người dùng nào</td></tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        <tr><td colSpan="6" style={{ padding: '2rem', textAlign: 'center' }}>Đang tải...</td></tr>
+                                    ) : users.filter(u => 
+                                        u.username?.toLowerCase().includes(userSearch.toLowerCase()) || 
+                                        u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
+                                        u.roleType?.toLowerCase().includes(userSearch.toLowerCase())
+                                    ).map(u => {
+                                        let isLocked = false;
+                                        try {
+                                            if (u.attributes) {
+                                                const attr = JSON.parse(u.attributes);
+                                                isLocked = attr.isLocked === true;
+                                            }
+                                        } catch(e) {}
+                                        return (
+                                            <tr key={u.id} style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: isLocked ? '#fef2f2' : 'transparent' }}>
+                                                <td style={{ padding: '1rem', color: '#6b7280', fontSize: '0.9rem' }}>{u.id}</td>
+                                                <td style={{ padding: '1rem', color: '#111827', fontWeight: 500 }}>{u.username}</td>
+                                                <td style={{ padding: '1rem', color: '#dc2626', fontWeight: 500 }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontFamily: visiblePasswords[u.id] ? 'inherit' : 'monospace', letterSpacing: visiblePasswords[u.id] ? 'normal' : '2px' }}>
+                                                            {visiblePasswords[u.id] ? u.passwordHash : '••••••••'}
+                                                        </span>
+                                                        <button 
+                                                            onClick={() => setVisiblePasswords(prev => ({ ...prev, [u.id]: !prev[u.id] }))}
+                                                            style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.8rem', color: '#3b82f6', textDecoration: 'underline' }}
+                                                        >
+                                                            {visiblePasswords[u.id] ? 'Ẩn' : 'Hiện'}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '1rem', color: '#4b5563', fontSize: '0.9rem' }}>{u.email}</td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <span style={{ backgroundColor: u.roleType === 'admin' ? '#fef3c7' : '#f3f4f6', color: u.roleType === 'admin' ? '#92400e' : '#4b5563', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize' }}>
+                                                        {u.roleType}
+                                                    </span>
+                                                    {isLocked && (
+                                                        <span style={{ marginLeft: '0.5rem', backgroundColor: '#fee2e2', color: '#b91c1c', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                                                            Đã khóa
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    {u.roleType !== 'admin' && (
+                                                        <button 
+                                                            onClick={() => handleToggleLockUser(u.id, isLocked)}
+                                                            style={{ 
+                                                                padding: '0.4rem 0.8rem', 
+                                                                fontSize: '0.8rem', 
+                                                                fontWeight: 600, 
+                                                                color: '#fff', 
+                                                                backgroundColor: isLocked ? '#10b981' : '#ef4444', 
+                                                                border: 'none', 
+                                                                borderRadius: '0.25rem', 
+                                                                cursor: 'pointer' 
+                                                            }}
+                                                        >
+                                                            {isLocked ? 'Mở khóa' : 'Khóa tài khoản'}
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {users.length === 0 && !loading && (
+                                        <tr><td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>Chưa có người dùng nào</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 

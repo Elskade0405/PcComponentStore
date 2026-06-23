@@ -72,6 +72,10 @@ namespace PcComponentStore.Api.Controllers
             
             if (user != null)
             {
+                if (!string.IsNullOrEmpty(user.Attributes) && user.Attributes.Contains("\"isLocked\":true"))
+                {
+                    return Unauthorized(new { Status = "Error", Message = "Tài khoản của bạn đã bị khóa." });
+                }
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),
