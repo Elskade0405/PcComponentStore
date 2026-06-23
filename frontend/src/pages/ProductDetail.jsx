@@ -51,12 +51,11 @@ const ProductDetail = () => {
     }
 
     // Mock images since DB doesn't have them yet
-    const placeholderImg = "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80"; // CPU placeholder
-
     const backendUrl = API_URL;
     const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
-    const mainImg = resolvedThumb ? `${backendUrl}${resolvedThumb}` : placeholderImg;
-    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => `${backendUrl}${u}`) : [];
+    const placeholderImg = 'https://via.placeholder.com/600x600?text=No+Image';
+    const mainImg = resolvedThumb ? (resolvedThumb.startsWith('http') ? resolvedThumb : `${backendUrl}${resolvedThumb}`) : placeholderImg;
+    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => u.startsWith('http') ? u : `${backendUrl}${u}`) : [];
 
     // Combined list of images
     const allImages = Array.from(new Set([mainImg, ...detailList]));

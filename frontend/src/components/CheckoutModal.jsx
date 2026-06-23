@@ -186,7 +186,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                 let parsedAttr = {};
                                 try { if (item.attributes) parsedAttr = JSON.parse(item.attributes); } catch(e) {}
                                 const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl || item.imageUrl;
-                                const imgUrl = resolvedImage ? `${backendUrl}${resolvedImage}` : 'https://via.placeholder.com/60';
+                                const imgUrl = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`) : 'https://via.placeholder.com/60';
                                 
                                 return (
                                 <div key={item.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #f3f4f6' }}>

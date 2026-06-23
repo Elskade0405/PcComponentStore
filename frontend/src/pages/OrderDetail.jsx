@@ -185,7 +185,7 @@ const OrderDetail = () => {
                             let parsedAttr = {};
                             try { if (rawImage) parsedAttr = JSON.parse(rawImage); } catch(e) {}
                             const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl;
-                            const imgUrl = resolvedImage ? `${backendUrl}${resolvedImage}` : 'https://via.placeholder.com/60';
+                            const imgUrl = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`) : 'https://via.placeholder.com/60';
 
                             return (
                                 <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 0', borderBottom: idx !== itemsList.length - 1 ? '1px solid #f3f4f6' : 'none' }}>

@@ -32,7 +32,7 @@ const Cart = () => {
                                 let parsedAttr = {};
                                 try { if (item.attributes) parsedAttr = JSON.parse(item.attributes); } catch(e) {}
                                 const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl || item.imageUrl;
-                                const imgUrl = resolvedImage ? `${backendUrl}${resolvedImage}` : 'https://via.placeholder.com/80?text=SP';
+                                const imgUrl = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`) : 'https://via.placeholder.com/80?text=SP';
                                 
                                 return (
                                     <div key={item.id} style={{ 

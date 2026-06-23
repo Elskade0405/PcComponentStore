@@ -189,7 +189,7 @@ const BuildPC = () => {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                                 <div style={{ width: '60px', height: '60px', backgroundColor: 'white', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
                                                     <img 
-                                                        src={resolvedImage ? `${API_URL}${resolvedImage}` : 'https://via.placeholder.com/60?text=No+Img'} 
+                                                        src={resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${API_URL}${resolvedImage}`) : 'https://via.placeholder.com/60?text=No+Img'} 
                                                         alt={selectedItem.product.name} 
                                                         style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
                                                         onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/60?text=No+Img'; }}
