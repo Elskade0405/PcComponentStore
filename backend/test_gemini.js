@@ -1,8 +1,23 @@
-const url = 'https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyCs3VU9NhqJ-i7khcQjzDavn29GIh3I1Q0';
+const keys = [
+  "AIzaSyC2tAYeideqYK9BQ8wIf1D2LFWGJQf6Q1Y",
+  "AQ.Ab8RN6KbjxV8Hen-uKDmStFQuim8xo9VMWBP9Zeo1BsyhJiDLg"
+];
 
-fetch(url)
-.then(async r => {
-    let json = await r.json();
-    let names = json.models.map(m => m.name).filter(n => n.includes('gemini'));
-    console.log(names.join('\n'));
-}).catch(console.error);
+async function checkKeys() {
+  for (let key of keys) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+    try {
+      let r = await fetch(url);
+      let json = await r.json();
+      if (json.error) {
+        console.log(`Key ${key.substring(0, 10)}...: FAILED - ${json.error.message}`);
+      } else {
+        console.log(`Key ${key.substring(0, 10)}...: SUCCESS`);
+      }
+    } catch (e) {
+      console.log(`Key ${key.substring(0, 10)}...: ERROR - ${e.message}`);
+    }
+  }
+}
+
+checkKeys();
