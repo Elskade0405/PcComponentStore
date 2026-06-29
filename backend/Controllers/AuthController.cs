@@ -267,6 +267,41 @@ namespace PcComponentStore.Api.Controllers
                 var senderEmail = Environment.GetEnvironmentVariable("SMTP_SENDER_EMAIL") 
                     ?? _configuration["EmailSettings:SenderEmail"] ?? smtpUsername;
 
+                var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY") 
+                    ?? _configuration["EmailSettings:BrevoApiKey"];
+
+                if (!string.IsNullOrEmpty(brevoApiKey))
+                {
+                    Console.WriteLine($"[Brevo] Sending email to {model.Email} via HTTP API...");
+                    using (var httpClient = new HttpClient())
+                    {
+                        httpClient.DefaultRequestHeaders.Add("api-key", brevoApiKey);
+                        httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var payload = new
+                        {
+                            sender = new { name = senderName, email = senderEmail },
+                            to = new[] { new { email = model.Email } },
+                            subject = "Mã xác thực Khôi phục mật khẩu - PC Component Store",
+                            htmlContent = $"<h3>Mã xác thực OTP của bạn là: <strong style='font-size:24px;color:#2563eb'>{otp}</strong></h3><p>Mã này có hiệu lực trong vòng 5 phút. Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>"
+                        };
+
+                        var jsonPayload = System.Text.Json.JsonSerializer.Serialize(payload);
+                        var content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
+
+                        var response = await httpClient.PostAsync("https://api.brevo.com/v3/smtp/email", content);
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"[Brevo Response] Status: {response.StatusCode}, Body: {responseBody}");
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new Exception($"Brevo API returned error: {response.StatusCode} - {responseBody}");
+                        }
+                    }
+
+                    return Ok(new { Message = "Một mã OTP đã được gửi đến email của bạn qua Brevo." });
+                }
+
                 Console.WriteLine($"[SMTP] Connecting to {smtpServer}:{smtpPort} as {smtpUsername}...");
 
                 var message = new MimeMessage();
@@ -306,14 +341,14 @@ namespace PcComponentStore.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[SMTP ERROR] {ex.GetType().Name}: {ex.Message}");
+                Console.WriteLine($"[SMTP/Brevo ERROR] {ex.GetType().Name}: {ex.Message}");
                 if (ex.InnerException != null)
-                    Console.WriteLine($"[SMTP INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                    Console.WriteLine($"[SMTP/Brevo INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 
                 var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 
                 // Return an Ok with warning message. The page will transition to step 2 where they can type the OTP from Railway logs.
-                return Ok(new { Message = $"Mã OTP đã được tạo thành công! (Lưu ý: Không thể gửi email do lỗi SMTP: '{errorMsg}'. Vui lòng lấy mã OTP trực tiếp trong Log của Railway)." });
+                return Ok(new { Message = $"Mã OTP đã được tạo thành công! (Lưu ý: Không thể gửi email do lỗi SMTP/Brevo: '{errorMsg}'. Vui lòng lấy mã OTP trực tiếp trong Log của Railway)." });
             }
 
             return Ok(new { Message = "Một mã OTP đã được gửi đến email của bạn." });
