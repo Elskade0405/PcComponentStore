@@ -239,8 +239,7 @@ namespace PcComponentStore.Api.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
             if (user == null)
             {
-                // To prevent email enumeration, we still return Ok but don't actually send
-                return Ok(new { Message = "Nếu email hợp lệ, một mã OTP đã được gửi đến bạn." });
+                return BadRequest(new { Message = "Email này chưa được đăng ký trong hệ thống." });
             }
 
             // Generate 6-digit OTP
@@ -248,6 +247,9 @@ namespace PcComponentStore.Api.Controllers
 
             // Store in cache with 5 minutes expiration
             _cache.Set($"OTP_{model.Email}", otp, TimeSpan.FromMinutes(5));
+
+            // Log OTP clearly to console/system log for developer debugging and demo mode fallback
+            Console.WriteLine($"[FORGOT PASSWORD OTP] Email: {model.Email} | OTP: {otp}");
 
             try
             {
@@ -265,7 +267,7 @@ namespace PcComponentStore.Api.Controllers
                 var senderEmail = Environment.GetEnvironmentVariable("SMTP_SENDER_EMAIL") 
                     ?? _configuration["EmailSettings:SenderEmail"] ?? smtpUsername;
 
-                Console.WriteLine($"[SMTP] Config: Server={smtpServer}, Port={smtpPort}, User={smtpUsername}");
+                Console.WriteLine($"[SMTP] Connecting to {smtpServer}:{smtpPort} as {smtpUsername}...");
 
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(senderName, senderEmail));
@@ -280,13 +282,11 @@ namespace PcComponentStore.Api.Controllers
 
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    client.Timeout = 30000; // 30 seconds
+                    client.Timeout = 15000; // 15 seconds
 
                     // Accept all SSL certificates
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    Console.WriteLine($"[SMTP] Connecting to {smtpServer}:{smtpPort}...");
-                    
                     // Use StartTls for port 587, SslOnConnect for port 465
                     var sslOptions = smtpPort == 465 
                         ? MailKit.Security.SecureSocketOptions.SslOnConnect 
@@ -309,11 +309,14 @@ namespace PcComponentStore.Api.Controllers
                 Console.WriteLine($"[SMTP ERROR] {ex.GetType().Name}: {ex.Message}");
                 if (ex.InnerException != null)
                     Console.WriteLine($"[SMTP INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                
                 var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                return StatusCode(500, new { Message = "Lỗi SMTP: " + errorMsg });
+                
+                // Return an Ok with warning message. The page will transition to step 2 where they can type the OTP from Railway logs.
+                return Ok(new { Message = $"Mã OTP đã được tạo thành công! (Lưu ý: Không thể gửi email do lỗi SMTP: '{errorMsg}'. Vui lòng lấy mã OTP trực tiếp trong Log của Railway)." });
             }
 
-            return Ok(new { Message = "Nếu email hợp lệ, một mã OTP đã được gửi đến bạn." });
+            return Ok(new { Message = "Một mã OTP đã được gửi đến email của bạn." });
         }
 
         [HttpPost("reset-password")]
