@@ -44,21 +44,43 @@ const ProductDetail = () => {
 
     // Parse attributes
     let attributes = {};
-    if (product.attributes && typeof product.attributes === 'string') {
-        try {
-            attributes = JSON.parse(product.attributes);
-        } catch (e) { }
+    if (product.attributes) {
+        if (typeof product.attributes === 'string') {
+            try {
+                attributes = JSON.parse(product.attributes);
+            } catch (e) { }
+        } else if (typeof product.attributes === 'object') {
+            attributes = product.attributes;
+        }
     }
 
     // Mock images since DB doesn't have them yet
     const backendUrl = API_URL;
+    // Inline SVG data URL placeholder that works 100% offline and never fails
+    const placeholderImg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="24" fill="%239ca3af">No Image</text></svg>`;
+
+    const getImgUrl = (rawUrl) => {
+        if (rawUrl && typeof rawUrl === 'string') {
+            rawUrl = rawUrl.trim();
+        }
+        if (!rawUrl) {
+            return placeholderImg;
+        }
+        if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:image/')) {
+            return rawUrl;
+        }
+        const separator = rawUrl.startsWith('/') ? '' : '/';
+        return `${backendUrl}${separator}${rawUrl}`;
+    };
+
     const resolvedThumb = attributes.thumbnailUrl || attributes.imageUrl;
-    const placeholderImg = 'https://via.placeholder.com/600x600?text=No+Image';
-    const mainImg = resolvedThumb ? (resolvedThumb.startsWith('http') ? resolvedThumb : `${backendUrl}${resolvedThumb}`) : placeholderImg;
-    const detailList = Array.isArray(attributes.detailImageUrls) ? attributes.detailImageUrls.map(u => u.startsWith('http') ? u : `${backendUrl}${u}`) : [];
+    const mainImg = getImgUrl(resolvedThumb);
+    const detailList = Array.isArray(attributes.detailImageUrls) 
+        ? attributes.detailImageUrls.map(u => getImgUrl(u)) 
+        : [];
 
     // Combined list of images
-    const allImages = Array.from(new Set([mainImg, ...detailList]));
+    const allImages = Array.from(new Set([mainImg, ...detailList])).filter(Boolean);
 
     // Mapper for friendly labels
     const specLabels = {
@@ -160,7 +182,15 @@ const ProductDetail = () => {
                     {/* 1. Left: Images */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-                            <img src={allImages[activeIdx] || mainImg} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                            <img 
+                                src={allImages[activeIdx] || mainImg} 
+                                alt={product.name} 
+                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = placeholderImg;
+                                }}
+                            />
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
                             {allImages.map((img, idx) => (
@@ -168,7 +198,15 @@ const ProductDetail = () => {
                                     width: '70px', height: '70px', border: idx === activeIdx ? '2px solid #ee1b24' : '1px solid #eee',
                                     borderRadius: '4px', padding: '4px', cursor: 'pointer', flexShrink: 0
                                 }}>
-                                    <img src={img} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                    <img 
+                                        src={img} 
+                                        alt="thumbnail" 
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = placeholderImg;
+                                        }}
+                                    />
                                 </div>
                             ))}
                         </div>

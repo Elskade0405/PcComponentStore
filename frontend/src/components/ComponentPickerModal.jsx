@@ -383,15 +383,43 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
                             {modalProducts.map(p => {
                                 let parsedAttr = {};
-                                try { if (p.attributes) parsedAttr = JSON.parse(p.attributes); } catch(e) {}
+                                if (p.attributes) {
+                                    if (typeof p.attributes === 'string') {
+                                        try { parsedAttr = JSON.parse(p.attributes); } catch(e) {}
+                                    } else if (typeof p.attributes === 'object') {
+                                        parsedAttr = p.attributes;
+                                    }
+                                }
                                 const oldPrice = (parsedAttr.originalPrice && parsedAttr.originalPrice > p.price) ? parsedAttr.originalPrice : null;
-                                const resolvedImage = parsedAttr.thumbnailUrl || parsedAttr.imageUrl || p.imageUrl || '';
-                                const imageSrc = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${API_URL}${resolvedImage}`) : 'https://via.placeholder.com/180?text=No+Image';
+                                
+                                const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af">No Image</text></svg>`;
+                                
+                                const getImgUrl = () => {
+                                    let rawUrl = parsedAttr.thumbnailUrl || parsedAttr.imageUrl || p.imageUrl || '';
+                                    if (rawUrl && typeof rawUrl === 'string') {
+                                        rawUrl = rawUrl.trim();
+                                    }
+                                    if (!rawUrl) {
+                                        return placeholderSvg;
+                                    }
+                                    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:image/')) {
+                                        return rawUrl;
+                                    }
+                                    const separator = rawUrl.startsWith('/') ? '' : '/';
+                                    return `${API_URL}${separator}${rawUrl}`;
+                                };
+                                
+                                const imageSrc = getImgUrl();
                                 
                                 return (
                                 <div key={p.id} style={{ backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                                     <div style={{ height: '180px', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' }}>
-                                        <img src={imageSrc} alt={p.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/180?text=No+Image'; }} />
+                                        <img 
+                                            src={imageSrc} 
+                                            alt={p.name} 
+                                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                            onError={e => { e.target.onerror = null; e.target.src = placeholderSvg; }} 
+                                        />
                                     </div>
                                     <div style={{ padding: '0.75rem 1rem 1rem 1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
                                         <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4 }}>

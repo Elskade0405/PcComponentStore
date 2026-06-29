@@ -183,14 +183,45 @@ const OrderDetail = () => {
                             const quantity = item.quantity || 1;
 
                             let parsedAttr = {};
-                            try { if (rawImage) parsedAttr = JSON.parse(rawImage); } catch(e) {}
-                            const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl;
-                            const imgUrl = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`) : 'https://via.placeholder.com/60';
+                            if (rawImage) {
+                                if (typeof rawImage === 'string') {
+                                    try { parsedAttr = JSON.parse(rawImage); } catch(e) {}
+                                } else if (typeof rawImage === 'object') {
+                                    parsedAttr = rawImage;
+                                }
+                            }
+                            
+                            const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><rect width="60" height="60" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="8" fill="%239ca3af">No Image</text></svg>`;
+                            
+                            const getImgUrl = () => {
+                                let rawUrl = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl;
+                                if (rawUrl && typeof rawUrl === 'string') {
+                                    rawUrl = rawUrl.trim();
+                                }
+                                if (!rawUrl) {
+                                    return placeholderSvg;
+                                }
+                                if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:image/')) {
+                                    return rawUrl;
+                                }
+                                const separator = rawUrl.startsWith('/') ? '' : '/';
+                                return `${backendUrl}${separator}${rawUrl}`;
+                            };
+                            
+                            const imgUrl = getImgUrl();
 
                             return (
                                 <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 0', borderBottom: idx !== itemsList.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                                     <div style={{ width: '80px', height: '80px', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '4px', marginRight: '1.5rem' }}>
-                                        <img src={imgUrl} alt={productName} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                        <img 
+                                            src={imgUrl} 
+                                            alt={productName} 
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = placeholderSvg;
+                                            }}
+                                        />
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{productName}</h4>

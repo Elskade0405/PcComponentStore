@@ -29,20 +29,51 @@ const Cart = () => {
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {cart.map((item, index) => {
-                                let parsedAttr = {};
-                                try { if (item.attributes) parsedAttr = JSON.parse(item.attributes); } catch(e) {}
-                                const resolvedImage = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl || item.imageUrl;
-                                const imgUrl = resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`) : 'https://via.placeholder.com/80?text=SP';
-                                
-                                return (
-                                    <div key={item.id} style={{ 
-                                        display: 'flex', alignItems: 'center', padding: '1rem 1.5rem', 
-                                        borderBottom: index < cart.length - 1 ? '1px solid #e5e7eb' : 'none' 
-                                    }}>
-                                        {/* Image */}
-                                        <div style={{ width: '80px', height: '80px', flexShrink: 0, marginRight: '1.5rem' }}>
-                                            <img src={imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                        </div>
+                                 let parsedAttr = {};
+                                 if (item.attributes) {
+                                     if (typeof item.attributes === 'string') {
+                                         try { parsedAttr = JSON.parse(item.attributes); } catch(e) {}
+                                     } else if (typeof item.attributes === 'object') {
+                                         parsedAttr = item.attributes;
+                                     }
+                                 }
+                                 
+                                 const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="10" fill="%239ca3af">No Image</text></svg>`;
+                                 
+                                 const getImgUrl = () => {
+                                     let rawUrl = parsedAttr?.thumbnailUrl || parsedAttr?.imageUrl || item.imageUrl;
+                                     if (rawUrl && typeof rawUrl === 'string') {
+                                         rawUrl = rawUrl.trim();
+                                     }
+                                     if (!rawUrl) {
+                                         return placeholderSvg;
+                                     }
+                                     if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:image/')) {
+                                         return rawUrl;
+                                     }
+                                     const separator = rawUrl.startsWith('/') ? '' : '/';
+                                     return `${backendUrl}${separator}${rawUrl}`;
+                                 };
+                                 
+                                 const imgUrl = getImgUrl();
+                                 
+                                 return (
+                                     <div key={item.id} style={{ 
+                                         display: 'flex', alignItems: 'center', padding: '1rem 1.5rem', 
+                                         borderBottom: index < cart.length - 1 ? '1px solid #e5e7eb' : 'none' 
+                                     }}>
+                                         {/* Image */}
+                                         <div style={{ width: '80px', height: '80px', flexShrink: 0, marginRight: '1.5rem' }}>
+                                             <img 
+                                                 src={imgUrl} 
+                                                 alt={item.name} 
+                                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                 onError={(e) => {
+                                                     e.target.onerror = null;
+                                                     e.target.src = placeholderSvg;
+                                                 }}
+                                             />
+                                         </div>
 
                                         {/* Name & Warranty */}
                                         <div style={{ flex: 1, paddingRight: '1rem' }}>

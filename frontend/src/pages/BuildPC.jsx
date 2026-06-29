@@ -149,9 +149,34 @@ const BuildPC = () => {
                             if (selectedItem && selectedItem.product) {
                                 const p = selectedItem.product;
                                 let parsedAttr = {};
-                                try { if (p.attributes) parsedAttr = JSON.parse(p.attributes); } catch(e) {}
+                                if (p.attributes) {
+                                    if (typeof p.attributes === 'string') {
+                                        try { parsedAttr = JSON.parse(p.attributes); } catch(e) {}
+                                    } else if (typeof p.attributes === 'object') {
+                                        parsedAttr = p.attributes;
+                                    }
+                                }
                                 resolvedImage = parsedAttr.thumbnailUrl || parsedAttr.imageUrl || p.imageUrl || '';
                             }
+
+                            const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><rect width="60" height="60" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="8" fill="%239ca3af">No Image</text></svg>`;
+
+                            const getImgUrl = () => {
+                                let url = resolvedImage;
+                                if (url && typeof url === 'string') {
+                                    url = url.trim();
+                                }
+                                if (!url) {
+                                    return placeholderSvg;
+                                }
+                                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/')) {
+                                    return url;
+                                }
+                                const separator = url.startsWith('/') ? '' : '/';
+                                return `${API_URL}${separator}${url}`;
+                            };
+
+                            const imgUrl = getImgUrl();
 
                             return (
                                 <div key={slot.id} style={{ 
@@ -189,10 +214,10 @@ const BuildPC = () => {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                                 <div style={{ width: '60px', height: '60px', backgroundColor: 'white', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
                                                     <img 
-                                                        src={resolvedImage ? (resolvedImage.startsWith('http') ? resolvedImage : `${API_URL}${resolvedImage}`) : 'https://via.placeholder.com/60?text=No+Img'} 
+                                                        src={imgUrl} 
                                                         alt={selectedItem.product.name} 
                                                         style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-                                                        onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/60?text=No+Img'; }}
+                                                        onError={e => { e.target.onerror = null; e.target.src = placeholderSvg; }}
                                                     />
                                                 </div>
                                                 <div style={{ flex: 1, paddingRight: '1rem' }}>

@@ -8,20 +8,39 @@ const ProductCard = ({ product, onAdd }) => {
     const { addToCart } = useCart();
     const backendUrl = API_URL;
     
-    // Parse attributes if they come from the new SQL DB
+    // Parse attributes if they come from the new SQL DB (handle both string and object formats)
     let parsedAttributes = null;
-    if (product.attributes && typeof product.attributes === 'string') {
-        try {
-            parsedAttributes = JSON.parse(product.attributes);
-        } catch (e) {
-            console.error("Failed to parse attributes JSON");
+    if (product.attributes) {
+        if (typeof product.attributes === 'string') {
+            try {
+                parsedAttributes = JSON.parse(product.attributes);
+            } catch (e) {
+                console.error("Failed to parse attributes JSON", e);
+            }
+        } else if (typeof product.attributes === 'object') {
+            parsedAttributes = product.attributes;
         }
     }
 
-    const resolvedImage = parsedAttributes?.thumbnailUrl || parsedAttributes?.imageUrl || product.imageUrl;
-    const imgUrl = resolvedImage
-        ? (resolvedImage.startsWith('http') ? resolvedImage : `${backendUrl}${resolvedImage}`)
-        : 'https://via.placeholder.com/200x200?text=No+Image';
+    // Inline SVG data URL placeholder that works 100% offline and never fails
+    const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%239ca3af">No Image</text></svg>`;
+
+    const getImgUrl = () => {
+        let rawUrl = parsedAttributes?.thumbnailUrl || parsedAttributes?.imageUrl || product.imageUrl;
+        if (rawUrl && typeof rawUrl === 'string') {
+            rawUrl = rawUrl.trim();
+        }
+        if (!rawUrl) {
+            return placeholderSvg;
+        }
+        if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:image/')) {
+            return rawUrl;
+        }
+        const separator = rawUrl.startsWith('/') ? '' : '/';
+        return `${backendUrl}${separator}${rawUrl}`;
+    };
+
+    const imgUrl = getImgUrl();
 
     // Parse the original price from Attributes (fallback to normal price if it's 0 or missing to avoid weird displays)
     const oldPrice = (parsedAttributes?.originalPrice && parsedAttributes.originalPrice > product.price) 
@@ -65,7 +84,15 @@ const ProductCard = ({ product, onAdd }) => {
 
             <Link to={`/product/${product.id}`} style={{ display: 'flex', flexDirection: 'column', flex: 1, textDecoration: 'none', color: 'inherit' }}>
                 <div style={{ height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
-                    <img src={imgUrl} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                    <img 
+                        src={imgUrl} 
+                        alt={product.name} 
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = placeholderSvg;
+                        }}
+                    />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
