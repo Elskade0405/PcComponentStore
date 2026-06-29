@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Trash2, Minus, Plus, Settings } from 'lucide-react'; // Settings as a placeholder for Print/Excel if needed
+import { Trash2, Minus, Plus, Settings } from 'lucide-react'; 
 import CheckoutModal from '../components/CheckoutModal';
 import API_URL from '../config';
 
@@ -62,7 +62,7 @@ const Cart = () => {
                                          display: 'flex', alignItems: 'center', padding: '1rem 1.5rem', 
                                          borderBottom: index < cart.length - 1 ? '1px solid #e5e7eb' : 'none' 
                                      }}>
-                                         {/* Image */}
+                                         
                                          <div style={{ width: '80px', height: '80px', flexShrink: 0, marginRight: '1.5rem' }}>
                                              <img 
                                                  src={imgUrl} 
@@ -75,7 +75,7 @@ const Cart = () => {
                                              />
                                          </div>
 
-                                        {/* Name & Warranty */}
+                                        
                                         <div style={{ flex: 1, paddingRight: '1rem' }}>
                                             <Link to={`/product/${item.id}`} style={{ fontWeight: 700, color: '#333', textDecoration: 'none', fontSize: '0.95rem', display: 'block', marginBottom: '0.4rem', lineHeight: 1.4 }}>
                                                 {item.name}
@@ -85,12 +85,12 @@ const Cart = () => {
                                             </div>
                                         </div>
 
-                                        {/* Price */}
+                                        
                                         <div style={{ width: '140px', fontWeight: 700, fontSize: '0.95rem', color: '#333' }}>
                                             {item.price.toLocaleString('vi-VN')} đ
                                         </div>
 
-                                        {/* Quantity Controls */}
+                                        
                                         <div style={{ width: '120px', display: 'flex', alignItems: 'center' }}>
                                             <div style={{ display: 'flex', border: '1px solid #d1d5db', borderRadius: '2px', overflow: 'hidden' }}>
                                                 <button 
@@ -110,12 +110,12 @@ const Cart = () => {
                                             </div>
                                         </div>
 
-                                        {/* Total Price */}
+                                        
                                         <div style={{ width: '140px', fontWeight: 700, fontSize: '0.95rem', color: '#333', textAlign: 'right' }}>
                                             {(item.price * item.quantity).toLocaleString('vi-VN')} đ
                                         </div>
 
-                                        {/* Remove Action */}
+                                        
                                         <div style={{ width: '50px', textAlign: 'right' }}>
                                             <button 
                                                 onClick={() => removeFromCart(item.id)}
@@ -139,7 +139,7 @@ const Cart = () => {
                 {cart.length > 0 && (
                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1.5rem' }}>
                         
-                        {/* Buyer Info Form */}
+                        
                         <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1rem' }}>
                             <div style={{ backgroundColor: '#e5e7eb', padding: '0.75rem 1rem', fontWeight: 700, fontSize: '1.1rem', color: '#333', marginBottom: '1rem' }}>
                                 Thông tin người mua
@@ -184,7 +184,7 @@ const Cart = () => {
                             </div>
                         </div>
 
-                        {/* Order Summary & Actions */}
+                        
                         <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1rem', height: 'fit-content' }}>
                             <div style={{ backgroundColor: '#e5e7eb', padding: '0.75rem 1rem', fontWeight: 700, fontSize: '1.1rem', color: '#333', marginBottom: '1rem' }}>
                                 Tổng tiền

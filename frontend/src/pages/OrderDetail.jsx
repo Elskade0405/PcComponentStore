@@ -37,12 +37,12 @@ const OrderDetail = () => {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Pending': return { bg: '#fef3c7', text: '#d97706', icon: <Clock size={16} /> }; // Amber
-            case 'Processing': return { bg: '#e0f2fe', text: '#0284c7', icon: <Package size={16} /> }; // Blue
-            case 'Shipped': return { bg: '#ecfdf5', text: '#059669', icon: <Truck size={16} /> }; // Emerald
-            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a', icon: <CheckCircle2 size={16} /> }; // Green
-            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626', icon: <XCircle size={16} /> }; // Red
-            default: return { bg: '#f3f4f6', text: '#4b5563', icon: <Package size={16} /> }; // Gray
+            case 'Pending': return { bg: '#fef3c7', text: '#d97706', icon: <Clock size={16} /> }; 
+            case 'Processing': return { bg: '#e0f2fe', text: '#0284c7', icon: <Package size={16} /> }; 
+            case 'Shipped': return { bg: '#ecfdf5', text: '#059669', icon: <Truck size={16} /> }; 
+            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a', icon: <CheckCircle2 size={16} /> }; 
+            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626', icon: <XCircle size={16} /> }; 
+            default: return { bg: '#f3f4f6', text: '#4b5563', icon: <Package size={16} /> }; 
         }
     };
 
@@ -80,9 +80,9 @@ const OrderDetail = () => {
         return (
             <div style={{ padding: '1.5rem', borderBottom: '1px solid #f3f4f6', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
-                    {/* Background line */}
+                    
                     <div style={{ position: 'absolute', top: '16px', left: '10%', right: '10%', height: '3px', backgroundColor: '#e5e7eb', zIndex: 1 }}></div>
-                    {/* Active line */}
+                    
                     <div style={{ position: 'absolute', top: '16px', left: '10%', width: `${(activeIndex / (steps.length - 1)) * 80}%`, height: '3px', backgroundColor: '#059669', zIndex: 2, transition: 'width 0.3s ease' }}></div>
                     
                     {steps.map((step, idx) => {
@@ -125,7 +125,7 @@ const OrderDetail = () => {
     }
 
     const statusStyle = getStatusStyle(order.status);
-    // Support both API formats (raw Entity vs mapped DTO)
+
     const itemsList = order.orderItems || order.items || [];
 
     return (
@@ -139,7 +139,7 @@ const OrderDetail = () => {
                 </button>
 
                 <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-                    {/* Order Header */}
+                    
                     <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fafafa' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                             <div>
@@ -158,7 +158,7 @@ const OrderDetail = () => {
                         </div>
                     </div>
 
-                    {/* Shipping Info */}
+                    
                     <div style={{ padding: '1.5rem', borderBottom: '1px solid #f3f4f6' }}>
                         <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '1rem' }}>Thông tin giao hàng</h3>
                         <div style={{ fontSize: '0.9rem', color: '#4b5563', lineHeight: '1.5' }}>
@@ -169,14 +169,14 @@ const OrderDetail = () => {
                         </div>
                     </div>
                     
-                    {/* Order Progress Tracker */}
+                    
                     {renderOrderProgress(order.status)}
 
-                    {/* Order Items */}
+                    
                     <div style={{ padding: '0 1.5rem' }}>
                         <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', margin: '1.5rem 0 0.5rem' }}>Chi tiết mặt hàng</h3>
                         {itemsList.map((item, idx) => {
-                            // Extract properties gracefully to support both DTO and raw Entity
+
                             const productName = item.name || (item.product && item.product.cpuName) || 'Sản phẩm';
                             const rawImage = item.image || (item.product && item.product.attributes);
                             const unitPrice = item.unitPrice || 0;
@@ -235,7 +235,7 @@ const OrderDetail = () => {
                         })}
                     </div>
 
-                    {/* Order Footer */}
+                    
                     <div style={{ padding: '1.25rem 1.5rem', backgroundColor: '#fafafa', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem' }}>
                         <div style={{ fontSize: '1rem', color: '#4b5563' }}>Tổng cộng:</div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#e30019' }}>

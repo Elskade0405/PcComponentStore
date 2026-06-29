@@ -16,7 +16,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
     return (
         <section className="container" style={{ marginTop: '1rem' }}>
             <div style={{ display: 'flex', gap: '1rem', flexDirection: 'row', minHeight: '280px' }}>
-                {/* Left Banner */}
+                
                 <div style={{ 
                     width: '240px', 
                     minWidth: '240px',
@@ -40,7 +40,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                         <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '2rem', textTransform: 'uppercase' }}>{title}</h2>
                         <Link to={categoryLink} style={{ fontSize: '0.9rem', textDecoration: 'underline' }}>Xem tất cả</Link>
                     </div>
-                    {/* Floating Right Mock Arrow on the banner */}
+                    
                     <div onClick={scrollLeft} style={{
                         position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
                         width: '32px', height: '32px', backgroundColor: 'white', border: '1px solid var(--border-color)', borderRadius: '50%',
@@ -57,7 +57,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                     borderRadius: 'var(--border-radius-md)', 
                     boxShadow: 'var(--shadow-sm)',
                     position: 'relative',
-                    maxWidth: 'calc(100% - 316px)' /* Account for banner gap */ 
+                    maxWidth: 'calc(100% - 316px)'  
                 }}>
                     <div ref={sliderRef} style={{ 
                         display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', height: '100%',
@@ -76,7 +76,7 @@ const CategoryBlock = ({ title, bannerImage, categoryLink, products }) => {
                         )}
                     </div>
                     
-                    {/* Right Scroll Arrow */}
+                    
                     <div onClick={scrollRight} style={{
                         position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
                         width: '32px', height: '32px', backgroundColor: 'white', border: '1px solid var(--border-color)', borderRadius: '50%',

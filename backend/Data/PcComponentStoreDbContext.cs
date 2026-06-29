@@ -17,9 +17,7 @@ namespace PcComponentStore.Api.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-
-            // Configure Users table mapping
+            base.OnModelCreating(builder);
             builder.Entity<User>(entity =>
             {
                 entity.ToTable("users");
@@ -32,9 +30,7 @@ namespace PcComponentStore.Api.Data
                 entity.Property(e => e.RoleType).HasColumnName("role_type");
                 entity.Property(e => e.Attributes).HasColumnName("attributes").HasColumnType("json");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            });
-
-            // Configure Products table mapping
+            });
             builder.Entity<Product>(entity =>
             {
                 entity.ToTable("products");
@@ -46,9 +42,7 @@ namespace PcComponentStore.Api.Data
                 entity.Property(e => e.Stock).HasColumnName("stock");
                 entity.Property(e => e.Price).HasColumnName("price");
                 entity.Property(e => e.Attributes).HasColumnName("attributes").HasColumnType("json");
-            });
-
-            // Configure Order table mapping
+            });
             builder.Entity<Order>(entity =>
             {
                 entity.ToTable("orders");
@@ -68,9 +62,7 @@ namespace PcComponentStore.Api.Data
                       .WithMany()
                       .HasForeignKey(e => e.UserId)
                       .OnDelete(DeleteBehavior.SetNull);
-            });
-
-            // Configure OrderItem table mapping
+            });
             builder.Entity<OrderItem>(entity =>
             {
                 entity.ToTable("order_items");

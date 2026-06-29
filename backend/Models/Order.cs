@@ -8,7 +8,7 @@ namespace PcComponentStore.Api.Models
     public class Order
     {
         [Key]
-        public string Id { get; set; } = string.Empty; // Alphanumeric Order ID
+        public string Id { get; set; } = string.Empty; 
         
         public int? UserId { get; set; }
         public User? User { get; set; }
@@ -20,7 +20,7 @@ namespace PcComponentStore.Api.Models
 
         public decimal TotalAmount { get; set; }
         
-        public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
+        public string Status { get; set; } = "Pending"; 
         public string PaymentMethod { get; set; } = "COD";
 
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;

@@ -22,8 +22,8 @@ namespace PcComponentStore.Api.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _context.Users.ToListAsync();
-            // In a real application, DO NOT return PasswordHash. 
-            // However, the user explicitly requested to view the username and password for the admin dashboard.
+
+
             return Ok(users);
         }
 

@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 
 const products = [
-    // --- MAINBOARDS ---
+
     {
         brand: 'Asus',
         name: 'Mainboard Asus ROG STRIX Z790-A GAMING WIFI II DDR5',
@@ -55,7 +55,6 @@ const products = [
         }
     },
 
-    // --- STORAGE (SSD/HDD) ---
     {
         brand: 'Samsung',
         name: 'Ổ cứng SSD Samsung 980 PRO 1TB M.2 NVMe PCIe Gen 4.0',

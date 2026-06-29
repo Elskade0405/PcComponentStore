@@ -19,14 +19,12 @@ namespace PcComponentStore.Api.Controllers
             _context = context;
         }
 
-        // GET: api/settings
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Setting>>> GetSettings()
         {
             return await _context.Settings.ToListAsync();
         }
 
-        // GET: api/settings/HOME_BANNER_URL
         [HttpGet("{key}")]
         public async Task<ActionResult<Setting>> GetSetting(string key)
         {
@@ -38,7 +36,6 @@ namespace PcComponentStore.Api.Controllers
             return setting;
         }
 
-        // POST: api/settings
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSetting([FromBody] SettingRequestDto request)

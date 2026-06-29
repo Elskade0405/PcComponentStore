@@ -15,7 +15,7 @@ const Chatbot = () => {
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
 
-    const { user } = useAuth(); // Import useAuth to get user
+    const { user } = useAuth(); 
     const { addToCart } = useCart();
 
     const scrollToBottom = () => {
@@ -54,7 +54,7 @@ const Chatbot = () => {
 
     return (
         <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 9999 }}>
-            {/* Chat Button */}
+            
             {!isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}
@@ -78,7 +78,7 @@ const Chatbot = () => {
                 </button>
             )}
 
-            {/* Chat Window */}
+            
             {isOpen && (
                 <div style={{
                     width: '350px',
@@ -91,7 +91,7 @@ const Chatbot = () => {
                     overflow: 'hidden',
                     border: '1px solid #e5e7eb'
                 }}>
-                    {/* Header */}
+                    
                     <div style={{
                         padding: '1rem',
                         backgroundColor: 'var(--accent-blue)',
@@ -112,7 +112,7 @@ const Chatbot = () => {
                         </button>
                     </div>
 
-                    {/* Messages Area */}
+                    
                     <div style={{
                         flex: 1,
                         padding: '1rem',
@@ -206,7 +206,7 @@ const Chatbot = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input Area */}
+                    
                     <form onSubmit={handleSendMessage} style={{
                         padding: '1rem',
                         borderTop: '1px solid #e5e7eb',

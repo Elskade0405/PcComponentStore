@@ -133,7 +133,7 @@ namespace PcComponentStore.Api.Controllers
                         Name = oi.Product != null ? oi.Product.Name : "Unknown Product",
                         oi.Quantity,
                         oi.UnitPrice,
-                        Image = oi.Product != null ? oi.Product.Attributes : null // To parse image on frontend
+                        Image = oi.Product != null ? oi.Product.Attributes : null 
                     })
                 })
                 .ToListAsync();

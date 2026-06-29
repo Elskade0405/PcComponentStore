@@ -3,9 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { Cpu, HardDrive, Filter, Monitor, Mouse, Keyboard, Plus, Minus, Trash2, X, RefreshCw, ShoppingCart, Info, Search, Sparkles } from 'lucide-react';
-import API_URL from '../config';
-
-// Custom icons based on lucide for various parts
+import API_URL from '../config';
 const partIcons = {
     cpu: <Cpu size={24} />,
     mainboard: <HardDrive size={24} />,
@@ -27,12 +25,8 @@ const BuildPC = () => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [allProducts, setAllProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    // selectedParts object: { [slotId]: { product: {...}, quantity: 1 } }
-    const [selectedParts, setSelectedParts] = useState({});
-    
-    // Modal state
+    const [loading, setLoading] = useState(true);
+    const [selectedParts, setSelectedParts] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeSlot, setActiveSlot] = useState(null);
 
@@ -130,7 +124,7 @@ const BuildPC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '2rem', alignItems: 'start' }}>
                 
-                {/* Left Column: Build List */}
+                
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <button 
@@ -188,14 +182,13 @@ const BuildPC = () => {
                                     gap: '1rem',
                                     transition: 'all 0.2s ease'
                                 }}>
-                                    {/* Icon Column */}
+                                    
                                     <div style={{ width: '50px', display: 'flex', justifyContent: 'center', color: selectedItem ? 'var(--accent-blue)' : '#94a3b8' }}>
                                         {partIcons[slot.id] || <HardDrive size={24} />}
                                     </div>
 
-                                    {/* Content Column */}
-                                    {!selectedItem ? (
-                                        // Empty State for Slot
+                                    
+                                    {!selectedItem ? (
                                         <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <div style={{ fontWeight: 600, color: '#334155' }}>
                                                 {slot.label}
@@ -208,8 +201,7 @@ const BuildPC = () => {
                                                 Chọn
                                             </button>
                                         </div>
-                                    ) : (
-                                        // Selected Item State
+                                    ) : (
                                         <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                                 <div style={{ width: '60px', height: '60px', backgroundColor: 'white', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
@@ -264,7 +256,7 @@ const BuildPC = () => {
                     </div>
                 </div>
 
-                {/* Right Column: Sticky Summary */}
+                
                 <div style={{ position: 'sticky', top: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div style={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid var(--border-color)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>

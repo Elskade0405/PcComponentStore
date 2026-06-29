@@ -10,7 +10,7 @@ namespace PcComponentStore.Api.Models
         public string Email { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string RoleType { get; set; } = null!;
-        public string Attributes { get; set; } = null!; // JSON string mapped to string in EF Core
+        public string Attributes { get; set; } = null!; 
         public DateTime CreatedAt { get; set; }
     }
 }

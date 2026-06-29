@@ -9,19 +9,13 @@ import MegaMenu from './MegaMenu';
 const Navbar = () => {
     const { user, isAdmin, logout } = useAuth();
     const { cartCount } = useCart();
-    const navigate = useNavigate();
-    
-    // Search suggestions logic
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [allProducts, setAllProducts] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    
-    // Account Menu state
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [showAccountMenu, setShowAccountMenu] = useState(false);
-    const accountMenuRef = useRef(null);
-
-    // Close menu when clicking outside
+    const accountMenuRef = useRef(null);
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
@@ -50,7 +44,7 @@ const Navbar = () => {
         } else {
             const lowerQuery = searchQuery.toLowerCase();
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(lowerQuery));
-            setSuggestions(filtered.slice(0, 5)); // show up to 5 results
+            setSuggestions(filtered.slice(0, 5)); 
         }
     }, [searchQuery, allProducts]);
 
@@ -58,7 +52,7 @@ const Navbar = () => {
 
     return (
         <header style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 100 }}>
-            {/* Tier 1: Top Bar (Black) */}
+            
             <div style={{ backgroundColor: 'black', color: 'white', padding: '0.4rem 0', fontSize: '0.75rem' }}>
                 <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '2rem' }}>
@@ -75,16 +69,16 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Tier 2: Main Header (Logo, Search, Icons) */}
+            
             <div className="container" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem' }}>
                 
-                {/* Logo */}
+                
                 <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.5px' }}>
                     <Settings className="text-red" size={28} />
                     <span>HGEARS</span>
                 </Link>
                 
-                {/* Search Bar */}
+                
                 <div style={{ flex: 1, position: 'relative', maxWidth: '600px' }}>
                     <form onSubmit={(e) => { e.preventDefault(); navigate(`/products?search=${searchQuery}`); setShowSuggestions(false); }}>
                         <input 
@@ -108,7 +102,7 @@ const Navbar = () => {
                         </button>
                     </form>
 
-                    {/* Live Search Suggestions Dropdown */}
+                    
                     {showSuggestions && searchQuery.trim() !== '' && suggestions.length > 0 && (
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px', zIndex: 120, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
@@ -142,7 +136,7 @@ const Navbar = () => {
                     )}
                 </div>
                 
-                {/* User & Cart Icons */}
+                
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                     {user ? (
                         <div style={{ position: 'relative' }} ref={accountMenuRef}>
@@ -170,7 +164,7 @@ const Navbar = () => {
                                 </div>
                             </div>
 
-                            {/* Dropdown Menu */}
+                            
                             {showAccountMenu && (
                                 <div style={{
                                     position: 'absolute',
@@ -265,7 +259,7 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Tier 3: Navigation Links */}
+            
             <div className="container" style={{ padding: '0.5rem 1rem', display: 'flex', justifyContent: 'center', gap: '3rem', fontSize: '0.85rem', fontWeight: 600 }}>
                 
                 <MegaMenu />

@@ -5,9 +5,7 @@ import ProductCard from '../components/ProductCard';
 import CategoryBlock from '../components/CategoryBlock';
 import api from '../services/api';
 import API_URL from '../config';
-import { useAuth } from '../context/AuthContext';
-
-// Image Assets
+import { useAuth } from '../context/AuthContext';
 import imgMayBan from '../assets/Images/HomePage/Mayban.png';
 import imgMonitor from '../assets/Images/HomePage/Monitor.png';
 import imgVGA from '../assets/Images/HomePage/VGA.png';
@@ -42,8 +40,7 @@ const Home = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await api.get('/products');
-                // Store all products for category blocks
+                const res = await api.get('/products');
                 setProducts(res.data);
             } catch (err) {
                 console.error("Failed to load products", err);
@@ -99,7 +96,7 @@ const Home = () => {
         <>
             <div className="animate-fade-in" style={{ paddingBottom: '4rem', backgroundColor: '#f3f4f6', position: 'relative' }}>
                 
-                {/* Floating Side Banners */}
+                
                 {leftBannerUrl && (
                     <div style={{ position: 'absolute', top: '100px', left: '10px', width: '150px', zIndex: 5 }} className="side-banner">
                         <img src={getFullImageUrl(leftBannerUrl)} alt="Left Banner" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
@@ -111,7 +108,7 @@ const Home = () => {
                     </div>
                 )}
 
-                {/* Hero Banner Section */}
+                
                 <section style={{ backgroundColor: 'white', borderBottom: '1px solid var(--border-color)' }}>
                     <div className="container" style={{ padding: '0 0' }}>
                         <img
@@ -122,7 +119,7 @@ const Home = () => {
                     </div>
                 </section>
 
-                {/* New Products Container (No side banner) */}
+                
                 <section className="container" style={{ marginTop: '1rem' }}>
                     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 'var(--border-radius-md)', boxShadow: 'var(--shadow-sm)' }}>
 
@@ -168,7 +165,7 @@ const Home = () => {
                     </div>
                 </section>
 
-                {/* AI Suggestions Section */}
+                
                 {user && suggestions.length > 0 && (
                     <section className="container" style={{ marginTop: '2rem' }}>
                         <div style={{ backgroundColor: '#fffbe3', border: '1px solid #fde047', padding: '1.5rem', borderRadius: 'var(--border-radius-md)', boxShadow: 'var(--shadow-sm)' }}>
@@ -210,7 +207,7 @@ const Home = () => {
                     </section>
                 )}
 
-                {/* Reusable Category Blocks */}
+                
                 <CategoryBlock
                     title="Máy bàn"
                     categoryLink="/collection/pc-gaming"
@@ -260,7 +257,7 @@ const Home = () => {
                     products={products.filter(p => p.categoryName === 'storage')}
                 />
 
-                {/* Brand Logos Row */}
+                
                 <section className="container" style={{ marginTop: '4rem', marginBottom: '1rem' }}>
                     <div style={{
                         display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -275,7 +272,7 @@ const Home = () => {
                 </section>
             </div>
 
-            {/* Left and Right Floating Banners (Hidden on small screens) */}
+            
             <div className="side-banner side-banner-left" style={{
                 position: 'fixed', top: '100px', right: 'calc(50% + 610px)', zIndex: 40, display: 'none'
             }}>

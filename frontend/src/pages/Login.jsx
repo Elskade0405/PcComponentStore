@@ -30,7 +30,7 @@ const Login = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--bg-secondary)', padding: '2rem' }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', width: '100%', maxWidth: '420px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
-                {/* Header */}
+                
                 <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0' }}>
                     <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827', margin: 0, letterSpacing: '0.5px' }}>
                         ĐĂNG NHẬP HOẶC TẠO TÀI KHOẢN
@@ -101,19 +101,19 @@ const Login = () => {
                         </button>
                     </form>
 
-                    {/* Divider */}
+                    
                     <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
                         <div style={{ flex: 1, borderBottom: '1px dashed #cbd5e1' }}></div>
                         <span style={{ padding: '0 10px', color: '#64748b', fontSize: '0.75rem' }}>Hoặc đăng nhập bằng</span>
                         <div style={{ flex: 1, borderBottom: '1px dashed #cbd5e1' }}></div>
                     </div>
 
-                    {/* Social Buttons */}
+                    
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                             <GoogleLogin
                                 onSuccess={async (credentialResponse) => {
-                                    // alert('Google trả về token thành công! Bắt đầu gửi lên server...');
+
                                     setLoading(true);
                                     try {
                                         const res = await api.post('/auth/google-login', { credential: credentialResponse.credential });
@@ -129,7 +129,7 @@ const Login = () => {
                                             localStorage.setItem('email', email);
                                             localStorage.setItem('role', role);
                                             if (userId) localStorage.setItem('userId', userId);
-                                            // alert('Lưu thông tin thành công! Đang chuyển hướng...');
+
                                             window.location.href = '/';
                                         } else {
                                             setError('Không nhận được dữ liệu hợp lệ từ máy chủ');

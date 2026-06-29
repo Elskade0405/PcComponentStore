@@ -12,9 +12,7 @@ const CpuCategory = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isTextExpanded, setIsTextExpanded] = useState(false);
-    const [showFilterMenu, setShowFilterMenu] = useState(false);
-
-    // Filter States
+    const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedModels, setSelectedModels] = useState([]);
     const [minPrice, setMinPrice] = useState(500000);
@@ -37,9 +35,7 @@ const CpuCategory = () => {
                     p.name.toLowerCase().includes('ryzen') || 
                     p.name.toLowerCase().includes('intel') ||
                     p.name.toLowerCase().includes('amd')
-                );
-                
-                // Show some UI filler even if db is empty
+                );
                 if (cpus.length === 0) {
                     setProducts(allProds.slice(0, 12));
                 } else {
@@ -71,7 +67,7 @@ const CpuCategory = () => {
 
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', paddingBottom: '4rem' }}>
-            {/* Breadcrumb */}
+            
             <div style={{ backgroundColor: 'white', padding: '0.75rem 0', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
                 <div className="container" style={{ fontSize: '0.85rem', color: '#64748b' }}>
                     <Link to="/" style={{ color: '#0ea5e9', textDecoration: 'none' }}>Trang chủ</Link> / 
@@ -81,7 +77,7 @@ const CpuCategory = () => {
 
             <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 
-                {/* Filter Box */}
+                
                 <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', border: '1px solid #e2e8f0', position: 'relative' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
                         <div 
@@ -113,7 +109,7 @@ const CpuCategory = () => {
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) minmax(250px, 1.5fr) 2fr', gap: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '2rem', marginBottom: '2rem' }}>
-                                {/* Tình trạng sản phẩm */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Tình trạng sản phẩm</div>
                                     <button 
@@ -130,7 +126,7 @@ const CpuCategory = () => {
                                     </button>
                                 </div>
 
-                                {/* Giá */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Giá</div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -188,7 +184,7 @@ const CpuCategory = () => {
                                     `}</style>
                                 </div>
 
-                                {/* Hãng */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Hãng</div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -216,7 +212,7 @@ const CpuCategory = () => {
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr', gap: '2rem' }}>
-                                {/* Dòng CPU */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Dòng CPU</div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -242,7 +238,7 @@ const CpuCategory = () => {
                                     </div>
                                 </div>
 
-                                {/* Socket, thế hệ... (để trống placeholder theo UI) */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Các bộ lọc khác hiện chưa khả dụng</div>
                                 </div>
@@ -251,7 +247,7 @@ const CpuCategory = () => {
                     )}
                 </div>
 
-                {/* Sort Header */}
+                
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
                         Sắp xếp theo: 
@@ -263,7 +259,7 @@ const CpuCategory = () => {
                     </div>
                 </div>
 
-                {/* Product Grid */}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
                     {products.map((p, i) => (
                         <div key={i} style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '4px', transition: 'box-shadow 0.2s', ':hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}}>
@@ -272,7 +268,7 @@ const CpuCategory = () => {
                     ))}
                 </div>
 
-                {/* Load More Button */}
+                
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                     <button style={{ 
                         border: '1px solid #0ea5e9', color: '#0ea5e9', backgroundColor: 'white', 
@@ -286,7 +282,7 @@ const CpuCategory = () => {
                     </button>
                 </div>
 
-                {/* SEO Text Section from CPU.txt */}
+                
                 <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginTop: '2rem', position: 'relative' }}>
                     <div style={{ 
                         maxHeight: isTextExpanded ? 'none' : '300px', 
@@ -361,7 +357,7 @@ const CpuCategory = () => {
                     )}
                 </div>
                 
-                {/* Reveal Text Button */}
+                
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-1rem', zIndex: 10 }}>
                     <button 
                         onClick={() => setIsTextExpanded(!isTextExpanded)}

@@ -40,12 +40,12 @@ const OrderHistory = () => {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Pending': return { bg: '#fef3c7', text: '#d97706', icon: <Clock size={16} /> }; // Amber
-            case 'Processing': return { bg: '#e0f2fe', text: '#0284c7', icon: <Package size={16} /> }; // Blue
-            case 'Shipped': return { bg: '#ecfdf5', text: '#059669', icon: <Truck size={16} /> }; // Emerald
-            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a', icon: <CheckCircle2 size={16} /> }; // Green
-            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626', icon: <XCircle size={16} /> }; // Red
-            default: return { bg: '#f3f4f6', text: '#4b5563', icon: <Package size={16} /> }; // Gray
+            case 'Pending': return { bg: '#fef3c7', text: '#d97706', icon: <Clock size={16} /> }; 
+            case 'Processing': return { bg: '#e0f2fe', text: '#0284c7', icon: <Package size={16} /> }; 
+            case 'Shipped': return { bg: '#ecfdf5', text: '#059669', icon: <Truck size={16} /> }; 
+            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a', icon: <CheckCircle2 size={16} /> }; 
+            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626', icon: <XCircle size={16} /> }; 
+            default: return { bg: '#f3f4f6', text: '#4b5563', icon: <Package size={16} /> }; 
         }
     };
 

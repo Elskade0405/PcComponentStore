@@ -42,8 +42,7 @@ const ForgotPassword = () => {
         try {
             const res = await api.post('/auth/reset-password', { email, otp, newPassword });
             setStatus({ type: 'success', message: res.data.message || 'Khôi phục mật khẩu thành công!' });
-            
-            // Wait 2 seconds then redirect to login
+
             setTimeout(() => {
                 navigate('/login');
             }, 2000);
@@ -57,7 +56,7 @@ const ForgotPassword = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--bg-secondary)', padding: '2rem' }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', width: '100%', maxWidth: '420px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
-                {/* Header */}
+                
                 <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0' }}>
                     <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827', margin: 0, letterSpacing: '0.5px' }}>
                         QUÊN MẬT KHẨU

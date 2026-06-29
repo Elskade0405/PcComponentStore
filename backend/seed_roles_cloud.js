@@ -44,7 +44,7 @@ async function seedRolesCloud() {
     ];
 
     for (const user of usersToSeed) {
-        // Check if user already exists
+
         const [existing] = await connection.execute('SELECT id FROM users WHERE email = ?', [user.email]);
         
         if (existing.length === 0) {

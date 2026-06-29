@@ -12,13 +12,11 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     const [gender, setGender] = useState('anh');
     const [deliveryType, setDeliveryType] = useState('home');
     const [currentStep, setCurrentStep] = useState(1);
-    
-    // User info states
+
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
-    
-    // Delivery info states
+
     const [addressLine, setAddressLine] = useState('');
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -31,10 +29,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     const backendUrl = API_URL;
 
     useEffect(() => {
-        // Generate a random order ID on mount
+
         setOrderId('BDAO_' + Math.floor(Math.random() * 10000000000));
-        
-        // Fetch provinces data
+
         fetch('https://provinces.open-api.vn/api/?depth=3')
             .then(res => res.json())
             .then(data => {
@@ -61,7 +58,6 @@ const CheckoutModal = ({ isOpen, onClose }) => {
         setSelectedWard('');
     };
 
-    // Helpers for summary display
     const provinceName = provinces.find(x => x.code.toString() === selectedProvince)?.name || '';
     const districtName = districts.find(x => x.code.toString() === selectedDistrict)?.name || '';
     const wardName = wards.find(x => x.code.toString() === selectedWard)?.name || '';
@@ -133,7 +129,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                 borderRadius: '8px',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}>
-                {/* Header Steps */}
+                
                 <div style={{
                     backgroundColor: '#00709e',
                     color: 'white',
@@ -176,11 +172,11 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* Scrollable Body */}
+                
                 <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
                     <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         
-                        {/* Cart Items Summary */}
+                        
                         <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                             {cart.map(item => {
                                 let parsedAttr = {};
@@ -244,7 +240,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
 
                         {currentStep === 1 && (
                             <>
-                                {/* Thông tin khách hàng */}
+                                
                                 <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                                     <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', color: '#374151' }}>Thông tin khách hàng</h3>
                                     
@@ -279,7 +275,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                     </div>
                                 </div>
 
-                                {/* Yêu cầu nhận hàng */}
+                                
                                 <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                                     <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', color: '#374151' }}>Yêu cầu nhận hàng</h3>
                                     
@@ -374,7 +370,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                 <h3 style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: 600, color: '#374151', margin: '0.5rem 0' }}>Chọn hình thức thanh toán</h3>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    {/* Payment Method 1 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('VietQR')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <div style={{ color: '#e30019' }}><QrCode size={32} /></div>
@@ -386,25 +382,25 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                         <div style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 700 }}>baokim</div>
                                     </button>
 
-                                    {/* Payment Method 2 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('ATM')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#00709e' }}><CardIcon size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thẻ ATM</div>
                                     </button>
 
-                                    {/* Payment Method 3 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('Visa/MasterCard')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#1e3a8a' }}><CardIcon size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thẻ Visa, MasterCard, JCB</div>
                                     </button>
 
-                                    {/* Payment Method 4 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('COD')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#e30019' }}><Banknote size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>Thanh toán khi nhận hàng (COD)</div>
                                     </button>
 
-                                    {/* Payment Method 5 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('Bank Transfer')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#00709e' }}><Building2 size={28} /></div>
                                         <div>
@@ -413,7 +409,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                         </div>
                                     </button>
 
-                                    {/* Payment Method 6 */}
+                                    
                                     <button onClick={() => handlePlaceOrder('VNPAY')} style={{ display: 'flex', alignItems: 'center', padding: '1.25rem 1.5rem', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', gap: '1rem' }}>
                                         <div style={{ color: '#e30019' }}><QrCode size={28} /></div>
                                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '1rem' }}>VNPAY QR</div>
@@ -425,7 +421,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* Footer */}
+                
                 <div style={{ 
                     padding: '1rem 2rem', 
                     borderTop: '1px solid #e5e7eb', 

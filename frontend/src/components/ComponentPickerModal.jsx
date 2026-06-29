@@ -114,7 +114,6 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
     const [openFilterDropdown, setOpenFilterDropdown] = useState(null);
     const [selectedFilters, setSelectedFilters] = useState({});
 
-    // Reset filters when modal opens for a new slot
     useEffect(() => {
         if (isOpen) {
             setSearchQuery('');
@@ -131,8 +130,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
         if (!slotConfig) return [];
 
         let filtered = allProducts;
-        
-        // Smart filtering based on exact category name
+
         filtered = filtered.filter(p => {
             const catLower = (p.categoryName || '').toLowerCase();
             if (activeSlot === 'cpu' && catLower === 'cpu') return true;
@@ -145,7 +143,6 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
             if (activeSlot === 'case' && catLower === 'case') return true;
             if (activeSlot === 'monitor' && catLower === 'monitor') return true;
 
-            // Only fallback to name search if category is somehow missing
             if (!catLower) {
                 const nameLower = p.name ? p.name.toLowerCase() : '';
                 return slotConfig.searchKeys.some(key => nameLower.includes(key));
@@ -153,17 +150,15 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
             return false;
         });
 
-        // Brand filtering
         if (selectedBrand !== 'Tất cả') {
             filtered = filtered.filter(p => {
                 if (p.brand && typeof p.brand === 'string') {
                     return p.brand.toLowerCase() === selectedBrand.toLowerCase();
                 }
-                return p.name ? p.name.toLowerCase().includes(selectedBrand.toLowerCase()) : false; // fallback
+                return p.name ? p.name.toLowerCase().includes(selectedBrand.toLowerCase()) : false; 
             });
         }
 
-        // Dropdown Filters Logic
         if (selectedFilters['Giá']) {
             const priceFilter = selectedFilters['Giá'];
             const parsePrice = (priceStr) => {
@@ -197,13 +192,11 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
             }
         });
 
-        // Apply manual search query inside modal if any
         if (searchQuery.trim()) {
             const queryLower = searchQuery.toLowerCase();
             filtered = filtered.filter(p => p.name ? p.name.toLowerCase().includes(queryLower) : false);
         }
 
-        // Apply sorting
         if (sortBy === 'Giá (Thấp đến Cao)') {
             filtered.sort((a, b) => a.price - b.price);
         } else if (sortBy === 'Giá (Cao đến Thấp)') {
@@ -220,7 +213,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '8px', width: '100%', maxWidth: '1000px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                {/* Header */}
+                
                 <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f1f5f9' }}>
                     <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, color: '#1e293b', textTransform: 'uppercase' }}>
                         {activeSlot === 'cpu' ? 'CPU' : currentSlotData?.label || 'Chưa rõ'}
@@ -230,11 +223,11 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                     </button>
                 </div>
                 
-                {/* Filter Section */}
+                
                 <div style={{ padding: '1.5rem', backgroundColor: '#fff', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {/* Brands and Filters */}
+                    
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'center' }}>
-                        {/* Brand Selection */}
+                        
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#000' }}>Chọn thương hiệu:</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -258,7 +251,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                                 ))}
                             </div>
                         </div>
-                        {/* Pseudo Filters */}
+                        
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#000' }}>Lọc theo:</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -283,7 +276,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                                             {selectedFilters[filterObj.name] || filterObj.name} <span style={{ fontSize: '0.6rem', transform: openFilterDropdown === filterObj.name ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
                                         </button>
                                         
-                                        {/* Dropdown Menu */}
+                                        
                                         {openFilterDropdown === filterObj.name && (
                                             <div style={{
                                                 position: 'absolute',
@@ -331,7 +324,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                         </div>
                     </div>
 
-                    {/* Search and Sort */}
+                    
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginTop: '0.5rem' }}>
                         <div className="input-group" style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: 0 }}>
                             <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
@@ -373,7 +366,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                     </div>
                 </div>
 
-                {/* Product Grid Area */}
+                
                 <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#e0f2fe', padding: '1.5rem', position: 'relative' }}>
                     {modalProducts.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b', fontSize: '1.1rem' }}>
@@ -461,7 +454,7 @@ const ComponentPickerModal = ({ isOpen, onClose, activeSlot, onSelectProduct, al
                         </div>
                     )}
 
-                    {/* Show More Button */}
+                    
                     {modalProducts.length > 0 && (
                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
                             <button style={{

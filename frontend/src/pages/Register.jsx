@@ -6,7 +6,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import api from '../services/api';
 
 const Register = () => {
-    // Note: The UI shows First Name (Tên) and Last Name (Họ), but backend takes fullName. We'll combine them.
+
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -30,7 +30,7 @@ const Register = () => {
         const result = await register(fullName, email, password);
         
         if (result.success) {
-            // Auto-login after successful registration
+
             await login(email, password);
             navigate('/');
         } else {
@@ -42,7 +42,7 @@ const Register = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--bg-secondary)', padding: '2rem' }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', width: '100%', maxWidth: '420px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
-                {/* Header */}
+                
                 <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #e2e8f0' }}>
                     <h1 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827', margin: 0, letterSpacing: '0.5px' }}>
                         ĐĂNG KÝ TÀI KHOẢN
@@ -133,14 +133,14 @@ const Register = () => {
                         </button>
                     </form>
 
-                    {/* Divider */}
+                    
                     <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
                         <div style={{ flex: 1, borderBottom: '1px dashed #cbd5e1' }}></div>
                         <span style={{ padding: '0 10px', color: '#64748b', fontSize: '0.75rem' }}>Hoặc đăng nhập bằng</span>
                         <div style={{ flex: 1, borderBottom: '1px dashed #cbd5e1' }}></div>
                     </div>
 
-                    {/* Social Buttons */}
+                    
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                             <GoogleLogin

@@ -10,7 +10,7 @@ const products = [
             category: 'monitor',
             brand: 'ASUS',
             resolution: '2K (1440p)',
-            refreshRate: '144Hz - 165Hz', // Gộp vào nhóm chung cho dễ lọc
+            refreshRate: '144Hz - 165Hz', 
             panel: 'IPS',
             thumbnailUrl: 'https://hanoicomputercdn.com/media/product/73873_man_hinh_asus_tuf_gaming_vg27aq3a_2.jpg'
         }

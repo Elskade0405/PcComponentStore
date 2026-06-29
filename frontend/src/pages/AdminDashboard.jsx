@@ -22,17 +22,11 @@ const AdminDashboard = () => {
     const [pcPickerModalOpen, setPcPickerModalOpen] = useState(false);
     const [pcActiveSlot, setPcActiveSlot] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
-    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-    
-    // Filtering states for products
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterCategory, setFilterCategory] = useState('');
-
-    // Filtering and state for users
+    const [filterCategory, setFilterCategory] = useState('');
     const [userSearch, setUserSearch] = useState('');
-    const [visiblePasswords, setVisiblePasswords] = useState({});
-
-    // Settings state
+    const [visiblePasswords, setVisiblePasswords] = useState({});
     const [homeBannerUrl, setHomeBannerUrl] = useState('');
     const [leftBannerUrl, setLeftBannerUrl] = useState('');
     const [rightBannerUrl, setRightBannerUrl] = useState('');
@@ -228,8 +222,7 @@ const AdminDashboard = () => {
     const updateOrderStatus = async (orderId, newStatus) => {
         if (newStatus === 'Delivered') {
             const confirm = window.confirm('Xác nhận đơn hàng này đã được giao thành công? (Sau khi xác nhận sẽ không thể hoàn tác hay chỉnh sửa).');
-            if (!confirm) {
-                // Force a re-render so the select box resets to its previous value visually
+            if (!confirm) {
                 setOrders([...orders]); 
                 return;
             }
@@ -272,8 +265,7 @@ const AdminDashboard = () => {
     };
 
     const handleSaveProduct = async () => {
-        try {
-            // Ensure detailImageUrls is an array before saving
+        try {
             let payload = { ...newProduct };
             if (typeof payload.detailImageUrls === 'string') {
                 payload.detailImageUrls = payload.detailImageUrls.split(/\s+/).filter(u => u.trim() !== '');
@@ -329,12 +321,12 @@ const AdminDashboard = () => {
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
-            case 'Pending': return { bg: '#fffbeb', text: '#d97706' }; // Amber
-            case 'Processing': return { bg: '#eff6ff', text: '#2563eb' }; // Blue
-            case 'Shipped': return { bg: '#ecfdf5', text: '#059669' }; // Emerald
-            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a' }; // Green
-            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626' }; // Red
-            default: return { bg: '#f3f4f6', text: '#6b7280' }; // Gray
+            case 'Pending': return { bg: '#fffbeb', text: '#d97706' }; 
+            case 'Processing': return { bg: '#eff6ff', text: '#2563eb' }; 
+            case 'Shipped': return { bg: '#ecfdf5', text: '#059669' }; 
+            case 'Delivered': return { bg: '#dcfce7', text: '#16a34a' }; 
+            case 'Cancelled': return { bg: '#fef2f2', text: '#dc2626' }; 
+            default: return { bg: '#f3f4f6', text: '#6b7280' }; 
         }
     };
 
@@ -359,7 +351,7 @@ const AdminDashboard = () => {
 
     return (
         <div style={{ display: 'flex', minHeight: 'calc(100vh - 120px)', backgroundColor: '#f9fafb' }}>
-            {/* Sidebar */}
+            
             <aside style={{ width: '260px', backgroundColor: '#ffffff', borderRight: '1px solid #e5e7eb', padding: '1.5rem 1rem' }}>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '2rem', color: '#111827', paddingLeft: '0.75rem' }}>Quản Trị Viên</h2>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -386,13 +378,13 @@ const AdminDashboard = () => {
                 </nav>
             </aside>
 
-            {/* Main Content Area */}
+            
             <main style={{ flex: 1, padding: '2rem 3rem' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '2rem' }}>
                     {navItems.find(i => i.id === activeTab)?.label}
                 </h1>
 
-                {/* --- Settings Tab --- */}
+                
                 {activeTab === 'settings' && (
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', color: '#1f2937' }}>Cài Đặt Trang Chủ</h2>
@@ -417,7 +409,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                {/* --- Orders Tab --- */}
+                
                 {activeTab === 'orders' && (
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -488,7 +480,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                {/* --- Products Tab --- */}
+                
                 {activeTab === 'products' && (
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -593,10 +585,10 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                {/* --- Users Tab --- */}
+                
                 {activeTab === 'users' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {/* User Search Bar */}
+                        
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: '#fff', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                             <div style={{ flex: 1, position: 'relative' }}>
                                 <input
@@ -696,7 +688,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                {/* --- Placeholders for other tabs --- */}
+                
                 {(activeTab === 'dashboard') && (
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e5e7eb', padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
                         <p>Khu vực quản lý {navItems.find(i => i.id === activeTab)?.label.toLowerCase()} (Đang xây dựng...)</p>
@@ -704,7 +696,7 @@ const AdminDashboard = () => {
                 )}
             </main>
 
-            {/* --- Add Product Modal Placeholder --- */}
+            
             {isAddProductModalOpen && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '1rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
@@ -715,7 +707,7 @@ const AdminDashboard = () => {
                             <button onClick={() => setIsAddProductModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={24} /></button>
                         </div>
 
-                        {/* Mock Form Fields */}
+                        
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Loại linh kiện</label>
@@ -824,7 +816,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
 
-                        {/* Special Fields (CPU) */}
+                        
                         {newProduct.type === 'cpu' && (
                             <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '1.5rem', borderRadius: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                                 <h4 style={{ margin: 0, fontSize: '1rem', color: '#1e3a8a' }}>Thuộc tính riêng do bạn đã chọn: <b>CPU</b></h4>
@@ -1490,7 +1482,7 @@ const AdminDashboard = () => {
                 </div>
             )}
 
-            {/* --- Order Details Modal --- */}
+            
             {isOrderModalOpen && selectedOrder && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '1rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>

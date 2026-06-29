@@ -1,25 +1,23 @@
-// ============================================================
-// SEED ALL DATA - Script tổng hợp để seed data lên cloud DB
-// ============================================================
-// Cách dùng:
-//   1. Sửa thông tin DB bên dưới (lấy từ Railway/Aiven)
-//   2. Chạy: node seed_cloud.js
-// ============================================================
+
+
+
+
+
+
+
 
 const mysql = require('mysql2/promise');
 
-// ============================================================
-// 👇 SỬA THÔNG TIN DATABASE CLOUD CỦA BẠN Ở ĐÂY 👇
-// ============================================================
+
+
 const DB_CONFIG = {
-    host: 'zephyr.proxy.rlwy.net',  // ← Host từ Railway
-    port: 42275,                       // ← Port từ Railway
-    user: 'root',                      // ← User từ Railway
-    password: 'gVGxHDkBOODigkRoamwOdHuhayuoODlD',          // ← Password từ Railway
-    database: 'railway'                // ← Database từ Railway
+    host: 'zephyr.proxy.rlwy.net',  
+    port: 42275,                       
+    user: 'root',                      
+    password: 'gVGxHDkBOODigkRoamwOdHuhayuoODlD',          
+    database: 'railway'                
 };
 
-// ============================================================
 
 async function run() {
     let con;
@@ -28,9 +26,8 @@ async function run() {
         con = await mysql.createConnection(DB_CONFIG);
         console.log('✅ Kết nối thành công!\n');
 
-        // ============================
-        // Xóa bảng cũ (để tránh rác)
-        // ============================
+
+
         console.log('🗑️ Đang xóa các bảng cũ (nếu có)...');
         await con.execute('SET FOREIGN_KEY_CHECKS = 0');
         const oldTables = ['cpu', 'vga', 'ram', 'psu', 'monitor', 'mainboard', 'storage', 'laptop'];
@@ -40,9 +37,8 @@ async function run() {
         await con.execute('SET FOREIGN_KEY_CHECKS = 1');
         console.log('  ✅ Đã xóa bảng cũ');
 
-        // ============================
-        // Tạo bảng mới
-        // ============================
+
+
         console.log('📦 Đang tạo bảng...');
 
         await con.execute(`
@@ -111,7 +107,6 @@ async function run() {
         `);
         console.log('  ✅ Bảng settings');
 
-        // Seed default setting
         await con.execute(`
             INSERT IGNORE INTO settings (setting_key, setting_value) 
             VALUES 
@@ -120,21 +115,18 @@ async function run() {
                 ('RIGHT_BANNER_URL', '')
         `);
 
-        // ============================
-        // Xóa data cũ trong products để seed lại
-        // ============================
+
+
         await con.execute('SET FOREIGN_KEY_CHECKS = 0');
         await con.execute('TRUNCATE TABLE products');
         await con.execute('SET FOREIGN_KEY_CHECKS = 1');
 
-        // ============================
-        // Seed dữ liệu sản phẩm
-        // ============================
+
+
         console.log('\n📥 Đang seed dữ liệu sản phẩm...\n');
 
         const allProducts = [];
 
-        // --- CPU ---
         allProducts.push(
             { category: 'cpu', brand: 'INTEL', name: 'CPU Intel Core i9-14900K (Up to 6.0GHz, 24 Nhân 32 Luồng, 36MB Cache, Socket LGA 1700)', stock: 20, price: 15490000, attributes: { category: 'cpu', brand: 'INTEL', socket: 'LGA 1700', cores: 24, threads: 32, baseClock: '3.2 GHz', boostClock: '6.0 GHz' } },
             { category: 'cpu', brand: 'INTEL', name: 'CPU Intel Core i7-14700K (Up to 5.6GHz, 20 Nhân 28 Luồng, 33MB Cache, Socket LGA 1700)', stock: 35, price: 10990000, attributes: { category: 'cpu', brand: 'INTEL', socket: 'LGA 1700', cores: 20, threads: 28, baseClock: '3.4 GHz', boostClock: '5.6 GHz' } },
@@ -146,7 +138,6 @@ async function run() {
             { category: 'cpu', brand: 'AMD', name: 'CPU AMD Ryzen 5 5600G (Up to 4.4GHz, 6 Nhân 12 Luồng, 16MB Cache, Socket AM4)', stock: 60, price: 3390000, attributes: { category: 'cpu', brand: 'AMD', socket: 'AM4', cores: 6, threads: 12, baseClock: '3.9 GHz', boostClock: '4.4 GHz' } }
         );
 
-        // --- VGA ---
         allProducts.push(
             { category: 'vga', brand: 'NVIDIA', name: 'VGA NVIDIA GeForce RTX 4090 Founders Edition 24GB GDDR6X', stock: 10, price: 49990000, attributes: { category: 'vga', brand: 'NVIDIA', vram: '24GB GDDR6X', cudaCores: 16384, boostClock: '2520 MHz', memoryInterface: '384-bit', tdp: '450W' } },
             { category: 'vga', brand: 'NVIDIA', name: 'VGA Gigabyte GeForce RTX 4070 Ti SUPER AERO OC 16GB GDDR6X', stock: 25, price: 22990000, attributes: { category: 'vga', brand: 'NVIDIA', vram: '16GB GDDR6X', cudaCores: 8448, boostClock: '2640 MHz', memoryInterface: '256-bit', tdp: '285W' } },
@@ -156,7 +147,6 @@ async function run() {
             { category: 'vga', brand: 'AMD', name: 'VGA MSI Radeon RX 7600 MECH 2X 8GB OC', stock: 35, price: 7490000, attributes: { category: 'vga', brand: 'AMD', vram: '8GB GDDR6', boostClock: '2655 MHz', memoryInterface: '128-bit', tdp: '165W' } }
         );
 
-        // --- RAM ---
         allProducts.push(
             { category: 'ram', brand: 'CORSAIR', name: 'RAM Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz CL36', stock: 30, price: 3290000, attributes: { category: 'ram', brand: 'CORSAIR', ramType: 'DDR5', capacity: '32GB (2x16GB)', busSpeed: '6000MHz', casLatency: 'CL36' } },
             { category: 'ram', brand: 'G.SKILL', name: 'RAM G.Skill Trident Z5 RGB DDR5 32GB (2x16GB) 6400MHz CL32', stock: 20, price: 4290000, attributes: { category: 'ram', brand: 'G.SKILL', ramType: 'DDR5', capacity: '32GB (2x16GB)', busSpeed: '6400MHz', casLatency: 'CL32', rgb: 'RGB' } },
@@ -164,34 +154,29 @@ async function run() {
             { category: 'ram', brand: 'KINGSTON', name: 'RAM Kingston Fury Beast DDR5 16GB (1x16GB) 5600MHz CL36', stock: 40, price: 1490000, attributes: { category: 'ram', brand: 'KINGSTON', ramType: 'DDR5', capacity: '16GB (1x16GB)', busSpeed: '5600MHz', casLatency: 'CL36' } }
         );
 
-        // --- PSU ---
         allProducts.push(
             { category: 'psu', brand: 'CORSAIR', name: 'Nguồn Corsair RM850x 850W 80 Plus Gold Full Modular', stock: 25, price: 3490000, attributes: { category: 'psu', brand: 'CORSAIR', powerCapacity: '850W', efficiency: '80 Plus Gold', modular: 'Full Modular' } },
             { category: 'psu', brand: 'CORSAIR', name: 'Nguồn Corsair RM1000e 1000W 80 Plus Gold Full Modular', stock: 15, price: 4290000, attributes: { category: 'psu', brand: 'CORSAIR', powerCapacity: '1000W', efficiency: '80 Plus Gold', modular: 'Full Modular' } },
             { category: 'psu', brand: 'MSI', name: 'Nguồn MSI MAG A650BN 650W 80 Plus Bronze', stock: 40, price: 1490000, attributes: { category: 'psu', brand: 'MSI', powerCapacity: '650W', efficiency: '80 Plus Bronze', modular: 'Non-Modular' } }
         );
 
-        // --- Monitor ---
         allProducts.push(
             { category: 'monitor', brand: 'LG', name: 'Màn hình LG 27GP850-B 27" QHD IPS 165Hz 1ms', stock: 20, price: 9990000, attributes: { category: 'monitor', brand: 'LG', screenSize: '27 inch', resolution: '2560x1440 (QHD)', refreshRate: '165Hz' } },
             { category: 'monitor', brand: 'SAMSUNG', name: 'Màn hình Samsung Odyssey G5 27" QHD VA 165Hz', stock: 25, price: 6990000, attributes: { category: 'monitor', brand: 'SAMSUNG', screenSize: '27 inch', resolution: '2560x1440 (QHD)', refreshRate: '165Hz' } },
             { category: 'monitor', brand: 'ASUS', name: 'Màn hình ASUS TUF Gaming VG249Q1A 24" FHD IPS 165Hz', stock: 35, price: 4490000, attributes: { category: 'monitor', brand: 'ASUS', screenSize: '24 inch', resolution: '1920x1080 (FHD)', refreshRate: '165Hz' } }
         );
 
-        // --- Mainboard ---
         allProducts.push(
             { category: 'mainboard', brand: 'ASUS', name: 'Mainboard ASUS ROG STRIX B760-F GAMING WIFI DDR5 (LGA 1700)', stock: 20, price: 6990000, attributes: { category: 'mainboard', brand: 'ASUS', socket: 'LGA 1700', chipset: 'B760', ramSlots: 4, mainboardSize: 'ATX' } },
             { category: 'mainboard', brand: 'MSI', name: 'Mainboard MSI PRO B760M-A WIFI DDR4 (LGA 1700)', stock: 35, price: 3690000, attributes: { category: 'mainboard', brand: 'MSI', socket: 'LGA 1700', chipset: 'B760', ramSlots: 2, mainboardSize: 'Micro-ATX' } },
             { category: 'mainboard', brand: 'GIGABYTE', name: 'Mainboard Gigabyte B650 AORUS ELITE AX DDR5 (AM5)', stock: 25, price: 5490000, attributes: { category: 'mainboard', brand: 'GIGABYTE', socket: 'AM5', chipset: 'B650', ramSlots: 4, mainboardSize: 'ATX' } }
         );
 
-        // --- Storage ---
         allProducts.push(
             { category: 'storage', brand: 'SAMSUNG', name: 'Ổ cứng SSD Samsung 990 PRO 1TB M.2 NVMe PCIe Gen4', stock: 30, price: 3490000, attributes: { category: 'storage', brand: 'SAMSUNG', driveType: 'SSD M.2 NVMe', storageCapacity: '1TB', readSpeed: '7450 MB/s', writeSpeed: '6900 MB/s' } },
             { category: 'storage', brand: 'WD', name: 'Ổ cứng SSD WD Black SN770 500GB M.2 NVMe PCIe Gen4', stock: 45, price: 1590000, attributes: { category: 'storage', brand: 'WD', driveType: 'SSD M.2 NVMe', storageCapacity: '500GB', readSpeed: '5000 MB/s', writeSpeed: '4000 MB/s' } }
         );
 
-        // --- Laptop ---
         allProducts.push(
             { category: 'laptop', brand: 'ASUS', name: 'Laptop ASUS TUF Gaming A15 FA507NV-LP131W (Ryzen 7 7735HS, RTX 4060 8GB, 16GB DDR5, 512GB SSD)', stock: 15, price: 24990000, attributes: { category: 'laptop', brand: 'ASUS', pcCpu: 'Ryzen 7 7735HS', pcVga: 'RTX 4060 8GB', pcRam: '16GB DDR5', pcStorage: '512GB SSD', screenSize: '15.6 inch', resolution: '1920x1080 (FHD)', refreshRate: '144Hz' } },
             { category: 'laptop', brand: 'LENOVO', name: 'Laptop Lenovo Legion 5 15IAH7H (i7-12700H, RTX 3060 6GB, 16GB DDR5, 512GB SSD)', stock: 20, price: 27990000, attributes: { category: 'laptop', brand: 'LENOVO', pcCpu: 'i7-12700H', pcVga: 'RTX 3060 6GB', pcRam: '16GB DDR5', pcStorage: '512GB SSD', screenSize: '15.6 inch', resolution: '2560x1440 (QHD)', refreshRate: '165Hz' } }

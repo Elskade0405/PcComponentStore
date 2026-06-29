@@ -43,8 +43,7 @@ const Products = () => {
         const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const existingItemIndex = currentCart.findIndex(item => item.productId === product.id);
 
-        if (existingItemIndex > -1) {
-            // Already in cart - theoretically increase quantity later in cart page
+        if (existingItemIndex > -1) {
             alert('Added to cart!');
         } else {
             currentCart.push({
@@ -81,7 +80,7 @@ const Products = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '2rem', alignItems: 'start' }}>
-                {/* Sidebar Filters */}
+                
                 <div className="glass-panel" style={{ padding: '1.5rem', position: 'sticky', top: '2rem' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
                         <Filter size={18} /> Filters
@@ -136,7 +135,7 @@ const Products = () => {
                     </div>
                 </div>
 
-                {/* Product Grid */}
+                
                 <div>
                     {filteredProducts.length === 0 ? (
                         <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>

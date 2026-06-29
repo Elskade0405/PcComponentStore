@@ -33,7 +33,6 @@ namespace PcComponentStore.Api.Controllers
 
             string msg = request.Message.ToLower().Trim();
 
-            // Nhận diện ý định (Intent detection) cơ bản
             bool isGreeting = msg.Contains("chào") || msg.Contains("hello") || msg.Contains("hi");
             bool isPriceQuery = msg.Contains("giá") || msg.Contains("rẻ") || msg.Contains("đắt");
             bool isBuildPc = msg.Contains("build") || msg.Contains("xây dựng") || msg.Contains("cấu hình")
@@ -43,11 +42,9 @@ namespace PcComponentStore.Api.Controllers
                              || (msg.Contains("pc") && (msg.Contains("triệu") || msg.Contains("tr") || msg.Contains("củ") || msg.Contains("giá")));
             bool optimizeVga = msg.Contains("vga") || msg.Contains("card màn hình") || msg.Contains("đồ họa");
 
-            // Xây dựng danh sách từ khóa tìm kiếm
 
             string[] keywords = msg.Split(new[] { ' ', ',', '.', '?' }, System.StringSplitOptions.RemoveEmptyEntries);
 
-            // Trích xuất danh mục sản phẩm có thể có
 
             string? targetCategory = null;
             if (msg.Contains("laptop")) targetCategory = "laptop";
@@ -60,7 +57,6 @@ namespace PcComponentStore.Api.Controllers
             else if (msg.Contains("nguồn") || msg.Contains("psu")) targetCategory = "psu";
             else if (msg.Contains("tản nhiệt")) targetCategory = "cooler";
 
-            // Nhận diện giá tiền (VD: dưới 10 triệu, trên 5 tr)
             decimal? maxPrice = null;
             decimal? minPrice = null;
             decimal? exactBudget = null;
@@ -92,7 +88,6 @@ namespace PcComponentStore.Api.Controllers
                 exactBudget = exactVal * 1000000;
             }
 
-            // Truy vấn CSDL
             var allProducts = await _context.Products.ToListAsync();
 
             if (isBuildPc)
@@ -154,7 +149,6 @@ namespace PcComponentStore.Api.Controllers
                 return Ok(new { reply = buildReplyText, buildItems = buildItemsResult });
             }
 
-            // Lọc sản phẩm
 
             var matchedProducts = allProducts.Select(c =>
             {
@@ -176,13 +170,11 @@ namespace PcComponentStore.Api.Controllers
                 return new { Product = c, Category = catName };
             });
 
-            // Lọc theo Category nếu nhận diện được
             if (!string.IsNullOrEmpty(targetCategory))
             {
                 matchedProducts = matchedProducts.Where(p => p.Category == targetCategory);
             }
 
-            // Lọc theo Khoảng giá
             if (maxPrice.HasValue)
             {
                 matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price <= maxPrice.Value);
@@ -192,13 +184,11 @@ namespace PcComponentStore.Api.Controllers
                 matchedProducts = matchedProducts.Where(p => p.Product.Price != null && p.Product.Price >= minPrice.Value);
             }
 
-            // Tính điểm số trùng khớp dựa trên Keywords
             var rankedProducts = matchedProducts.Select(p =>
             {
                 int score = 0;
                 string searchSpace = $"{p.Product.Name?.ToLower()} {p.Product.Brand?.ToLower()} {p.Product.Attributes?.ToLower()}";
 
-                // Các keyword loại trừ không tính điểm
 
                 string[] ignoreWords = { "cho", "mình", "tôi", "hỏi", "có", "không", "giá", "bao", "nhiêu", "tìm", "mua", "loại", "nào" };
 
@@ -211,47 +201,45 @@ namespace PcComponentStore.Api.Controllers
                     }
                 }
 
-                // Strict model matching (Tránh hỏi i5 ra i3/i7)
                 string[] strictModels = { "i3", "i5", "i7", "i9", "ryzen 3", "ryzen 5", "ryzen 7", "ryzen 9" };
                 foreach (var model in strictModels)
                 {
-                    // Nếu user đích danh hỏi dòng model này
+
                     if (msg.Contains(model))
                     {
                         if (searchSpace.Contains(model))
                         {
-                            score += 10; // Điểm cộng tuyệt đối
+                            score += 10; 
                         }
                         else
                         {
-                            score -= 20; // Trừ điểm rất nặng nếu lạc quẻ (vd: hỏi i5 mà đây là i3)
+                            score -= 20; 
                         }
                     }
                 }
 
-                // Heuristic chấm điểm cho nhu cầu đặc biệt (Render, 3D, Gaming)
                 if (msg.Contains("render") || msg.Contains("3d") || msg.Contains("đồ họa") || msg.Contains("làm việc"))
                 {
                     if (searchSpace.Contains("i9") || searchSpace.Contains("i7") || searchSpace.Contains("ryzen 9") || searchSpace.Contains("ryzen 7") || searchSpace.Contains("rtx 4090") || searchSpace.Contains("rtx 4080"))
                     {
-                        score += 5; // Ưu tiên CPU nhiều nhân, VGA mạnh
+                        score += 5; 
                     }
                 }
                 if (msg.Contains("game") || msg.Contains("gaming") || msg.Contains("chơi"))
                 {
                     if (searchSpace.Contains("x3d") || searchSpace.Contains("i5") || searchSpace.Contains("ryzen 5") || searchSpace.Contains("rtx 4060") || searchSpace.Contains("rx 7600"))
                     {
-                        score += 5; // Ưu tiên CPU dòng X3D, i5, Ryzen 5 hoặc VGA tầm trung/cao
+                        score += 5; 
                     }
                 }
 
                 return new { p.Product, p.Category, Score = score };
             })
-            // Chỉ lấy những sản phẩm có điểm >= 0 (Loại bỏ những sản phẩm bị phạt điểm âm)
-            // Đồng thời Score > 0 HOẶC nếu đã biết category thì mới lấy
+
+
             .Where(p => p.Score >= 0 && (p.Score > 0 || !string.IsNullOrEmpty(targetCategory)))
             .OrderByDescending(p => p.Score)
-            .ThenBy(p => p.Product.Price) // Nếu cùng điểm thì ưu tiên giá rẻ lên trước
+            .ThenBy(p => p.Product.Price) 
             .Take(5)
             .ToList();
 
@@ -289,13 +277,12 @@ namespace PcComponentStore.Api.Controllers
                 }).ToList();
             }
 
-            // Lưu lịch sử nếu có UserId
             if (request.UserId.HasValue)
             {
                 var userObj = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId.Value);
                 if (userObj != null)
                 {
-                    // Update attributes JSON with search history
+
                     var currentHistory = new List<string>();
                     Dictionary<string, object> attrDict = new Dictionary<string, object>();
 
@@ -319,7 +306,6 @@ namespace PcComponentStore.Api.Controllers
                         catch { }
                     }
 
-                    // Add new keywords
                     var ignoreWordsList = new List<string> { "cho", "mình", "tôi", "hỏi", "có", "không", "giá", "bao", "nhiêu", "tìm", "mua", "loại", "nào", "dưới", "trên", "triệu", "tr", "củ" };
                     var newKeywords = keywords.Where(k => !ignoreWordsList.Contains(k)).ToList();
 
@@ -328,7 +314,7 @@ namespace PcComponentStore.Api.Controllers
 
 
                     currentHistory.AddRange(newKeywords);
-                    // Keep only last 20 keywords to avoid bloat
+
                     currentHistory = currentHistory.Distinct().TakeLast(20).ToList();
 
                     attrDict["searchHistory"] = currentHistory;
@@ -340,7 +326,6 @@ namespace PcComponentStore.Api.Controllers
                     if (maxPrice.HasValue) attrDict["lastMaxPrice"] = maxPrice.Value;
                     else attrDict.Remove("lastMaxPrice");
 
-                    // Save the exact product IDs we are suggesting
                     attrDict["lastSuggestedProductIds"] = rankedProducts.Select(p => p.Product.Id).ToList();
 
                     userObj.Attributes = JsonSerializer.Serialize(attrDict);

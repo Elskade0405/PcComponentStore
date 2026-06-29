@@ -9,8 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // Check local storage for token on mount
+    useEffect(() => {
         const token = localStorage.getItem('token');
         const email = localStorage.getItem('email');
         const role = localStorage.getItem('role');
@@ -18,8 +17,7 @@ export const AuthProvider = ({ children }) => {
 
         if (token && token !== 'undefined' && email && email !== 'undefined') {
             setUser({ email, role, token, userId });
-        } else {
-            // Clean up bad state
+        } else {
             localStorage.removeItem('token');
             localStorage.removeItem('email');
             localStorage.removeItem('role');
@@ -30,9 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await api.post('/auth/login', { email, password });
-            
-            // Handle both camelCase and PascalCase from .NET responses
+            const response = await api.post('/auth/login', { email, password });
             const token = response.data.token || response.data.Token;
             const role = response.data.role || response.data.Role;
             const userId = response.data.userId || response.data.UserId || (response.data.user && response.data.user.id) || (response.data.User && response.data.User.Id);
@@ -57,8 +53,7 @@ export const AuthProvider = ({ children }) => {
             await api.post('/auth/register', { fullName, email, password });
             return { success: true };
         } catch (error) {
-            console.error('Registration failed:', error);
-            // Return specific backend error message if available
+            console.error('Registration failed:', error);
             if (error.response && error.response.data) {
                  const errorMessage = error.response.data.message || error.response.data.Message;
                  if (errorMessage) {

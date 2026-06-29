@@ -8,9 +8,7 @@ const VgaCategory = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isTextExpanded, setIsTextExpanded] = useState(false);
-    const [showFilterMenu, setShowFilterMenu] = useState(false);
-
-    // Filter States
+    const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedModels, setSelectedModels] = useState([]);
     const [minPrice, setMinPrice] = useState(1000000);
@@ -24,9 +22,7 @@ const VgaCategory = () => {
 
     useEffect(() => {
         const fetchVgaProducts = async () => {
-            try {
-                // Fetch all products, then filter locally for "VGA"-like products
-                // In a real scenario, this would be api.get('/products?category=vga')
+            try {
                 const res = await api.get('/products');
                 const allProds = res.data;
                 const vgas = allProds.filter(p =>
@@ -35,9 +31,7 @@ const VgaCategory = () => {
                     p.name.toLowerCase().includes('rx ') ||
                     p.name.toLowerCase().includes('vga') ||
                     p.name.toLowerCase().includes('card')
-                );
-
-                // If the filter yields no items (db is empty), show a duplicate grid of what we have just to fill out the UI
+                );
                 if (vgas.length === 0) {
                     setProducts(allProds.slice(0, 12));
                 } else {
@@ -51,9 +45,7 @@ const VgaCategory = () => {
         };
 
         fetchVgaProducts();
-    }, []);
-
-    // Static Mock Filters based on screenshot
+    }, []);
     const filters = [
         { label: 'Tình trạng sản phẩm' },
         { label: 'Khoảng giá' },
@@ -69,7 +61,7 @@ const VgaCategory = () => {
 
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', paddingBottom: '4rem' }}>
-            {/* Breadcrumb Area */}
+            
             <div style={{ backgroundColor: 'white', padding: '0.75rem 0', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
                 <div className="container" style={{ fontSize: '0.85rem', color: '#64748b' }}>
                     <Link to="/" style={{ color: '#0ea5e9', textDecoration: 'none' }}>Trang chủ</Link> /
@@ -79,7 +71,7 @@ const VgaCategory = () => {
 
             <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                {/* Filter Header Box */}
+                
                 <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', border: '1px solid #e2e8f0', position: 'relative' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
                         <div 
@@ -102,10 +94,10 @@ const VgaCategory = () => {
                             backgroundColor: 'white', padding: '2rem', borderRadius: '8px', 
                             boxShadow: '0 10px 25px rgba(0,0,0,0.15)', border: '1px solid #e2e8f0', zIndex: 100 
                         }}>
-                            {/* Visual Caret pointing to button */}
+                            
                             <div style={{ position: 'absolute', top: '-10px', left: '2rem', width: '20px', height: '20px', backgroundColor: 'white', transform: 'rotate(45deg)', borderLeft: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }} />
                             
-                            {/* Close button */}
+                            
                             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
                                 <button onClick={() => setShowFilterMenu(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, color: '#334155' }}>
                                     <X size={16} /> Đóng
@@ -113,7 +105,7 @@ const VgaCategory = () => {
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) minmax(250px, 1.5fr) 2fr', gap: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '2rem', marginBottom: '2rem' }}>
-                                {/* Tình trạng sản phẩm */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Tình trạng sản phẩm</div>
                                     <button 
@@ -130,7 +122,7 @@ const VgaCategory = () => {
                                     </button>
                                 </div>
 
-                                {/* Giá */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Giá</div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -148,11 +140,11 @@ const VgaCategory = () => {
                                             style={{ width: '100px', padding: '0.4rem', border: '1px solid #e2e8f0', borderRadius: '4px', textAlign: 'center', fontSize: '0.85rem', outline: 'none', backgroundColor: '#f8fafc' }} 
                                         />
                                     </div>
-                                    {/* Dual Slider Overlay Layout */}
+                                    
                                     <div style={{ position: 'relative', width: '230px', height: '20px' }}>
-                                        {/* Background Track */}
+                                        
                                         <div style={{ position: 'absolute', top: '8px', left: 0, right: 0, height: '4px', backgroundColor: '#e2e8f0', borderRadius: '2px' }} />
-                                        {/* Colored Track matching selection */}
+                                        
                                         <div style={{ 
                                             position: 'absolute', top: '8px', 
                                             left: `${(minPrice / 100000000) * 100}%`, 
@@ -192,7 +184,7 @@ const VgaCategory = () => {
                                     `}</style>
                                 </div>
 
-                                {/* Hãng */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Hãng</div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -220,7 +212,7 @@ const VgaCategory = () => {
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                                {/* Dòng VGA */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Dòng VGA</div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -246,17 +238,17 @@ const VgaCategory = () => {
                                     </div>
                                 </div>
 
-                                {/* Dung lượng bộ nhớ */}
+                                
                                 <div>
                                     <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Dung lượng bộ nhớ</div>
-                                    {/* Empty area as per screenshot */}
+                                    
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Sort Header */}
+                
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
                         Sắp xếp theo:
@@ -268,7 +260,7 @@ const VgaCategory = () => {
                     </div>
                 </div>
 
-                {/* Product Grid */}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
                     {products.map((p, i) => (
                         <div key={i} style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '4px', transition: 'box-shadow 0.2s', ':hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.1)' } }}>
@@ -277,7 +269,7 @@ const VgaCategory = () => {
                     ))}
                 </div>
 
-                {/* Load More Button */}
+                
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                     <button style={{
                         border: '1px solid #0ea5e9', color: '#0ea5e9', backgroundColor: 'white',
@@ -291,7 +283,7 @@ const VgaCategory = () => {
                     </button>
                 </div>
 
-                {/* SEO Text Section */}
+                
                 <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginTop: '2rem', position: 'relative' }}>
                     <div style={{
                         maxHeight: isTextExpanded ? 'none' : '300px',
@@ -362,7 +354,7 @@ const VgaCategory = () => {
                         </div>
                     </div>
 
-                    {/* Gradient overlay when collapsed */}
+                    
                     {!isTextExpanded && (
                         <div style={{
                             position: 'absolute',
@@ -380,7 +372,7 @@ const VgaCategory = () => {
                     )}
                 </div>
 
-                {/* Expand / Collapse Button */}
+                
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-1rem', zIndex: 10 }}>
                     <button
                         onClick={() => setIsTextExpanded(!isTextExpanded)}

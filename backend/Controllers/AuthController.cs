@@ -45,14 +45,12 @@ namespace PcComponentStore.Api.Controllers
             {
                 Username = model.Email.Split('@')[0],
                 Email = model.Email,
-                PasswordHash = model.Password, // WARNING: In production, hash this properly (BCrypt, Argon2, etc.)
+                PasswordHash = model.Password, 
                 PhoneNumber = "0000000000",
                 RoleType = "customer",
                 Attributes = "{}",
                 CreatedAt = DateTime.UtcNow
-            };
-
-            // If it's the very first user, make them an admin automatically
+            };
             if (!await _context.Users.AnyAsync())
             {
                 newUser.RoleType = "admin";
@@ -66,8 +64,7 @@ namespace PcComponentStore.Api.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
-        {
-            // Note: Currently doing plaintext password check for compatibility with provided SQL dump's 'hashed_pwd_1'.
+        {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == model.Password);
             
             if (user != null)
@@ -105,8 +102,7 @@ namespace PcComponentStore.Api.Controllers
             var sql = await System.IO.File.ReadAllTextAsync(sqlFilePath);
             
             try 
-            {
-                // First, connect without database to create it
+            {
                 var defaultConn = _configuration.GetConnectionString("DefaultConnection");
                 if (string.IsNullOrEmpty(defaultConn)) return BadRequest("DefaultConnection is not configured.");
                 var masterConnectionString = defaultConn.Replace("Database=pccomdb;", "");
@@ -115,9 +111,7 @@ namespace PcComponentStore.Api.Controllers
                 
                 using var createCmd = masterConnection.CreateCommand();
                 createCmd.CommandText = "CREATE DATABASE IF NOT EXISTS pccomdb; USE pccomdb;";
-                await createCmd.ExecuteNonQueryAsync();
-
-                // Now execute the script
+                await createCmd.ExecuteNonQueryAsync();
                 using var scriptCmd = masterConnection.CreateCommand();
                 scriptCmd.CommandText = sql;
                 await scriptCmd.ExecuteNonQueryAsync();
@@ -194,7 +188,7 @@ namespace PcComponentStore.Api.Controllers
                     {
                         Username = payload.Name ?? payload.Email.Split('@')[0],
                         Email = payload.Email,
-                        PasswordHash = "GOOGLE_LOGIN", // Placeholder for Google users
+                        PasswordHash = "GOOGLE_LOGIN", 
                         PhoneNumber = "0000000000",
                         RoleType = "customer",
                         Attributes = "{}",
@@ -240,20 +234,13 @@ namespace PcComponentStore.Api.Controllers
             if (user == null)
             {
                 return BadRequest(new { Message = "Email này chưa được đăng ký trong hệ thống." });
-            }
-
-            // Generate 6-digit OTP
-            string otp = new Random().Next(100000, 999999).ToString();
-
-            // Store in cache with 5 minutes expiration
-            _cache.Set($"OTP_{model.Email}", otp, TimeSpan.FromMinutes(5));
-
-            // Log OTP clearly to console/system log for developer debugging and demo mode fallback
+            }
+            string otp = new Random().Next(100000, 999999).ToString();
+            _cache.Set($"OTP_{model.Email}", otp, TimeSpan.FromMinutes(5));
             Console.WriteLine($"[FORGOT PASSWORD OTP] Email: {model.Email} | OTP: {otp}");
 
             try
-            {
-                // Read from environment variables first (Railway), fallback to appsettings.json
+            {
                 var smtpServer = Environment.GetEnvironmentVariable("SMTP_SERVER") 
                     ?? _configuration["EmailSettings:SmtpServer"] ?? "smtp.gmail.com";
                 var smtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") 
@@ -317,12 +304,8 @@ namespace PcComponentStore.Api.Controllers
 
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    client.Timeout = 15000; // 15 seconds
-
-                    // Accept all SSL certificates
-                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                    // Use StartTls for port 587, SslOnConnect for port 465
+                    client.Timeout = 15000; 
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                     var sslOptions = smtpPort == 465 
                         ? MailKit.Security.SecureSocketOptions.SslOnConnect 
                         : MailKit.Security.SecureSocketOptions.StartTls;
@@ -345,9 +328,7 @@ namespace PcComponentStore.Api.Controllers
                 if (ex.InnerException != null)
                     Console.WriteLine($"[SMTP/Brevo INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 
-                var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                
-                // Return an Ok with warning message. The page will transition to step 2 where they can type the OTP from Railway logs.
+                var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return Ok(new { Message = $"Mã OTP đã được tạo thành công! (Lưu ý: Không thể gửi email do lỗi SMTP/Brevo: '{errorMsg}'. Vui lòng lấy mã OTP trực tiếp trong Log của Railway)." });
             }
 
@@ -368,14 +349,10 @@ namespace PcComponentStore.Api.Controllers
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-            if (user == null) return BadRequest(new { Message = "Người dùng không tồn tại." });
-
-            // Cập nhật mật khẩu mới
+            if (user == null) return BadRequest(new { Message = "Người dùng không tồn tại." });
             user.PasswordHash = model.NewPassword;
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-
-            // Xóa OTP khỏi cache
+            await _context.SaveChangesAsync();
             _cache.Remove($"OTP_{model.Email}");
 
             return Ok(new { Message = "Khôi phục mật khẩu thành công!" });

@@ -7,8 +7,7 @@ import { ChevronDown, Filter, ChevronUp, X } from 'lucide-react';
 const GenericCategory = () => {
     const { alias } = useParams();
     const [searchParams] = useSearchParams();
-    
-    // Retrieve title and search parameters from URL or fallback to alias
+
     const displayTitle = searchParams.get('title') || alias.replace(/-/g, ' ').toUpperCase();
     const searchKey = (searchParams.get('search') || displayTitle).toLowerCase();
 
@@ -16,7 +15,6 @@ const GenericCategory = () => {
     const [loading, setLoading] = useState(true);
     const [activeFilterDropdown, setActiveFilterDropdown] = useState(null);
 
-    // Filter States
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(100000000);
@@ -39,8 +37,7 @@ const GenericCategory = () => {
                     const nameLower = p.name.toLowerCase();
                     const descLower = p.description ? p.description.toLowerCase() : '';
                     const catLower = (p.categoryName || '').toLowerCase();
-                    
-                    // Handle MegaMenu main titles specifically to match exact categories
+
                     if (alias === 'mainboard-bo-mach-chu' && catLower === 'mainboard') return true;
                     if (alias === 'vga-card-man-hinh' && catLower === 'vga') return true;
                     if (alias === 'o-cung-ssd-hdd' && catLower === 'storage') return true;
@@ -50,8 +47,7 @@ const GenericCategory = () => {
                     if (alias === 'gia-treo-man-hinh' && catLower === 'monitor-arm') return true;
                     if (alias === 'cpu' && catLower === 'cpu') return true;
                     if (alias === 'ram' && catLower === 'ram') return true;
-                    
-                    // Specific complex matching logic can go here. For now, substring match.
+
                     return nameLower.includes(searchKey) || descLower.includes(searchKey);
                 });
 
@@ -78,7 +74,7 @@ const GenericCategory = () => {
 
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', paddingBottom: '4rem' }}>
-            {/* Breadcrumb Area */}
+            
             <div style={{ backgroundColor: 'white', padding: '0.75rem 0', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
                 <div className="container" style={{ fontSize: '0.85rem', color: '#64748b' }}>
                     <Link to="/" style={{ color: '#0ea5e9', textDecoration: 'none' }}>Trang chủ</Link> /
@@ -87,7 +83,7 @@ const GenericCategory = () => {
             </div>
 
             <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {/* Filter Header Box */}
+                
                 <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
@@ -98,7 +94,7 @@ const GenericCategory = () => {
                                 <Filter size={16} /> Lọc nâng cao
                             </div>
 
-                            {/* Dropdown 1: Tình trạng */}
+                            
                             <div style={{ position: 'relative' }}>
                                 <div 
                                     onClick={() => setActiveFilterDropdown(activeFilterDropdown === 'Status' ? null : 'Status')}
@@ -125,7 +121,7 @@ const GenericCategory = () => {
                                 )}
                             </div>
 
-                            {/* Dropdown 2: Khoảng giá */}
+                            
                             <div style={{ position: 'relative' }}>
                                 <div 
                                     onClick={() => setActiveFilterDropdown(activeFilterDropdown === 'Price' ? null : 'Price')}
@@ -160,7 +156,7 @@ const GenericCategory = () => {
                                 )}
                             </div>
 
-                            {/* Dropdown 3: Hãng */}
+                            
                             <div style={{ position: 'relative' }}>
                                 <div 
                                     onClick={() => setActiveFilterDropdown(activeFilterDropdown === 'Brand' ? null : 'Brand')}
@@ -201,7 +197,7 @@ const GenericCategory = () => {
                         </h1>
                     </div>
 
-                    {/* All Filters Giant Dropdown for 'Lọc Nâng Cao' */}
+                    
                     {activeFilterDropdown === 'All' && (
                         <div style={{ 
                             position: 'relative', marginTop: '1rem', 
@@ -252,7 +248,7 @@ const GenericCategory = () => {
                     )}
                 </div>
 
-                {/* Sort Header */}
+                
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
                         Sắp xếp theo:
@@ -264,7 +260,7 @@ const GenericCategory = () => {
                     </div>
                 </div>
 
-                {/* Product Grid */}
+                
                 {products.length > 0 ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
                         {products.map((p, i) => (
@@ -279,7 +275,7 @@ const GenericCategory = () => {
                     </div>
                 )}
 
-                {/* Load More Button */}
+                
                 {products.length > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                         <button style={{

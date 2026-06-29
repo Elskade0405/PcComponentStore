@@ -8,7 +8,7 @@ const Footer = () => {
             <div className="container">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
 
-                    {/* Column 1 */}
+                    
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Về HGEARS</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
@@ -17,7 +17,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 2 */}
+                    
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Chính sách</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
@@ -29,7 +29,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 3 */}
+                    
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Thông tin liên hệ</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
@@ -42,7 +42,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 4 */}
+                    
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Tài khoản ngân hàng</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-primary)' }}>

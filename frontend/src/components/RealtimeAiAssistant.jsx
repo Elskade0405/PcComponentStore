@@ -7,7 +7,6 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
         let success = null;
         let hints = [];
 
-        // Lấy thông số từ parsed attributes
         const getAttr = (slotId, attrName) => {
             const item = selectedParts[slotId];
             if (!item || !item.product || !item.product.attributes) return null;
@@ -27,9 +26,8 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
         const mainSocket = getAttr('mainboard', 'socket');
         
         const mainChipset = getAttr('mainboard', 'chipset') || '';
-        const ramType = getAttr('ram', 'type') || getAttr('ram', 'chuẩn ram'); // DDR4, DDR5
+        const ramType = getAttr('ram', 'type') || getAttr('ram', 'chuẩn ram'); 
 
-        // Kiểm tra Socket (CPU vs Mainboard)
         if (hasCpu && hasMain) {
             if (cpuSocket && mainSocket && String(cpuSocket).trim().toLowerCase() !== String(mainSocket).trim().toLowerCase()) {
                 warnings.push(`Cảnh báo: CPU (Socket ${cpuSocket}) KHÔNG tương thích với Mainboard (Socket ${mainSocket})!`);
@@ -40,7 +38,6 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
             hints.push("Bạn đã có Mainboard, hãy chọn CPU có Socket phù hợp.");
         }
 
-        // Kiểm tra RAM
         if (hasMain && hasRam) {
             const mainName = selectedParts['mainboard'].product.name.toUpperCase();
             const isMainDDR5 = mainName.includes('DDR5') || mainChipset.includes('X670') || mainChipset.includes('B650') || mainChipset.includes('Z790') && !mainName.includes('DDR4');
@@ -60,14 +57,12 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
         const hasPsu = !!selectedParts['psu'];
         const hasSsd = !!selectedParts['ssd'];
 
-        // Cảnh báo thiếu linh kiện thiết yếu
         if (hasCpu && hasMain) {
             if (!hasRam) hints.push("Đừng quên chọn thêm RAM để hệ thống có thể hoạt động nhé.");
             if (!hasPsu && hasVga) hints.push("Bạn đã chọn Card màn hình rời, hãy chắc chắn chọn một bộ Nguồn (PSU) có công suất đủ lớn.");
             if (hasRam && !hasSsd) hints.push("Cấu hình vẫn thiếu ổ cứng (SSD) để cài hệ điều hành.");
         }
 
-        // Cảnh báo Nghẽn cổ chai (Bottleneck cơ bản)
         if (hasCpu && hasVga) {
             const cpuName = selectedParts['cpu'].product.name.toUpperCase();
             const vgaName = selectedParts['vga'].product.name.toUpperCase();
@@ -76,7 +71,6 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
             }
         }
 
-        // Tính toán & Cảnh báo Công suất Nguồn (PSU)
         const estimateWattage = (name, type) => {
             if (!name) return 0;
             const upName = name.toUpperCase();
@@ -104,9 +98,9 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
         if (hasCpu && hasVga && hasPsu) {
             const cpuW = estimateWattage(selectedParts['cpu'].product.name, 'cpu');
             const vgaW = estimateWattage(selectedParts['vga'].product.name, 'vga');
-            const baseW = 100; // Mainboard, RAM, SSD, Fans
+            const baseW = 100; 
             const totalEstimated = cpuW + vgaW + baseW;
-            const recommendedPsu = totalEstimated * 1.3; // 30% headroom
+            const recommendedPsu = totalEstimated * 1.3; 
 
             const psuWattageAttr = getAttr('psu', 'wattage') || '0W';
             const psuW = parseInt(psuWattageAttr.replace(/\D/g, '')) || 0;
@@ -136,7 +130,7 @@ const RealtimeAiAssistant = ({ selectedParts }) => {
     }, [selectedParts]);
 
     if (analysis.warnings.length === 0 && analysis.hints.length === 0 && !analysis.success) {
-        return null; // Không có gì để nói
+        return null; 
     }
 
     return (

@@ -9,7 +9,6 @@ const MonitorCategory = () => {
     const [loading, setLoading] = useState(true);
     const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-    // Filter States
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedResolutions, setSelectedResolutions] = useState([]);
     const [selectedRefreshRates, setSelectedRefreshRates] = useState([]);

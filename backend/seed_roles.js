@@ -5,7 +5,7 @@ async function seedRoles() {
     const connection = await mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: '1234', // Update with actual DB password if different
+        password: '1234', 
         database: 'pccomdb'
     });
 
@@ -43,7 +43,7 @@ async function seedRoles() {
     ];
 
     for (const user of usersToSeed) {
-        // Check if user already exists
+
         const [existing] = await connection.execute('SELECT id FROM users WHERE email = ?', [user.email]);
         
         if (existing.length === 0) {

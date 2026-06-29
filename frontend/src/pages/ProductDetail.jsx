@@ -20,12 +20,9 @@ const ProductDetail = () => {
 
     useEffect(() => {
         const fetchProduct = async () => {
-            try {
-                // Fetch main product
+            try {
                 const res = await api.get(`/products/${id}`);
-                setProduct(res.data);
-
-                // Fetch similar products (mock by fetching all and slicing)
+                setProduct(res.data);
                 const similarRes = await api.get('/products');
                 setSimilarProducts(similarRes.data.filter(p => p.id !== parseInt(id)).slice(0, 4));
             } catch (err) {
@@ -40,9 +37,7 @@ const ProductDetail = () => {
     }, [id]);
 
     if (loading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Đang tải thông tin sản phẩm...</div>;
-    if (!product) return <div style={{ padding: '4rem', textAlign: 'center' }}>Không tìm thấy sản phẩm!</div>;
-
-    // Parse attributes
+    if (!product) return <div style={{ padding: '4rem', textAlign: 'center' }}>Không tìm thấy sản phẩm!</div>;
     let attributes = {};
     if (product.attributes) {
         if (typeof product.attributes === 'string') {
@@ -52,11 +47,8 @@ const ProductDetail = () => {
         } else if (typeof product.attributes === 'object') {
             attributes = product.attributes;
         }
-    }
-
-    // Mock images since DB doesn't have them yet
-    const backendUrl = API_URL;
-    // Inline SVG data URL placeholder that works 100% offline and never fails
+    }
+    const backendUrl = API_URL;
     const placeholderImg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="24" fill="%239ca3af">No Image</text></svg>`;
 
     const getImgUrl = (rawUrl) => {
@@ -77,14 +69,9 @@ const ProductDetail = () => {
     const mainImg = getImgUrl(resolvedThumb);
     const detailList = Array.isArray(attributes.detailImageUrls) 
         ? attributes.detailImageUrls.map(u => getImgUrl(u)) 
-        : [];
-
-    // Combined list of images
-    const allImages = Array.from(new Set([mainImg, ...detailList])).filter(Boolean);
-
-    // Mapper for friendly labels
-    const specLabels = {
-        // CPU
+        : [];
+    const allImages = Array.from(new Set([mainImg, ...detailList])).filter(Boolean);
+    const specLabels = {
         generation: 'Thế hệ',
         generationName: 'Tên thế hệ',
         socket: 'Socket',
@@ -98,8 +85,7 @@ const ProductDetail = () => {
         pcieVersion: 'Phiên bản PCI Express',
         pcieLanes: 'Số lane PCI Express',
         tdp: 'TDP',
-        cooling: 'Tản nhiệt',
-        // VGA
+        cooling: 'Tản nhiệt',
         graphicEngine: 'Engine đồ họa',
         busStandard: 'Chuẩn Bus',
         vram: 'Bộ nhớ (VRAM)',
@@ -111,8 +97,7 @@ const ProductDetail = () => {
         dimensions: 'Kích thước',
         recommendedPsu: 'PSU đề nghị',
         powerConnectors: 'Power Connectors',
-        directX: 'DirectX',
-        // RAM
+        directX: 'DirectX',
         ramModel: 'Model',
         ramType: 'Loại RAM',
         capacity: 'Dung lượng RAM',
@@ -121,16 +106,13 @@ const ProductDetail = () => {
         rgb: 'Đèn nền',
         voltage: 'Điện Áp',
         casLatency: 'CAS Latency',
-        warranty: 'Bảo hành',
-        // Monitor
+        warranty: 'Bảo hành',
         screenSize: 'Kích thước Màn hình',
         resolution: 'Độ phân giải',
-        refreshRate: 'Tần số quét',
-        // Mainboard
+        refreshRate: 'Tần số quét',
         mainboardSize: 'Kích Thước Mainboard',
         ramSlots: 'Khe Cắm Ram',
-        chipset: 'CHIPSET',
-        // Storage
+        chipset: 'CHIPSET',
         driveType: 'Loại ổ cứng',
         connection: 'Kết nối',
         storageCapacity: 'Dung lượng',
@@ -138,37 +120,33 @@ const ProductDetail = () => {
         writeSpeed: 'Tốc độ ghi',
         osSupport: 'Hỗ trợ hệ điều hành',
         operatingTemp: 'Nhiệt độ hoạt động',
-        otherFeatures: 'Tính năng khác',
-        // PC
+        otherFeatures: 'Tính năng khác',
         pcCpu: 'Vi xử lý',
         pcMainboard: 'Bo mạch chủ',
         pcRam: 'RAM',
         pcVga: 'Card đồ họa',
         pcStorage: 'Ổ cứng',
         pcPsu: 'Nguồn',
-        pcCase: 'Vỏ Case',
-        // PSU
+        pcCase: 'Vỏ Case',
         powerCapacity: 'Công suất',
         efficiency: 'Chuẩn hiệu suất',
         formFactor: 'Kích thước',
         modular: 'Kiểu cáp',
         inputVoltage: 'Nguồn điện',
-        psuFanSize: 'Kích thước quạt',
-        // Cooling
+        psuFanSize: 'Kích thước quạt',
         coolerType: 'Loại tản nhiệt',
         supportedSockets: 'Hỗ trợ Socket',
         fanSpeed: 'Tốc độ quạt',
         airflow: 'Lưu lượng gió',
         noiseLevel: 'Độ ồn',
-        radiatorSize: 'Kích thước Radiator',
-        // Common
+        radiatorSize: 'Kích thước Radiator',
         type: 'Loại linh kiện',
         category: 'Danh mục'
     };
 
     return (
         <div style={{ backgroundColor: '#f1f1f1', paddingBottom: '4rem', paddingTop: '1rem' }}>
-            {/* Breadcrumb mock */}
+            
             <div className="container" style={{ marginBottom: '1rem', fontSize: '0.875rem', color: '#666' }}>
                 <span style={{ cursor: 'pointer' }}>Trang chủ</span> &gt;
                 <span style={{ cursor: 'pointer', margin: '0 0.5rem' }}>Linh kiện PC</span> &gt;
@@ -176,10 +154,10 @@ const ProductDetail = () => {
             </div>
 
             <div className="container">
-                {/* Top Section Layout: Image (Left), Info (Middle), Policy (Right) */}
+                
                 <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '4px', display: 'grid', gridTemplateColumns: 'minmax(350px, 400px) 1fr 300px', gap: '1.5rem', marginBottom: '1.5rem' }}>
 
-                    {/* 1. Left: Images */}
+                    
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
                             <img 
@@ -212,7 +190,7 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    {/* 2. Middle: Info & Buy */}
+                    
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem', color: '#333', lineHeight: 1.4 }}>
                             {product.name || 'Đang cập nhật tên sản phẩm'}
@@ -226,7 +204,7 @@ const ProductDetail = () => {
                             <span style={{ borderLeft: '1px solid #ccc', paddingLeft: '1rem' }}>Thương hiệu: <b style={{ color: '#0056b3' }}>{product.brand}</b></span>
                         </div>
 
-                        {/* Price Block TTG style (Red Text, Gray Background or bold red) */}
+                        
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem', backgroundColor: '#f9f9f9', padding: '1rem', borderRadius: '4px' }}>
                             <span style={{ fontSize: '2rem', fontWeight: 700, color: '#e30019' }}>{product.price?.toLocaleString('vi-VN')} đ</span>
                             {attributes.originalPrice && attributes.originalPrice > product.price && (
@@ -234,7 +212,7 @@ const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Short Specs Bullet Points */}
+                        
                         <div style={{ marginBottom: '1.5rem' }}>
                             <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.9rem', color: '#333', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <li><b>Tình trạng:</b> {product.stockQuantity > 0 ? <span style={{ color: '#28a745', fontWeight: 'bold' }}>Còn hàng</span> : <span style={{ color: 'red' }}>Hết hàng</span>}</li>
@@ -244,7 +222,7 @@ const ProductDetail = () => {
                             </ul>
                         </div>
 
-                        {/* TTG Shop Fake Promotion Box */}
+                        
                         <div style={{ border: '1px solid #fed7d7', borderRadius: '4px', marginBottom: '1.5rem', position: 'relative' }}>
                             <div style={{ backgroundColor: '#fff5f5', color: '#c53030', padding: '0.5rem 1rem', fontWeight: 600, borderBottom: '1px solid #fed7d7', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 🎁 Khuyến mãi / Ưu đãi
@@ -255,7 +233,7 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {/* Quantity and Actions */}
+                        
                         <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
                             <button
                                 onClick={() => {
@@ -286,7 +264,7 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    {/* 3. Right: Policy Box (Mua hàng tại TTG SHOP style) */}
+                    
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1rem', backgroundColor: '#fff' }}>
                             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem 0', textTransform: 'uppercase', color: '#333' }}>Mua hàng tại cửa hàng</h3>
@@ -324,7 +302,7 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {/* Contact Box */}
+                        
                         <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1rem', backgroundColor: '#f9f9f9', textAlign: 'center' }}>
                             <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Hotline tư vấn online</div>
                             <div style={{ color: '#e30019', fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>********</div>
@@ -333,10 +311,10 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
-                {/* Bottom Section Layout */}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '1.5rem' }}>
 
-                    {/* Left: Product Description (Mô tả sản phẩm) */}
+                    
                     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                         <div style={{ borderBottom: '2px solid #e30019', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
                             <h2 style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase', margin: 0, color: '#333', display: 'inline-block' }}>
@@ -357,7 +335,7 @@ const ProductDetail = () => {
                         </p>
                     </div>
 
-                    {/* Right: Tech Specs (Thông số kỹ thuật) */}
+                    
                     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', height: 'fit-content' }}>
                         <div style={{ borderBottom: '2px solid #e30019', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
                             <h2 style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase', margin: 0, color: '#333', display: 'inline-block' }}>
@@ -375,7 +353,7 @@ const ProductDetail = () => {
                                 <div style={{ flex: '2', padding: '0.75rem', color: '#333' }}>{product.brand}</div>
                             </div>
 
-                            {/* Dynamic Attributes from JSON */}
+                            
                             {Object.entries(attributes)
                                 .filter(([key, value]) => !['thumbnailUrl', 'detailImageUrls', 'imageUrl'].includes(key) && value !== null && value !== '')
                                 .slice(0, 5)
@@ -405,7 +383,7 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
-                {/* Similar Products */}
+                
                 {similarProducts.length > 0 && (
                     <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginTop: '1.5rem' }}>
                         <div style={{ borderBottom: '2px solid #e30019', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
@@ -422,11 +400,11 @@ const ProductDetail = () => {
                 )}
             </div>
 
-            {/* Modal Thông Số Kỹ Thuật Chi Tiết */}
+            
             {isSpecModalOpen && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
                     <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', borderRadius: '4px', overflow: 'hidden' }}>
-                        {/* Nút Close đỏ góc trên phải */}
+                        
                         <button
                             onClick={() => setIsSpecModalOpen(false)}
                             style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#f44336', color: 'white', border: 'none', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}

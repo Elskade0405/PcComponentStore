@@ -3,25 +3,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PcComponentStore.Api.Data;
-using PcComponentStore.Api.Models;
-
-// Load environment variables from .env file
+using PcComponentStore.Api.Models;
 DotNetEnv.Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMemoryCache();
-
-// Configure Entity Framework Core with MySQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Auto-detect Railway MySQL URL
+builder.Services.AddMemoryCache();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var railwayMySqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL");
 if (!string.IsNullOrEmpty(railwayMySqlUrl))
 {
@@ -31,14 +22,10 @@ if (!string.IsNullOrEmpty(railwayMySqlUrl))
     connectionString = $"Server={uri.Host};Port={(uri.Port > 0 ? uri.Port : 3306)};Database={dbName};User={userInfo[0]};Password={(userInfo.Length > 1 ? userInfo[1] : "")};";
 }
 builder.Services.AddDbContext<PcComponentStoreDbContext>(options =>
-{
-    // Use an explicit version instead of AutoDetect to prevent segmentation fault (139) 
-    // when the database is unreachable during app startup on Linux/Render.
+{
     var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
     options.UseMySql(connectionString, serverVersion);
-});
-
-// Configure JWT Authentication
+});
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["Key"];
 if (string.IsNullOrEmpty(secretKey))
@@ -63,17 +50,15 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
-});
-
-// Configure CORS
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.SetIsOriginAllowed(_ => true) // Allow any origin for deployment flexibility
+        policy.SetIsOriginAllowed(_ => true) 
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Often needed for auth
+              .AllowCredentials(); 
     });
 });
 
@@ -83,9 +68,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<PcComponentStoreDbContext>();
     try
-    {
-        // EnsureCreated doesn't add tables to an existing DB.
-        // We use raw SQL to create the tables if they don't exist.
+    {
         var createUsersTable = @"
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -135,9 +118,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Could not create tables: {ex.Message}");
     }
-}
-
-// Configure the HTTP request pipeline.
+}
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

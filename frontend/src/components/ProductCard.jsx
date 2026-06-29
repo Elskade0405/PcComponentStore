@@ -6,9 +6,7 @@ import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product, onAdd }) => {
     const { addToCart } = useCart();
-    const backendUrl = API_URL;
-    
-    // Parse attributes if they come from the new SQL DB (handle both string and object formats)
+    const backendUrl = API_URL;
     let parsedAttributes = null;
     if (product.attributes) {
         if (typeof product.attributes === 'string') {
@@ -20,9 +18,7 @@ const ProductCard = ({ product, onAdd }) => {
         } else if (typeof product.attributes === 'object') {
             parsedAttributes = product.attributes;
         }
-    }
-
-    // Inline SVG data URL placeholder that works 100% offline and never fails
+    }
     const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%239ca3af">No Image</text></svg>`;
 
     const getImgUrl = () => {
@@ -40,9 +36,7 @@ const ProductCard = ({ product, onAdd }) => {
         return `${backendUrl}${separator}${rawUrl}`;
     };
 
-    const imgUrl = getImgUrl();
-
-    // Parse the original price from Attributes (fallback to normal price if it's 0 or missing to avoid weird displays)
+    const imgUrl = getImgUrl();
     const oldPrice = (parsedAttributes?.originalPrice && parsedAttributes.originalPrice > product.price) 
                         ? parsedAttributes.originalPrice 
                         : null;
@@ -62,11 +56,11 @@ const ProductCard = ({ product, onAdd }) => {
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            padding: '0.75rem', /* Reduced padding */
+            padding: '0.75rem', 
             position: 'relative',
             height: '100%'
         }}>
-            {/* New Badge */}
+            
             <div style={{
                 position: 'absolute',
                 top: '0.75rem',
@@ -96,7 +90,7 @@ const ProductCard = ({ product, onAdd }) => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    {/* Rating - Hardcoded to 5 stars per design */}
+                    
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.25rem' }}>
                         {[1, 2, 3, 4, 5].map((star) => (
                             <Star key={star} size={12} fill="#f59e0b" color="#f59e0b" />
@@ -193,7 +187,7 @@ const ProductCard = ({ product, onAdd }) => {
                             Tấm nền {parsedAttributes.panel}
                         </span>
                     )}
-                    {/* Laptop attributes */}
+                    
                     {parsedAttributes?.category === 'laptop' && (
                         <>
                             {parsedAttributes?.cpu && (

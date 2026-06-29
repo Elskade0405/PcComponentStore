@@ -12,7 +12,6 @@ namespace PcComponentStore.Api.Helpers
         {
             var build = new List<Product>();
 
-            // Phân bổ ngân sách
             decimal vgaBudgetRatio = optimizeVga ? 0.45m : 0.30m;
             decimal cpuBudgetRatio = optimizeVga ? 0.20m : 0.30m;
             decimal mainboardBudgetRatio = 0.15m;
@@ -27,7 +26,6 @@ namespace PcComponentStore.Api.Helpers
             decimal storageBudget = targetBudget * storageBudgetRatio;
             decimal psuBudget = targetBudget * psuBudgetRatio;
 
-            // Lấy danh sách từng loại
             var vgas = GetProductsByCategory(allProducts, "vga").OrderByDescending(p => p.Price).ToList();
             var cpus = GetProductsByCategory(allProducts, "cpu").OrderByDescending(p => p.Price).ToList();
             var mainboards = GetProductsByCategory(allProducts, "mainboard").OrderByDescending(p => p.Price).ToList();
@@ -35,23 +33,19 @@ namespace PcComponentStore.Api.Helpers
             var storages = GetProductsByCategory(allProducts, "storage").OrderByDescending(p => p.Price).ToList();
             var psus = GetProductsByCategory(allProducts, "psu").OrderByDescending(p => p.Price).ToList();
 
-            // 1. Chọn VGA gần với ngân sách VGA nhất (hoặc rẻ hơn)
             var selectedVga = vgas.FirstOrDefault(p => p.Price <= vgaBudget) ?? vgas.LastOrDefault();
             if (selectedVga != null) build.Add(selectedVga);
 
-            // 2. Chọn CPU gần với ngân sách CPU nhất
             var selectedCpu = cpus.FirstOrDefault(p => p.Price <= cpuBudget) ?? cpus.LastOrDefault();
             if (selectedCpu != null) build.Add(selectedCpu);
 
             string cpuSocket = GetAttribute(selectedCpu, "socket");
 
-            // 3. Chọn Mainboard tương thích Socket với CPU
             var compatibleMainboards = mainboards.Where(m => GetAttribute(m, "socket") == cpuSocket).ToList();
             var selectedMain = compatibleMainboards.FirstOrDefault(p => p.Price <= mainboardBudget) ?? compatibleMainboards.LastOrDefault();
             if (selectedMain != null) build.Add(selectedMain);
 
-            // 4. Chọn RAM (DDR4/DDR5) tương thích Mainboard (Tạm thời giả sử DDR5 nếu Main đời mới)
-            // Lấy tên Mainboard chứa "DDR4" hoặc "DDR5"
+
             string mainName = selectedMain?.Name?.ToLower() ?? "";
             string requiredRamType = mainName.Contains("ddr4") ? "ddr4" : "ddr5";
             
@@ -59,11 +53,9 @@ namespace PcComponentStore.Api.Helpers
             var selectedRam = compatibleRams.FirstOrDefault(p => p.Price <= ramBudget) ?? compatibleRams.LastOrDefault();
             if (selectedRam != null) build.Add(selectedRam);
 
-            // 5. Chọn Storage
             var selectedStorage = storages.FirstOrDefault(p => p.Price <= storageBudget) ?? storages.LastOrDefault();
             if (selectedStorage != null) build.Add(selectedStorage);
 
-            // 6. Chọn PSU (Dựa trên tổng công suất ước tính, VGA xịn thì cần nguồn xịn)
             var selectedPsu = psus.FirstOrDefault(p => p.Price <= psuBudget) ?? psus.LastOrDefault();
             if (selectedPsu != null) build.Add(selectedPsu);
 
