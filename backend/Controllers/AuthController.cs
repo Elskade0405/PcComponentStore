@@ -251,9 +251,24 @@ namespace PcComponentStore.Api.Controllers
 
             try
             {
-                var emailSettings = _configuration.GetSection("EmailSettings");
+                // Read from environment variables first (Railway), fallback to appsettings.json
+                var smtpServer = Environment.GetEnvironmentVariable("SMTP_SERVER") 
+                    ?? _configuration["EmailSettings:SmtpServer"] ?? "smtp.gmail.com";
+                var smtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") 
+                    ?? _configuration["EmailSettings:SmtpPort"] ?? "587");
+                var smtpUsername = Environment.GetEnvironmentVariable("SMTP_USERNAME") 
+                    ?? _configuration["EmailSettings:SmtpUsername"] ?? "";
+                var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") 
+                    ?? _configuration["EmailSettings:SmtpPassword"] ?? "";
+                var senderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") 
+                    ?? _configuration["EmailSettings:SenderName"] ?? "PC Component Store";
+                var senderEmail = Environment.GetEnvironmentVariable("SMTP_SENDER_EMAIL") 
+                    ?? _configuration["EmailSettings:SenderEmail"] ?? smtpUsername;
+
+                Console.WriteLine($"[SMTP] Config: Server={smtpServer}, Port={smtpPort}, User={smtpUsername}");
+
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(emailSettings["SenderName"], emailSettings["SenderEmail"]));
+                message.From.Add(new MailboxAddress(senderName, senderEmail));
                 message.To.Add(new MailboxAddress("", model.Email));
                 message.Subject = "Mã xác thực Khôi phục mật khẩu - PC Component Store";
 
@@ -265,19 +280,35 @@ namespace PcComponentStore.Api.Controllers
 
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    client.Timeout = 15000; // 15 seconds
+                    client.Timeout = 30000; // 30 seconds
 
-                    // Accept all SSL certificates (in case of local proxy/antivirus issues)
+                    // Accept all SSL certificates
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
-                    await client.AuthenticateAsync(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
+                    Console.WriteLine($"[SMTP] Connecting to {smtpServer}:{smtpPort}...");
+                    
+                    // Use StartTls for port 587, SslOnConnect for port 465
+                    var sslOptions = smtpPort == 465 
+                        ? MailKit.Security.SecureSocketOptions.SslOnConnect 
+                        : MailKit.Security.SecureSocketOptions.StartTls;
+                    
+                    await client.ConnectAsync(smtpServer, smtpPort, sslOptions);
+                    Console.WriteLine("[SMTP] Connected! Authenticating...");
+                    
+                    await client.AuthenticateAsync(smtpUsername, smtpPassword);
+                    Console.WriteLine("[SMTP] Authenticated! Sending email...");
+                    
                     await client.SendAsync(message);
+                    Console.WriteLine("[SMTP] Email sent successfully!");
+                    
                     await client.DisconnectAsync(true);
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[SMTP ERROR] {ex.GetType().Name}: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"[SMTP INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 var errorMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return StatusCode(500, new { Message = "Lỗi SMTP: " + errorMsg });
             }
