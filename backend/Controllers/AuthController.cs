@@ -265,12 +265,12 @@ namespace PcComponentStore.Api.Controllers
 
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    client.Timeout = 10000; // 10 seconds
-                    
+                    client.Timeout = 15000; // 15 seconds
+
                     // Accept all SSL certificates (in case of local proxy/antivirus issues)
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.Auto);
+                    await client.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
                     await client.AuthenticateAsync(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
