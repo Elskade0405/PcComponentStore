@@ -31,24 +31,56 @@ const GenericCategory = () => {
                 setLoading(true);
                 const res = await api.get('/products');
                 const allProds = res.data;
+
+                const aliasLower = alias.toLowerCase();
+                const titleParam = (searchParams.get('title') || '').toLowerCase();
+                const combinedKey = aliasLower + ' ' + titleParam;
+
+                const categoryMap = [
+                    { keywords: ['mainboard', 'bo-mach-chu', 'bo mạch chủ'], category: 'mainboard' },
+                    { keywords: ['vga', 'card-man-hinh', 'card màn hình'], category: 'vga' },
+                    { keywords: ['o-cung', 'ssd', 'hdd', 'ổ cứng', 'storage'], category: 'storage' },
+                    { keywords: ['nguon', 'psu'], category: 'psu' },
+                    { keywords: ['tan-nhiet', 'tản nhiệt', 'cooling', 'quat', 'quạt'], category: 'cooling' },
+                    { keywords: ['vo-case', 'vỏ case', 'case'], category: 'case' },
+                    { keywords: ['cpu', 'vi-xu-ly', 'vi xử lý'], category: 'cpu' },
+                    { keywords: ['ram'], category: 'ram' },
+                    { keywords: ['man-hinh', 'màn hình', 'monitor'], category: 'monitor' },
+                    { keywords: ['laptop'], category: 'laptop' },
+                    { keywords: ['gia-treo', 'giá treo'], category: 'monitor-arm' },
+                ];
+
+                let matchedCategory = null;
+                for (const entry of categoryMap) {
+                    if (entry.keywords.some(kw => combinedKey.includes(kw))) {
+                        matchedCategory = entry.category;
+                        break;
+                    }
+                }
+
                 const filtered = allProds.filter(p => {
                     if (searchKey === 'tất cả' || alias === 'all') return true;
-                    
-                    const nameLower = p.name.toLowerCase();
-                    const descLower = p.description ? p.description.toLowerCase() : '';
+
                     const catLower = (p.categoryName || '').toLowerCase();
+                    const nameLower = (p.name || '').toLowerCase();
 
-                    if (alias === 'mainboard-bo-mach-chu' && catLower === 'mainboard') return true;
-                    if (alias === 'vga-card-man-hinh' && catLower === 'vga') return true;
-                    if (alias === 'o-cung-ssd-hdd' && catLower === 'storage') return true;
-                    if (alias === 'nguon-psu' && (catLower === 'psu' || catLower === 'pc')) return true;
-                    if (alias === 'tan-nhiet' && catLower === 'cooling') return true;
-                    if (alias === 'vo-case' && catLower === 'case') return true;
-                    if (alias === 'gia-treo-man-hinh' && catLower === 'monitor-arm') return true;
-                    if (alias === 'cpu' && catLower === 'cpu') return true;
-                    if (alias === 'ram' && catLower === 'ram') return true;
+                    if (matchedCategory) {
+                        if (catLower === matchedCategory) return true;
 
-                    return nameLower.includes(searchKey) || descLower.includes(searchKey);
+                        if (matchedCategory === 'vga' && combinedKey.includes('nvidia') && nameLower.includes('nvidia')) return true;
+                        if (matchedCategory === 'vga' && combinedKey.includes('amd') && catLower === 'vga' && nameLower.includes('amd')) return true;
+                        if (matchedCategory === 'vga' && combinedKey.includes('rtx 5000') && catLower === 'vga' && nameLower.includes('rtx 50')) return true;
+                        if (matchedCategory === 'cpu' && combinedKey.includes('intel') && catLower === 'cpu' && nameLower.includes('intel')) return true;
+                        if (matchedCategory === 'cpu' && combinedKey.includes('amd') && catLower === 'cpu' && nameLower.includes('amd')) return true;
+                        if (matchedCategory === 'mainboard' && combinedKey.includes('intel') && catLower === 'mainboard' && nameLower.includes('intel')) return true;
+                        if (matchedCategory === 'mainboard' && combinedKey.includes('amd') && catLower === 'mainboard' && nameLower.includes('amd')) return true;
+                        if (matchedCategory === 'storage' && combinedKey.includes('ssd') && !combinedKey.includes('hdd') && catLower === 'storage' && nameLower.includes('ssd')) return true;
+                        if (matchedCategory === 'storage' && combinedKey.includes('hdd') && !combinedKey.includes('ssd') && catLower === 'storage' && nameLower.includes('hdd')) return true;
+
+                        return false;
+                    }
+
+                    return nameLower.includes(searchKey);
                 });
 
                 setProducts(filtered);
