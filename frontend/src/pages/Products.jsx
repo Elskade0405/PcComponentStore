@@ -12,6 +12,9 @@ const Products = () => {
     const urlSearch = searchParams.get('search') || '';
     const [searchTerm, setSearchTerm] = useState(urlSearch);
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [priceRange, setPriceRange] = useState('all');
+    const [selectedBrands, setSelectedBrands] = useState([]);
+    const [inStockOnly, setInStockOnly] = useState(false);
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -62,18 +65,44 @@ const Products = () => {
     };
 
     const categoryList = [...new Set(products.map(p => (p.categoryName || '').toLowerCase()).filter(Boolean))];
+    const brandList = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
+
+    const handleBrandToggle = (brand) => {
+        setSelectedBrands(prev => 
+            prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+        );
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setSelectedCategory('All');
+        setPriceRange('all');
+        setSelectedBrands([]);
+        setInStockOnly(false);
+    };
 
     const filteredProducts = products.filter(product => {
         const catLower = (product.categoryName || '').toLowerCase();
         const matchesCategory = selectedCategory === 'All' || catLower === selectedCategory;
 
-        if (!searchTerm.trim()) return matchesCategory;
-
         const nameLower = (product.name || '').toLowerCase();
         const query = searchTerm.toLowerCase();
-        const matchesSearch = nameLower.includes(query);
+        const matchesSearch = !searchTerm.trim() || nameLower.includes(query);
 
-        return matchesCategory && matchesSearch;
+        const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+        const matchesStock = !inStockOnly || (product.stockQuantity > 0);
+
+        let matchesPrice = true;
+        if (priceRange !== 'all') {
+            const price = product.price || 0;
+            if (priceRange === 'under2') matchesPrice = price < 2000000;
+            else if (priceRange === '2to5') matchesPrice = price >= 2000000 && price <= 5000000;
+            else if (priceRange === '5to10') matchesPrice = price >= 5000000 && price <= 10000000;
+            else if (priceRange === '10to20') matchesPrice = price >= 10000000 && price <= 20000000;
+            else if (priceRange === 'over20') matchesPrice = price > 20000000;
+        }
+
+        return matchesCategory && matchesSearch && matchesBrand && matchesStock && matchesPrice;
     });
 
     if (loading) {
@@ -114,8 +143,10 @@ const Products = () => {
                     </div>
 
                     <div style={{ marginTop: '2rem' }}>
-                        <label className="input-label">Danh mục</label>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <label className="input-label" style={{ margin: 0 }}>Danh mục</label>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
                             <button
                                 onClick={() => setSelectedCategory('All')}
                                 style={{
@@ -128,10 +159,9 @@ const Products = () => {
                                     border: 'none', cursor: 'pointer', fontSize: '0.9rem'
                                 }}
                             >
-                                Tất cả ({products.length})
+                                Tất cả
                             </button>
                             {categoryList.map(cat => {
-                                const count = products.filter(p => (p.categoryName || '').toLowerCase() === cat).length;
                                 return (
                                     <button
                                         key={cat}
@@ -147,12 +177,80 @@ const Products = () => {
                                             textTransform: 'uppercase'
                                         }}
                                     >
-                                        {cat} ({count})
+                                        {cat}
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
+
+                    {/* Price Range Filter */}
+                    <div style={{ marginTop: '2rem' }}>
+                        <label className="input-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Khoảng giá</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {[
+                                { id: 'all', label: 'Tất cả mức giá' },
+                                { id: 'under2', label: 'Dưới 2 triệu' },
+                                { id: '2to5', label: 'Từ 2 - 5 triệu' },
+                                { id: '5to10', label: 'Từ 5 - 10 triệu' },
+                                { id: '10to20', label: 'Từ 10 - 20 triệu' },
+                                { id: 'over20', label: 'Trên 20 triệu' }
+                            ].map(range => (
+                                <label key={range.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                    <input 
+                                        type="radio" 
+                                        name="priceRange" 
+                                        checked={priceRange === range.id}
+                                        onChange={() => setPriceRange(range.id)}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                    {range.label}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Brand Filter */}
+                    {brandList.length > 0 && (
+                        <div style={{ marginTop: '2rem' }}>
+                            <label className="input-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Thương hiệu</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '200px', overflowY: 'auto' }}>
+                                {brandList.map(brand => (
+                                    <label key={brand} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={selectedBrands.includes(brand)}
+                                            onChange={() => handleBrandToggle(brand)}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                        {brand}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Availability Filter */}
+                    <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                            <input 
+                                type="checkbox" 
+                                checked={inStockOnly}
+                                onChange={(e) => setInStockOnly(e.target.checked)}
+                                style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                            />
+                            Chỉ hiện sản phẩm còn hàng
+                        </label>
+                    </div>
+
+                    <button 
+                        onClick={handleClearFilters}
+                        style={{ width: '100%', marginTop: '2rem', padding: '0.75rem', backgroundColor: '#f1f5f9', border: 'none', borderRadius: '4px', color: '#475569', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#e2e8f0'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#f1f5f9'}
+                    >
+                        Xóa tất cả bộ lọc
+                    </button>
                 </div>
 
                 
