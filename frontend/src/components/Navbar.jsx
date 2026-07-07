@@ -107,12 +107,19 @@ const Navbar = () => {
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px', zIndex: 120, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                 {suggestions.map(s => {
-                                    let imgUrl = 'https://via.placeholder.com/50x50?text=SP';
+                                    let imgUrl = '';
                                     try {
-                                        const attrs = typeof s.attributes === 'string' ? JSON.parse(s.attributes) : s.attributes;
-                                        const rawUrl = attrs?.thumbnailUrl || attrs?.imageUrl || '';
-                                        if (rawUrl) {
-                                            imgUrl = (rawUrl.startsWith('http') || rawUrl.startsWith('data:')) ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+                                        let raw = s.attributes || s.Attributes || '';
+                                        let attrs = null;
+                                        if (typeof raw === 'string' && raw.trim()) {
+                                            attrs = JSON.parse(raw);
+                                            if (typeof attrs === 'string') attrs = JSON.parse(attrs);
+                                        } else if (typeof raw === 'object') {
+                                            attrs = raw;
+                                        }
+                                        const thumbUrl = attrs?.thumbnailUrl || attrs?.imageUrl || attrs?.ThumbnailUrl || attrs?.ImageUrl || '';
+                                        if (thumbUrl) {
+                                            imgUrl = (thumbUrl.startsWith('http') || thumbUrl.startsWith('data:')) ? thumbUrl : `${API_URL}${thumbUrl.startsWith('/') ? '' : '/'}${thumbUrl}`;
                                         }
                                     } catch(e) {}
                                     return (
@@ -122,8 +129,12 @@ const Navbar = () => {
                                             onClick={() => setShowSuggestions(false)}
                                             style={{ display: 'flex', padding: '0.75rem 1rem', borderBottom: '1px solid #eee', textDecoration: 'none', color: 'inherit' }}
                                         >
-                                            <div style={{ width: '50px', height: '50px', marginRight: '1rem', flexShrink: 0 }}>
-                                                <img src={imgUrl} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                            <div style={{ width: '50px', height: '50px', marginRight: '1rem', flexShrink: 0, backgroundColor: '#f3f4f6', borderRadius: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {imgUrl ? (
+                                                    <img src={imgUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; }} />
+                                                ) : (
+                                                    <span style={{ fontSize: '0.6rem', color: '#9ca3af' }}>IMG</span>
+                                                )}
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#333', marginBottom: '0.25rem' }}>{s.name}</div>
