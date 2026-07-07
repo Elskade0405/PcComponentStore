@@ -107,7 +107,14 @@ const Navbar = () => {
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px', zIndex: 120, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                 {suggestions.map(s => {
-                                    const imgUrl = s.imageUrl ? `${API_URL}${s.imageUrl}` : 'https://via.placeholder.com/50x50?text=SP';
+                                    let imgUrl = 'https://via.placeholder.com/50x50?text=SP';
+                                    try {
+                                        const attrs = typeof s.attributes === 'string' ? JSON.parse(s.attributes) : s.attributes;
+                                        const rawUrl = attrs?.thumbnailUrl || attrs?.imageUrl || '';
+                                        if (rawUrl) {
+                                            imgUrl = (rawUrl.startsWith('http') || rawUrl.startsWith('data:')) ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+                                        }
+                                    } catch(e) {}
                                     return (
                                         <Link 
                                             key={s.id} 
