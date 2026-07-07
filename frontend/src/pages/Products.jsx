@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { ShoppingCart, Filter, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -7,12 +7,18 @@ import ProductCard from '../components/ProductCard';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchParams] = useSearchParams();
+    const urlSearch = searchParams.get('search') || '';
+    const [searchTerm, setSearchTerm] = useState(urlSearch);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const q = searchParams.get('search') || '';
+        setSearchTerm(q);
+    }, [searchParams]);
 
     useEffect(() => {
         fetchData();
@@ -21,12 +27,8 @@ const Products = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [productsRes, categoriesRes] = await Promise.all([
-                api.get('/products'),
-                api.get('/categories')
-            ]);
+            const productsRes = await api.get('/products');
             setProducts(productsRes.data);
-            setCategories(categoriesRes.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -43,7 +45,7 @@ const Products = () => {
         const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const existingItemIndex = currentCart.findIndex(item => item.productId === product.id);
 
-        if (existingItemIndex > -1) {
+        if (existingItemIndex > -1) {
             alert('Added to cart!');
         } else {
             currentCart.push({
@@ -59,10 +61,18 @@ const Products = () => {
         }
     };
 
+    const categoryList = [...new Set(products.map(p => (p.categoryName || '').toLowerCase()).filter(Boolean))];
+
     const filteredProducts = products.filter(product => {
-        const matchesCategory = selectedCategory === 'All' || product.categoryId.toString() === selectedCategory;
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const catLower = (product.categoryName || '').toLowerCase();
+        const matchesCategory = selectedCategory === 'All' || catLower === selectedCategory;
+
+        if (!searchTerm.trim()) return matchesCategory;
+
+        const nameLower = (product.name || '').toLowerCase();
+        const query = searchTerm.toLowerCase();
+        const matchesSearch = nameLower.includes(query);
+
         return matchesCategory && matchesSearch;
     });
 
@@ -74,8 +84,12 @@ const Products = () => {
         <div className="animate-fade-in container" style={{ padding: '2rem 1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Components Catalog</h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>Find everything you need for your next build.</p>
+                    <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+                        {searchTerm ? `Kết quả tìm kiếm: "${searchTerm}"` : 'Tất cả sản phẩm'}
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                        {filteredProducts.length} sản phẩm được tìm thấy
+                    </p>
                 </div>
             </div>
 
@@ -83,24 +97,24 @@ const Products = () => {
                 
                 <div className="glass-panel" style={{ padding: '1.5rem', position: 'sticky', top: '2rem' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-                        <Filter size={18} /> Filters
+                        <Filter size={18} /> Bộ lọc
                     </h3>
 
                     <div className="input-group">
                         <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Search size={14} /> Search
+                            <Search size={14} /> Tìm kiếm
                         </label>
                         <input
                             type="text"
                             className="input-field"
-                            placeholder="e.g. RTX 4090"
+                            placeholder="VD: RTX 4090, Intel i7..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
                     <div style={{ marginTop: '2rem' }}>
-                        <label className="input-label">Categories</label>
+                        <label className="input-label">Danh mục</label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <button
                                 onClick={() => setSelectedCategory('All')}
@@ -110,27 +124,33 @@ const Products = () => {
                                     borderRadius: 'var(--border-radius-sm)',
                                     background: selectedCategory === 'All' ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
                                     color: selectedCategory === 'All' ? 'var(--accent-primary)' : 'var(--text-primary)',
-                                    transition: 'background var(--transition-fast)'
+                                    transition: 'background var(--transition-fast)',
+                                    border: 'none', cursor: 'pointer', fontSize: '0.9rem'
                                 }}
                             >
-                                All Components
+                                Tất cả ({products.length})
                             </button>
-                            {categories.map(category => (
-                                <button
-                                    key={category.id}
-                                    onClick={() => setSelectedCategory(category.id.toString())}
-                                    style={{
-                                        textAlign: 'left',
-                                        padding: '0.5rem 0.75rem',
-                                        borderRadius: 'var(--border-radius-sm)',
-                                        background: selectedCategory === category.id.toString() ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                                        color: selectedCategory === category.id.toString() ? 'var(--accent-primary)' : 'var(--text-primary)',
-                                        transition: 'background var(--transition-fast)'
-                                    }}
-                                >
-                                    {category.name}
-                                </button>
-                            ))}
+                            {categoryList.map(cat => {
+                                const count = products.filter(p => (p.categoryName || '').toLowerCase() === cat).length;
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        style={{
+                                            textAlign: 'left',
+                                            padding: '0.5rem 0.75rem',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            background: selectedCategory === cat ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
+                                            color: selectedCategory === cat ? 'var(--accent-primary)' : 'var(--text-primary)',
+                                            transition: 'background var(--transition-fast)',
+                                            border: 'none', cursor: 'pointer', fontSize: '0.9rem',
+                                            textTransform: 'uppercase'
+                                        }}
+                                    >
+                                        {cat} ({count})
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -139,7 +159,7 @@ const Products = () => {
                 <div>
                     {filteredProducts.length === 0 ? (
                         <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
-                            <h3 style={{ color: 'var(--text-secondary)' }}>No products found matching your criteria.</h3>
+                            <h3 style={{ color: 'var(--text-secondary)' }}>Không tìm thấy sản phẩm phù hợp.</h3>
                         </div>
                     ) : (
                         <div style={{
