@@ -47,8 +47,10 @@ const ProductCard = ({ product, onAdd }) => {
         if (onAdd) {
             onAdd(product);
         } else {
-            addToCart(product, 1);
-            alert('Đã thêm vào giỏ hàng!');
+            const success = addToCart(product, 1);
+            if (success) {
+                alert('Đã thêm vào giỏ hàng!');
+            }
         }
     };
     return (

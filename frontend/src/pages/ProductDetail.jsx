@@ -269,8 +269,10 @@ const ProductDetail = () => {
                             <button
                                 onClick={() => {
                                     if (product.stockQuantity > 0) {
-                                        addToCart(product, quantity);
-                                        alert('Đã thêm vào giỏ hàng!');
+                                        const success = addToCart(product, quantity);
+                                        if (success) {
+                                            alert('Đã thêm vào giỏ hàng!');
+                                        }
                                     }
                                 }}
                                 disabled={product.stockQuantity <= 0}
