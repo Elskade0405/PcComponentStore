@@ -237,26 +237,53 @@ const ProductDetail = () => {
                         <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
                             <button
                                 onClick={() => {
-                                    addToCart(product, quantity);
-                                    navigate('/cart');
+                                    if (product.stockQuantity > 0) {
+                                        addToCart(product, quantity);
+                                        navigate('/cart');
+                                    }
                                 }}
+                                disabled={product.stockQuantity <= 0}
                                 style={{
-                                    flex: 2, backgroundColor: '#e30019', color: 'white', border: 'none', borderRadius: '4px',
-                                    padding: '0.8rem', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer', textTransform: 'uppercase',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+                                    flex: 2, 
+                                    backgroundColor: product.stockQuantity > 0 ? '#e30019' : '#9ca3af', 
+                                    color: 'white', 
+                                    border: 'none', 
+                                    borderRadius: '4px',
+                                    padding: '0.8rem', 
+                                    fontWeight: 700, 
+                                    fontSize: '1.1rem', 
+                                    cursor: product.stockQuantity > 0 ? 'pointer' : 'not-allowed', 
+                                    textTransform: 'uppercase',
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    opacity: product.stockQuantity > 0 ? 1 : 0.7
                                 }}
                             >
-                                <span>MUA NGAY</span>
-                                <span style={{ fontSize: '0.75rem', fontWeight: 400, textTransform: 'none' }}>Giao hàng miễn phí tận nơi</span>
+                                <span>{product.stockQuantity > 0 ? 'MUA NGAY' : 'HẾT HÀNG'}</span>
+                                {product.stockQuantity > 0 && (
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 400, textTransform: 'none' }}>Giao hàng miễn phí tận nơi</span>
+                                )}
                             </button>
                             <button
                                 onClick={() => {
-                                    addToCart(product, quantity);
-                                    alert('Đã thêm vào giỏ hàng!');
+                                    if (product.stockQuantity > 0) {
+                                        addToCart(product, quantity);
+                                        alert('Đã thêm vào giỏ hàng!');
+                                    }
                                 }}
+                                disabled={product.stockQuantity <= 0}
                                 style={{
-                                    width: '60px', backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333', cursor: 'pointer'
+                                    width: '60px', 
+                                    backgroundColor: product.stockQuantity > 0 ? 'white' : '#f3f4f6', 
+                                    border: '1px solid #ccc', 
+                                    borderRadius: '4px',
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    color: product.stockQuantity > 0 ? '#333' : '#9ca3af', 
+                                    cursor: product.stockQuantity > 0 ? 'pointer' : 'not-allowed'
                                 }}
                             >
                                 <ShoppingCart size={24} />
