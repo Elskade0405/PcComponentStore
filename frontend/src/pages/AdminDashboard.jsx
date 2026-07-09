@@ -265,7 +265,7 @@ const AdminDashboard = () => {
     };
 
     const handleSaveProduct = async () => {
-        try {
+        try {
             let payload = { ...newProduct };
             if (typeof payload.detailImageUrls === 'string') {
                 payload.detailImageUrls = payload.detailImageUrls.split(/\s+/).filter(u => u.trim() !== '');
@@ -273,13 +273,58 @@ const AdminDashboard = () => {
                 payload.detailImageUrls = [];
             }
 
-            if (editingProductId) {
+            let existingProduct = null;
+            if (!editingProductId) {
+                existingProduct = products.find(p => p.name.trim().toLowerCase() === payload.name.trim().toLowerCase());
+            }
+
+            if (existingProduct) {
+                // Parse existing product attributes to keep unchanged parameters
+                let parsedAttr = {};
+                try {
+                    if (existingProduct.attributes) {
+                        const rawAttr = JSON.parse(existingProduct.attributes);
+                        for (const key in rawAttr) {
+                            if (key === 'originalPrice' || key === 'category' || key === 'detailImageUrls' || key === 'thumbnailUrl') {
+                                parsedAttr[key] = rawAttr[key];
+                            } else {
+                                parsedAttr[key] = rawAttr[key] != null ? String(rawAttr[key]) : '';
+                            }
+                        }
+                    }
+                } catch(e) {}
+                
+                // Merge payload
+                let mergedPayload = { ...initialProductState, ...parsedAttr };
+                mergedPayload.name = payload.name;
+                mergedPayload.price = payload.price; // always overwrite price
+                mergedPayload.stockQuantity = payload.stockQuantity; // always overwrite stock
+                
+                if (payload.originalPrice) mergedPayload.originalPrice = payload.originalPrice;
+                if (payload.brand) mergedPayload.brand = payload.brand;
+                if (payload.type) mergedPayload.type = payload.type;
+                if (payload.thumbnailUrl) mergedPayload.thumbnailUrl = payload.thumbnailUrl;
+                if (payload.detailImageUrls && payload.detailImageUrls.length > 0) mergedPayload.detailImageUrls = payload.detailImageUrls;
+                
+                // Overwrite any attribute that was filled out in the form
+                for (const key of Object.keys(payload)) {
+                    if (['name', 'price', 'originalPrice', 'stockQuantity', 'brand', 'type', 'thumbnailUrl', 'detailImageUrls'].includes(key)) continue;
+                    
+                    if (typeof payload[key] === 'string' && payload[key].trim() !== '') {
+                        mergedPayload[key] = payload[key];
+                    }
+                }
+                
+                await api.put(`/products/${existingProduct.id}`, mergedPayload);
+                alert('Sản phẩm đã tồn tại. Đã tự động ghi đè thông tin mới thành công!');
+            } else if (editingProductId) {
                 await api.put(`/products/${editingProductId}`, payload);
                 alert('Cập nhật sản phẩm thành công!');
             } else {
                 await api.post('/products', payload);
                 alert('Thêm sản phẩm thành công!');
             }
+            
             setIsAddProductModalOpen(false);
             setNewProduct(initialProductState);
             setEditingProductId(null);
