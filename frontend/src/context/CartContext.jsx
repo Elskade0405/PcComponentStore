@@ -30,6 +30,11 @@ export const CartProvider = ({ children }) => {
     };
 
     const addToCart = (product, quantity = 1) => {
+        if (!user) {
+            alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng và thanh toán!');
+            window.location.href = '/login';
+            return;
+        }
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id);
             if (existingItem) {

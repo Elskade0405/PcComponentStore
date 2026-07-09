@@ -4,9 +4,11 @@ import { useCart } from '../context/CartContext';
 import { Trash2, Minus, Plus, Settings } from 'lucide-react'; 
 import CheckoutModal from '../components/CheckoutModal';
 import API_URL from '../config';
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
     const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+    const { user } = useAuth();
     const [showCheckoutModal, setShowCheckoutModal] = React.useState(false);
     const backendUrl = API_URL;
 
@@ -231,7 +233,14 @@ const Cart = () => {
                                 </button>
                             </div>
 
-                            <button onClick={() => setShowCheckoutModal(true)} style={{ width: '100%', backgroundColor: '#e30019', color: 'white', border: 'none', borderRadius: '4px', padding: '0.8rem', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}>
+                            <button onClick={() => {
+                                if (!user) {
+                                    alert('Vui lòng đăng nhập để tiến hành đặt hàng và thanh toán!');
+                                    window.location.href = '/login';
+                                    return;
+                                }
+                                setShowCheckoutModal(true);
+                            }} style={{ width: '100%', backgroundColor: '#e30019', color: 'white', border: 'none', borderRadius: '4px', padding: '0.8rem', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}>
                                 ✓ ĐẶT HÀNG
                             </button>
                         </div>
